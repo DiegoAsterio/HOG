@@ -1,0 +1,2 @@
+# HOG
+Histogram of gradients 
