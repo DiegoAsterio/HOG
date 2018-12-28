@@ -20,6 +20,10 @@ def gammaNormalization(img,c1=1,c2=0.5):
     corrected = np.power(reduced*c1,c2)
     return (corrected*255).astype(np.uint8)
 
+################################################################################
+##                        2: Computacion del gradiente                        ##
+################################################################################
+
 def gradientComputation1DPaper(img,sigma):
     imgAux = None
     if sigma==0:
