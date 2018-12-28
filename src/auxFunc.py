@@ -7,9 +7,11 @@ def convoluteWith1DMask(ker,enHorizontal,im):
 
     if enHorizontal:
         kerX = np.array(ker)              # reversed(ker) (?) #Convolucion
-        kerY = np.array([0,1,0])
+        kerY = np.zeros(len(ker))
+        kerY[len(ker)/2] = 1
     else:
-        kerX = np.array([0,1,0])
+        kerX = np.zeros(len(ker))
+        kerX[len(ker)/2] = 1
         kerY = np.array(ker)              # reversed(ker) (?) #Convolucion
     alto = ancho = profundo = None
     if len(im.shape) == 3:      # Para imagenes RGB o LAB
