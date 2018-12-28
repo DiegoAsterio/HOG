@@ -74,11 +74,12 @@ def computeHistogram(cell):
             # Obtenemos el floor y ceiling
             ceil = np.ceil(angle)
             floor = np.floor(angle)
+            value = 1 if ceil==floor else np.absolute(angle-ceil)
             # Añadimos el valor de ceiling al histograma
             if not str(ceil) in histogram:
-                histogram[ceil] = np.absolute(angle-ceil)
+                histogram[ceil] = np.absolute(value)
             else:
-                histogram[ceil]+=np.absolute(angle-ceil)
+                histogram[ceil]+=np.absolute(value)
             # Cuando el resultado del ángulo no es entero añadimos el floor también
             if ceil!=floor:
                 if not str(floor) in histogram:
