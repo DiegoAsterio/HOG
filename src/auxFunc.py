@@ -6,12 +6,13 @@ def convoluteWith1DMask(ker,enHorizontal,im):
     kerX = kerY = None
 
     if enHorizontal:
+        pdb.set_trace()
         kerX = np.array(ker)              # reversed(ker) (?) #Convolucion
-        kerY = np.zeros(len(ker))
-        kerY[len(ker)/2] = 1
+        kerY = np.zeros(len(ker),dtype='int64')
+        kerY[int(len(ker)/2)] = 1
     else:
-        kerX = np.zeros(len(ker))
-        kerX[len(ker)/2] = 1
+        kerX = np.zeros(len(ker),dtype='int64')
+        kerX[int(len(ker)/2)] = 1
         kerY = np.array(ker)              # reversed(ker) (?) #Convolucion
     alto = ancho = profundo = None
     if len(im.shape) == 3:      # Para imagenes RGB o LAB
