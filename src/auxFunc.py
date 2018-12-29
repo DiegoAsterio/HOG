@@ -93,7 +93,7 @@ def computeHistogram(cell):
     for i in range(181):
         if not str(i) in histogram:
             histogram_vec.append(0)
-        else
+        else:
             histogram_vec.append(histogram[str(i)])
 
     return histogram_vec

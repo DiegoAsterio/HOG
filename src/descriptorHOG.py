@@ -1,5 +1,5 @@
 import numpy as np
-import cv2
+import cv2 as cv
 import auxFunc as af
 
 ################################################################################
@@ -21,7 +21,7 @@ def gammaNormalization(img,c1=1,c2=0.5):
     return (corrected*255).astype(np.uint8)
 
 ################################################################################
-##                        2: Computacion del gradiente                        ##
+##                        2: Cómputo del gradiente                            ##
 ################################################################################
 
 def gradientComputation1DPaper(img,sigma):
@@ -29,43 +29,43 @@ def gradientComputation1DPaper(img,sigma):
     if sigma==0:
         imgAux = np.copy(img)
     else:
-        imgAux = cv.GaussianBlur(img,None,(0,0),sigma)
+        imgAux = cv.GaussianBlur(img,(0,0),sigma)
     outputSignalsdx = af.convoluteWith1DMask([-1,0,1],True,imgAux)
     outputSignalsdy = af.convoluteWith1DMask([-1,0,1],False,imgAux)
-    return getGradient(outputSignalsdx, outputSignalsdy)
+    return af.getGradient(outputSignalsdx, outputSignalsdy)
 
 def gradientComputation1DAlt1(img,sigma):
     imgAux = None
     if sigma==0:
         imgAux = np.copy(img)
     else:
-        imgAux = cv.GaussianBlur(img,None,(0,0),sigma)
+        imgAux = cv.GaussianBlur(img,(0,0),sigma)
     outputSignalsdx = af.convoluteWith1DMask([-1,1],True,imgAux)
     outputSignalsdy = af.convoluteWith1DMask([-1,1],False,imgAux)
-    return getGradient(outputSignalsdx, outputSignalsdy)
+    return af.getGradient(outputSignalsdx, outputSignalsdy)
 
 def gradientComputation1DAlt2(img,sigma):
     imgAux = None
     if sigma==0:
         imgAux = np.copy(img)
     else:
-        imgAux = cv.GaussianBlur(img,None,(0,0),sigma)
+        imgAux = cv.GaussianBlur(img,(0,0),sigma)
     outputSignalsdx = af.convoluteWith1DMask([1,-8,0,8,-1],True,imgAux)
     outputSignalsdy = af.convoluteWith1DMask([1,-8,0,8,-1],False,imgAux)
-    return getGradient(outputSignalsdx, outputSignalsdy)
+    return af.getGradient(outputSignalsdx, outputSignalsdy)
 
 def gradientComputation1DAlt3(img,sigma):
     imgAux = None
     if sigma==0:
         imgAux = np.copy(img)
     else:
-        imgAux = cv.GaussianBlur(img,None,(0,0),sigma)
+        imgAux = cv.GaussianBlur(img,(0,0),sigma)
     mask1 = np.array([[0,-1],[1,0]])
     outputSignalsdx = cv.filter2D(img,-1,mask1)
     mask2 = np.array([[-1,0],[0,1]])
     outputSignalsdy = cv.filter2D(img,-1,mask2)
 
-    return getGradient(outputSignalsdx, outputSignalsdy)
+    return af.getGradient(outputSignalsdx, outputSignalsdy)
 
 ################################################################################
 ##                      3: Spatial/Orientation Binning                        ##
@@ -92,4 +92,3 @@ def spatialOrientationBinning(gradients,tam_cel=3):
             histograms.append(af.computeHistogram(gradients[i:i+tam_cel,j:j+tam_cel]))
 
     return histograms
-
