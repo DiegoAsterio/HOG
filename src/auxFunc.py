@@ -2,36 +2,67 @@ import cv2 as cv
 import numpy as np
 import pdb
 
-def convoluteWith1DMask(ker,enHorizontal,im):
+def convoluteWith1DMask(ker,horizontally,im):
+    '''
+    @brief Se convoluciona una imagen con una mascara 1 dimensional en una sola direccion horizontal
+    o vertical.
+    @param ker mascara con la que se hace la convolucion
+    @param horizontally booleano que define si la convolucion se hace en horizontal o en vertical
+    @param im numpy array de enteros sin signo que contiene informacion relativa a una imagen
+    @return Devuelve un vector con todas los canales de la imagen convolucionados.
+    '''
+    # Definimos los nucleos de convolucion
     kerX = kerY = None
-
-    if enHorizontal:
-        pdb.set_trace()
-        kerX = np.array(ker)              # reversed(ker) (?) #Convolucion
+    if horizontally:
+        # Si convolucionamos por filas el nucleo que no es trivial es kerX
+        kerX = np.array(ker) # Reversed porque filter hace correlacion
+        # Nucleo trivial [0,...,0,1,0,...,0]
         kerY = np.zeros(len(ker),dtype='int64')
         kerY[int(len(ker)/2)] = 1
     else:
+        # Lo contrario
+        # Nucleo trivial [0,...,0,1,0,...,0]
         kerX = np.zeros(len(ker),dtype='int64')
         kerX[int(len(ker)/2)] = 1
-        kerY = np.array(ker)              # reversed(ker) (?) #Convolucion
-    alto = ancho = profundo = None
+        # Si convolucionamos por filas el nucleo que no es trivial es kerY
+        kerY = np.array(ker)              
     if len(im.shape) == 3:      # Para imagenes RGB o LAB
         alto, ancho, profundo = im.shape
+        # Se tratan los tres canales por separado
         inputSignals = cv.split(im)
         convolutedSignals = []
         for i in range(profundo):
             inputSignal = inputSignals[i]
+            # Se convoluciona la senal R,G o B
             convolutedSignal = cv.sepFilter2D(inputSignal,-1,kerX,kerY)
             convolutedSignals.append(convolutedSignal)
         return convolutedSignals
     else:                       # Para imagenes GRAYSCALE
-        return cv.sepFilter2D(im,-1,kerX,kerY)
+        return [cv.sepFilter2D(im,-1,kerX,kerY)]
 
 def normaEuclidea(v):
+    '''
+    @brief Se calcula la norma euclidea de un vector
+    @param im numpy array que contiene las coordenadas del vector
+    @return Devuelve la norma de un vector
+    '''
     return np.sqrt(np.dot(v,v))
 
 def getGradient(signalsdx,signalsdy):
+    '''
+    @brief Calcula un gradiente a partir de las derivadas en las direcciones de x de 
+    todos los canales de una imagen
+    @param signalsdx Derivada en la direccion de equis para todos los canales de una
+    imagen
+    @param signalsdy Derivada en la direccion de i para todos los canales de una
+    imagen
+    @return Devuelve el gradiente formado por en cada pixel el gradiente de mayor norma de entre todos
+    los gradientes de todos los canales
+    '''
+    shape = None
+    # Contient el gradiente final
     ret = []
+    # Contiene los gradientes de todos los canales de la imagen
     gradientes = []
     for i in range(len(signalsdx)):
         dx = np.array(signalsdx[i])
@@ -39,20 +70,21 @@ def getGradient(signalsdx,signalsdy):
         shape = dx.shape
         dxprima = dx.reshape(-1)
         dyprima = dy.reshape(-1)
+        # Formamos parejas de la forma (df/dx, df/dy)
         gradiente = np.array([[ex,ey] for ex, ey in np.transpose(np.vstack([dxprima,dyprima]))])
-        gradiente = gradiente.reshape((shape[0],shape[1],2))
         gradientes.append(gradiente)
-    ancho, alto, prof = gradientes[0].shape
-    for i in range(ancho):
-        for j in range(alto):
-            normas = []
-            for k in range(3):
-                v = gradientes[k][i][j]
-                f = normaEuclidea(v)
-                normas.append(f)
-            normas = np.array(normas)
-            indiceMax = np.argmax(normas, axis=None)
-            ret.append(gradientes[indiceMax][i][j])
+    N = len(gradientes[0])
+    for i in range(N):
+        normas = []
+        for k in range(3):
+            v = gradientes[k][i]
+            f = normaEuclidea(v)
+            normas.append(f)
+        # Verificamos en cada pixel que 
+        indiceMax = np.argmax(normas, axis=None)
+        ret.append(gradientes[indiceMax][i])
+    ret = np.array(ret)
+    ret = ret.reshape((shape[0],shape[1],2))
     return ret
 
 def computeHistogram(cell):
