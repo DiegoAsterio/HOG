@@ -74,12 +74,12 @@ def test3():
 print("Quiere realizar todo el test o alguna función concreta [t/1/2/3]")
 option = input()
 
-if option=='1':
+if option=='1' or option=='t':
     print("############################################################")
     print("Test de la normalización gamma (Parte 1)")
     print("############################################################\n\n")
     test1()
-elif option=='2':
+elif option=='2' or option=='t':
     print("############################################################")
     print("Test del cómputo del gradiente según el paper (Parte 2)")
     print("############################################################\n\n")
@@ -99,37 +99,7 @@ elif option=='2':
     print("Test del cómputo del gradiente alternativa 3 (Parte 2)")
     print("############################################################\n\n")
     test2Alt3()
-elif option=='3':
-    print("############################################################")
-    print("Test del cómputo del spatial/orientation binning (Parte 3)")
-    print("############################################################\n\n")
-    test3()
-elif option=='t':
-    print("############################################################")
-    print("Test de la normalización gamma (Parte 1)")
-    print("############################################################\n\n")
-    test1()
-
-    print("############################################################")
-    print("Test del cómputo del gradiente según el paper (Parte 2)")
-    print("############################################################\n\n")
-    test2Paper()
-
-    print("############################################################")
-    print("Test del cómputo del gradiente alternativa 1 (Parte 2)")
-    print("############################################################\n\n")
-    test2Alt1()
-
-    print("############################################################")
-    print("Test del cómputo del gradiente alternativa 2 (Parte 2)")
-    print("############################################################\n\n")
-    test2Alt2()
-
-    print("############################################################")
-    print("Test del cómputo del gradiente alternativa 3 (Parte 2)")
-    print("############################################################\n\n")
-    test2Alt3()
-
+elif option=='3' or option=='t':
     print("############################################################")
     print("Test del cómputo del spatial/orientation binning (Parte 3)")
     print("############################################################\n\n")
