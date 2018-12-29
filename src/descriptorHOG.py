@@ -25,6 +25,12 @@ def gammaNormalization(img,c1=1,c2=0.5):
 ################################################################################
 
 def gradientComputation1DPaper(img,sigma):
+    '''
+    @brief Funcion que computa el gradiente que en el paper funciona mejor
+    @param img Imagen sobre la que calcular el gradiente
+    @param sigma varianza del nucleo gaussiano con el que se convoluciona la imagen
+    @return Devuelve una matriz que contiene el gradiente computado sobre la imagen
+    '''
     imgAux = None
     if sigma==0:
         imgAux = np.copy(img)
@@ -35,6 +41,12 @@ def gradientComputation1DPaper(img,sigma):
     return af.getGradient(outputSignalsdx, outputSignalsdy)
 
 def gradientComputation1DAlt1(img,sigma):
+    '''
+    @brief Funcion que computa el gradiente que en el paper funciona mejor
+    @param img Imagen sobre la que calcular el gradiente
+    @param sigma varianza del nucleo gaussiano con el que se convoluciona la imagen
+    @return Devuelve una matriz que contiene el gradiente computado sobre la imagen
+    '''
     imgAux = None
     if sigma==0:
         imgAux = np.copy(img)
@@ -45,6 +57,12 @@ def gradientComputation1DAlt1(img,sigma):
     return af.getGradient(outputSignalsdx, outputSignalsdy)
 
 def gradientComputation1DAlt2(img,sigma):
+    '''
+    @brief Funcion que computa el gradiente que en el paper funciona mejor
+    @param img Imagen sobre la que calcular el gradiente
+    @param sigma varianza del nucleo gaussiano con el que se convoluciona la imagen
+    @return Devuelve una matriz que contiene el gradiente computado sobre la imagen
+    '''
     imgAux = None
     if sigma==0:
         imgAux = np.copy(img)
@@ -55,6 +73,12 @@ def gradientComputation1DAlt2(img,sigma):
     return af.getGradient(outputSignalsdx, outputSignalsdy)
 
 def gradientComputation1DAlt3(img,sigma):
+    '''
+    @brief Funcion que computa el gradiente que en el paper funciona mejor
+    @param img Imagen sobre la que calcular el gradiente
+    @param sigma varianza del nucleo gaussiano con el que se convoluciona la imagen
+    @return Devuelve una matriz que contiene el gradiente computado sobre la imagen
+    '''
     imgAux = None
     if sigma==0:
         imgAux = np.copy(img)
