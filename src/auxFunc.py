@@ -25,7 +25,7 @@ def convoluteWith1DMask(ker,horizontally,im):
         kerX = np.zeros(len(ker),dtype='int64')
         kerX[int(len(ker)/2)] = 1
         # Si convolucionamos por filas el nucleo que no es trivial es kerY
-        kerY = np.array(ker)              
+        kerY = np.array(ker)
     if len(im.shape) == 3:      # Para imagenes RGB o LAB
         alto, ancho, profundo = im.shape
         # Se tratan los tres canales por separado
@@ -50,7 +50,7 @@ def normaEuclidea(v):
 
 def getGradient(signalsdx,signalsdy):
     '''
-    @brief Calcula un gradiente a partir de las derivadas en las direcciones de x de 
+    @brief Calcula un gradiente a partir de las derivadas en las direcciones de x de
     todos los canales de una imagen
     @param signalsdx Derivada en la direccion de equis para todos los canales de una
     imagen
@@ -80,12 +80,29 @@ def getGradient(signalsdx,signalsdy):
             v = gradientes[k][i]
             f = normaEuclidea(v)
             normas.append(f)
-        # Verificamos en cada pixel que 
+        # Verificamos en cada pixel que
         indiceMax = np.argmax(normas, axis=None)
         ret.append(gradientes[indiceMax][i])
     ret = np.array(ret)
     ret = ret.reshape((shape[0],shape[1],2))
     return ret
+
+def obtainAngle(vector):
+    '''
+    @brief Función que obtiene el ángulo del vector entre 0 y 180 grados
+    @param vector Vector del que queremos obtener el ángulo
+    @return Devuelve un valor real entre 0 y 180.
+    '''
+    angle_360=-1
+    if vector[0]==0:
+        angle_360 = 90
+    elif vector[1]==0:
+        angle_360 = 0
+    else:
+        angle_360 = np.rad2deg(np.arctan(vector[1]/vector[0]))
+
+    angle = angle_360 if angle_360<=180 else angle_360-180
+    return angle
 
 def computeHistogram(cell):
     '''
@@ -102,25 +119,23 @@ def computeHistogram(cell):
     # Para cada elemento del histograma
     for row in cell:
         for gradient in row:
-            # Calculamos su ángulo entre 0 y 360
-            angle_360 = np.rad2deg(np.arctan(gradient[1]/gradient[0]))
-            # Lo reducimos a [0,180]
-            angle = angle_360 if angle_360<180 else angle_360-180
+            # Calculamos el ángulo
+            angle = obtainAngle(gradient)
             # Obtenemos el floor y ceiling
-            ceil = np.ceil(angle)
-            floor = np.floor(angle)
+            ceil = int(np.ceil(angle))
+            floor = int(np.floor(angle))
             value = 1 if ceil==floor else np.absolute(angle-ceil)
             # Añadimos el valor de ceiling al histograma
             if not str(ceil) in histogram:
-                histogram[ceil] = value*normaEuclidea(gradient)
+                histogram[str(ceil)] = value*normaEuclidea(gradient)
             else:
-                histogram[ceil]+=value*normaEuclidea(gradient)
+                histogram[str(ceil)]+=value*normaEuclidea(gradient)
             # Cuando el resultado del ángulo no es entero añadimos el floor también
             if ceil!=floor:
                 if not str(floor) in histogram:
-                    histogram[floor] = np.absolute(angle-floor)*normaEuclidea(gradient)
+                    histogram[str(floor)] = np.absolute(angle-floor)*normaEuclidea(gradient)
                 else:
-                    histogram[floor]+=np.absolute(angle-floor)*normaEuclidea(gradient)
+                    histogram[str(floor)]+=np.absolute(angle-floor)*normaEuclidea(gradient)
 
     # Convertimos el diccionario a un vector
     for i in range(181):
