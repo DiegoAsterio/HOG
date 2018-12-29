@@ -79,15 +79,15 @@ def computeHistogram(cell):
             value = 1 if ceil==floor else np.absolute(angle-ceil)
             # Añadimos el valor de ceiling al histograma
             if not str(ceil) in histogram:
-                histogram[ceil] = value
+                histogram[ceil] = value*normaEuclidea(gradient)
             else:
-                histogram[ceil]+=value
+                histogram[ceil]+=value*normaEuclidea(gradient)
             # Cuando el resultado del ángulo no es entero añadimos el floor también
             if ceil!=floor:
                 if not str(floor) in histogram:
-                    histogram[floor] = np.absolute(angle-floor)
+                    histogram[floor] = np.absolute(angle-floor)*normaEuclidea(gradient)
                 else:
-                    histogram[floor]+=np.absolute(angle-floor)
+                    histogram[floor]+=np.absolute(angle-floor)*normaEuclidea(gradient)
 
     # Convertimos el diccionario a un vector
     for i in range(181):
