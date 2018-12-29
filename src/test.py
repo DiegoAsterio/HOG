@@ -45,4 +45,58 @@ def test2Paper():
     img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
     print(descriptorHOG.gradientComputation1DPaper(img,1))
 
+def test2Alt1():
+    img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
+    print(descriptorHOG.gradientComputation1DAlt1(img,1))
+
+def test2Alt2():
+    img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
+    print(descriptorHOG.gradientComputation1DAlt2(img,1))
+
+def test2Alt3():
+    img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
+    print(descriptorHOG.gradientComputation1DAlt3(img,1))
+
+
+################################################################################
+##             Test del orientation binning (Parte 3)                         ##
+################################################################################
+
+def test3():
+    img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
+    gradients = descriptorHOG.gradientComputation1DPaper(img,1)
+    print(descriptorHOG.spatialOrientationBinning(gradients))
+
+
+################################################################################
+################################################################################
+
+print("############################################################")
+print("Test de la normalización gamma (Parte 1)")
+print("############################################################\n\n")
+test1()
+
+print("############################################################")
+print("Test del cómputo del gradiente según el paper (Parte 2)")
+print("############################################################\n\n")
 test2Paper()
+
+print("############################################################")
+print("Test del cómputo del gradiente alternativa 1 (Parte 2)")
+print("############################################################\n\n")
+test2Alt1()
+
+print("############################################################")
+print("Test del cómputo del gradiente alternativa 2 (Parte 2)")
+print("############################################################\n\n")
+test2Alt2()
+
+print("############################################################")
+print("Test del cómputo del gradiente alternativa 3 (Parte 2)")
+print("############################################################\n\n")
+test2Alt3()
+
+print("############################################################")
+print("Test del cómputo del spatial/orientation binning (Parte 3)")
+print("############################################################\n\n")
+test3()
