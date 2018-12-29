@@ -65,7 +65,9 @@ def test2Alt3():
 def test3():
     img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
     gradients = descriptorHOG.gradientComputation1DPaper(img,1)
-    print(descriptorHOG.spatialOrientationBinning(gradients))
+    histograms = descriptorHOG.spatialOrientationBinning(gradients)
+    print(histograms)
+    print("Es una matriz de tamaño: " + str(histograms.shape))
 
 
 ################################################################################

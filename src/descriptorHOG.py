@@ -111,8 +111,10 @@ def spatialOrientationBinning(gradients,tam_cel=3):
 
     # Divide la matriz en celdas y llama con cada una al cálculo de histogramas.
     for i in range(0,rows,tam_cel):
+        row_histograms = []
         for j in range(0,cols,tam_cel):
             # Añade el histograma de la célula
-            histograms.append(af.computeHistogram(gradients[i:i+tam_cel,j:j+tam_cel]))
+            row_histograms.append(af.computeHistogram(gradients[i:i+tam_cel,j:j+tam_cel]))
+        histograms.append(row_histograms)
 
-    return histograms
+    return np.array(histograms)
