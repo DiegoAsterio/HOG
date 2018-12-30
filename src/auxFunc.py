@@ -2,6 +2,34 @@ import cv2 as cv
 import numpy as np
 import pdb
 
+################################################################################
+##                       Funciones de dibujado                                ##
+################################################################################
+
+def pintaMI(vim):
+    imagenes = []
+    max_h = 0
+    max_w = 0
+    for im in vim:
+        if im.shape[0]>max_h:
+            max_h = im.shape[0]
+        if im.shape[1]>max_w:
+            max_w = im.shape[1]
+    for im in vim:
+        if len(im.shape)==2:
+            imagenes.append(cv.copyMakeBorder(cv.cvtColor(im,cv.COLOR_GRAY2RGB),top=0,bottom=max_h-im.shape[0],left=0,right=0,borderType= cv.BORDER_CONSTANT, value=[0,0,0]))
+        else:
+            imagenes.append(cv.copyMakeBorder(im,top=0,bottom=max_h-im.shape[0],left=0,right=0,borderType= cv.BORDER_CONSTANT, value=[0,0,0]))
+    concatenada = cv.hconcat(imagenes)
+    cv.namedWindow('Imagenes', cv.WINDOW_NORMAL)
+    cv.imshow("Imagenes",concatenada)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
+################################################################################
+##                         Funciones de cálculo                               ##
+#
+
 def convoluteWith1DMask(ker,horizontally,im):
     '''
     @brief Se convoluciona una imagen con una mascara 1 dimensional en una sola direccion horizontal
