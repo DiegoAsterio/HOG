@@ -145,3 +145,23 @@ def computeHistogram(cell):
             histogram_vec.append(histogram[str(i)])
 
     return histogram_vec
+
+def modifyLocalMatrix(img,local_matrix,row_min,row_max,col_min,col_max):
+    '''
+    @brief Función que modifica la submatriz de img dada por los valores row_min,
+    row_max, col_min y col_max con los valores de local_matrix
+    @param img Matriz de la imagen que queremos modificar
+    @param local_matrix Matriz local que tiene los valores que queremos poner en img
+    @param row_min Valor mínimo en las filas (se empieza desde este índice)
+    @param row_max Valor máximo en las filas (no se llega a tomar este valor de índice)
+    @param col_min Valor mínimo en las columnas (se empieza desde este índice)
+    @param col_max Valor máximo en las columnas (no se llega a tomar este valor de índice)
+    @return Devuelve una copia de img con los valores modificados según local_matrix
+    '''
+    # Creamos una copia de la imagen
+    img_aux = np.copy(img)
+    for i in range(row_min,row_max):
+        for j in range(col_min,col_max):
+            # Modificamos los valores de la imagen auxiliar con los de local_matrix
+            img_aux[i][j]=local_matrix[i-row_min][j-col_min]
+    return img_aux
