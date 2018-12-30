@@ -26,7 +26,7 @@ def gammaNormalization(img,c1=1,c2=0.5):
 
 def gradientComputation1DPaper(img,sigma):
     '''
-    @brief Funcion que computa el gradiente que en el paper funciona mejor
+    @brief Funcion que computa el gradiente utilizando la mascara 1D [-1,0,1]
     @param img Imagen sobre la que calcular el gradiente
     @param sigma varianza del nucleo gaussiano con el que se convoluciona la imagen
     @return Devuelve una matriz que contiene el gradiente computado sobre la imagen
@@ -42,7 +42,7 @@ def gradientComputation1DPaper(img,sigma):
 
 def gradientComputation1DAlt1(img,sigma):
     '''
-    @brief Funcion que computa el gradiente que en el paper funciona mejor
+    @brief Funcion que computa el gradiente usando la mascara [-1,1]
     @param img Imagen sobre la que calcular el gradiente
     @param sigma varianza del nucleo gaussiano con el que se convoluciona la imagen
     @return Devuelve una matriz que contiene el gradiente computado sobre la imagen
@@ -58,7 +58,7 @@ def gradientComputation1DAlt1(img,sigma):
 
 def gradientComputation1DAlt2(img,sigma):
     '''
-    @brief Funcion que computa el gradiente que en el paper funciona mejor
+    @brief Funcion que computa el gradiente usando la mascara [1,-8,0,8,-1]
     @param img Imagen sobre la que calcular el gradiente
     @param sigma varianza del nucleo gaussiano con el que se convoluciona la imagen
     @return Devuelve una matriz que contiene el gradiente computado sobre la imagen
@@ -74,7 +74,7 @@ def gradientComputation1DAlt2(img,sigma):
 
 def gradientComputation1DAlt3(img,sigma):
     '''
-    @brief Funcion que computa el gradiente que en el paper funciona mejor
+    @brief Funcion que computa el gradiente usando una mascara 2D
     @param img Imagen sobre la que calcular el gradiente
     @param sigma varianza del nucleo gaussiano con el que se convoluciona la imagen
     @return Devuelve una matriz que contiene el gradiente computado sobre la imagen
@@ -95,12 +95,13 @@ def gradientComputation1DAlt3(img,sigma):
 ##                      3: Spatial/Orientation Binning                        ##
 ################################################################################
 
-def spatialOrientationBinning(gradients,tam_cel=3):
+def spatialOrientationBinning(gradients,tam_cel=3,num_cols=9):
     '''
     @brief Función que dada una matriz de gradientes y un tamaño de célula divide la matriz en
     células, calcula los histogramas de todas y los devuelve en un vector.
     @param gradients Matriz con los gradientes
     @param tam_cel Tamaño de la célula, por defecto 3.
+    @param num_cols Numero de columnas del histograma, por defecto 9.
     '''
     # Obtiene el número de filas y columnas de la imagen
     rows = gradients.shape[0]
@@ -115,7 +116,7 @@ def spatialOrientationBinning(gradients,tam_cel=3):
         for j in range(0,cols,tam_cel):
             if i+tam_cel<rows and j+tam_cel<cols:
                 # Añade el histograma de la célula
-                row_histograms.append(af.computeHistogram(gradients[i:i+tam_cel,j:j+tam_cel]))
+                row_histograms.append(af.computeHistogramDiego(gradients[i:i+tam_cel,j:j+tam_cel],num_cols))
         histograms.append(row_histograms)
 
     return np.array(histograms)

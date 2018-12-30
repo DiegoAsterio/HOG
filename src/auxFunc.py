@@ -132,7 +132,32 @@ def obtainAngle(vector):
     angle = angle_360 if angle_360<=180 else angle_360-180
     return angle
 
-def computeHistogram(cell):
+def convexCombOfTwo(point, vpoints):
+    for i in range(1,len(vpoints)):
+        if vpoints[i]>point:
+            tam = vpoints[1]-vpoints[0]
+            coef1 = 1 - (point-vpoints[i-1])/tam
+            coef2 = vpoints[i]-point/tam
+            return i-1, coef1, i, coef2
+    return False
+
+def computeHistogramDiego(cell, num_cols, threeSixtyQ=False):
+    possibleAngles = []
+    histogram = np.zeros(num_cols)
+    if threeSixtyQ:
+        possibleAngles = np.linspace(0,360,num_cols)
+    else:
+        possibleAngles = np.linspace(0,180,num_cols)
+    for row in cell:
+        for gradient in row:
+            angle = obtainAngle(gradient)
+            indice1, coef1, indice2, coef2 = convexCombOfTwo(angle,possibleAngles)
+            voto = normaEuclidea(gradient)
+            histogram[indice1] += coef1*voto
+            histogram[indice2] += coef2*voto
+    return histogram
+
+def computeHistogram(cell,num_cols):
     '''
     @brief Dada una célula con un vector gradiente en cada posición coge el ángulo
     de cada vector y hace un histograma en forma de vector con los ángulos ponderados.
