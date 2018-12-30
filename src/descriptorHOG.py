@@ -113,8 +113,9 @@ def spatialOrientationBinning(gradients,tam_cel=3):
     for i in range(0,rows,tam_cel):
         row_histograms = []
         for j in range(0,cols,tam_cel):
-            # Añade el histograma de la célula
-            row_histograms.append(af.computeHistogram(gradients[i:i+tam_cel,j:j+tam_cel]))
+            if i+tam_cel<rows and j+tam_cel<cols:
+                # Añade el histograma de la célula
+                row_histograms.append(af.computeHistogram(gradients[i:i+tam_cel,j:j+tam_cel]))
         histograms.append(row_histograms)
 
     return np.array(histograms)
@@ -141,8 +142,9 @@ def rhog(img,tam_bloque=2,tam_cel=3):
     size_block = tam_cel*tam_bloque
     for i in range(0,img_aux.shape[0],size_block):
         for j in range(0,img_aux.shape[1],size_block):
-            # Obtenemos el suavizado en la submatriz
-            local_gauss = cv.GaussianBlur(img_aux[i:i+size_block,j:j+size_block])
-            # Modificamos los valores de la imagen auxiliar con los de la gaussiana
-            img_aux = af.modifyLocalMatrix(img_aux,local_gauss,i,i+size_block,j,j+size_block)
+            if i+size_block<img.shape[0] and j+size_block<img.shape[1]:
+                # Obtenemos el suavizado en la submatriz
+                local_gauss = cv.GaussianBlur(img_aux[i:i+size_block,j:j+size_block],(0,0),sigma)
+                # Modificamos los valores de la imagen auxiliar con los de la gaussiana
+                img_aux = af.modifyLocalMatrix(img_aux,local_gauss,i,i+size_block,j,j+size_block)
     return img_aux
