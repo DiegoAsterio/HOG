@@ -118,3 +118,31 @@ def spatialOrientationBinning(gradients,tam_cel=3):
         histograms.append(row_histograms)
 
     return np.array(histograms)
+
+################################################################################
+##                 4: Normalization and Descriptor Blocks                     ##
+################################################################################
+
+def rhog(img,tam_bloque=2,tam_cel=3):
+    '''
+    @brief Función que divide la imagen img en bloques y aplica una gaussiana a
+    los mismos con sigma=0.5*tam_bloque
+    @param img Imagen a la que queremos aplicar la gaussiana localmente
+    @param tam_bloque Número de celdas por lado del bloque
+    @param tam_cel Número de píxeles por celda
+    @return Devuelve una imagen en la que se ha aplicado una gaussiana a cada
+    submatriz contenida en un bloque
+    '''
+    # Creamos una copia de la imagen
+    img_aux = np.copy(img)
+    # Sigma especificado en el paper
+    sigma = tam_bloque*0.5
+    # Tamaño en píxeles del bloque por lado
+    size_block = tam_cel*tam_bloque
+    for i in range(0,img_aux.shape[0],size_block):
+        for j in range(0,img_aux.shape[1],size_block):
+            # Obtenemos el suavizado en la submatriz
+            local_gauss = cv.GaussianBlur(img_aux[i:i+size_block,j:j+size_block])
+            # Modificamos los valores de la imagen auxiliar con los de la gaussiana
+            img_aux = af.modifyLocalMatrix(img_aux,local_gauss,i,i+size_block,j,j+size_block)
+    return img_aux
