@@ -149,3 +149,7 @@ def rhog(img,tam_bloque=2,tam_cel=3):
                 # Modificamos los valores de la imagen auxiliar con los de la gaussiana
                 img_aux = af.modifyLocalMatrix(img_aux,local_gauss,i,i+size_block,j,j+size_block)
     return img_aux
+
+################################################################################
+##                           5: Classification                                ##
+################################################################################

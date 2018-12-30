@@ -1,6 +1,9 @@
 import cv2 as cv
 import numpy as np
 import pdb
+import os
+
+PATH_TO_INRIA = "../../INRIAPerson"
 
 ################################################################################
 ##                       Funciones de dibujado                                ##
@@ -206,7 +209,7 @@ def modifyLocalMatrix(img,local_matrix,row_min,row_max,col_min,col_max):
     @param img Matriz de la imagen que queremos modificar
     @param local_matrix Matriz local que tiene los valores que queremos poner en img
     @param row_min Valor mínimo en las filas (se empieza desde este índice)
-    @param row_max Valor máximo en las filas (no se llega a tomar este valor de índice)
+    @param row_max Valor máximo en las filas (no se tinta en inglesllega a tomar este valor de índice)
     @param col_min Valor mínimo en las columnas (se empieza desde este índice)
     @param col_max Valor máximo en las columnas (no se llega a tomar este valor de índice)
     @return Devuelve una copia de img con los valores modificados según local_matrix
@@ -218,3 +221,37 @@ def modifyLocalMatrix(img,local_matrix,row_min,row_max,col_min,col_max):
             # Modificamos los valores de la imagen auxiliar con los de local_matrix
             img_aux[i][j]=local_matrix[i-row_min][j-col_min]
     return img_aux
+
+def loadTrainImgs():
+    '''
+    @brief Función que devuelve las imágenes de entrenamiento como dos listas
+    @return Devuelve dos vectores, el primero con los casos positivos, es decir,
+    donde si hay personas y el segundo con los casos negativos, es decir, donde
+    no hay personas.
+    '''
+    pos_imgs = []
+    neg_imgs = []
+    pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Train/pos")
+    for pimg in pos_imgs_names:
+        pos_imgs.append(cv.imread(PATH_TO_INRIA+"/Train/pos/"+pimg,-1))
+    neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Train/neg")
+    for nimg in neg_imgs_names:
+        neg_imgs.append(cv.imread(PATH_TO_INRIA+"/Train/neg/"+nimg,-1))
+    return pos_imgs,neg_imgs
+
+def loadTestImgs():
+    '''
+    @brief Función que devuelve las imágenes de test como dos listas
+    @return Devuelve dos vectores, el primero con los casos positivos, es decir,
+    donde si hay personas y el segundo con los casos negativos, es decir, donde
+    no hay personas.
+    '''
+    pos_imgs = []
+    neg_imgs = []
+    pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/pos")
+    for pimg in pos_imgs_names:
+        pos_imgs.append(cv.imread(PATH_TO_INRIA+"/Test/pos/"+pimg,-1))
+    neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/neg")
+    for nimg in neg_imgs_names:
+        neg_imgs.append(cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1))
+    return pos_imgs,neg_imgs
