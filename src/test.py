@@ -4,37 +4,13 @@ import numpy as np
 import cv2
 
 ################################################################################
-##                         Auxiliar de testing                                ##
-################################################################################
-
-def pintaMI(vim):
-    imagenes = []
-    max_h = 0
-    max_w = 0
-    for im in vim:
-        if im.shape[0]>max_h:
-            max_h = im.shape[0]
-        if im.shape[1]>max_w:
-            max_w = im.shape[1]
-    for im in vim:
-        if len(im.shape)==2:
-            imagenes.append(cv2.copyMakeBorder(cv2.cvtColor(im,cv2.COLOR_GRAY2RGB),top=0,bottom=max_h-im.shape[0],left=0,right=0,borderType= cv2.BORDER_CONSTANT, value=[0,0,0]))
-        else:
-            imagenes.append(cv2.copyMakeBorder(im,top=0,bottom=max_h-im.shape[0],left=0,right=0,borderType= cv2.BORDER_CONSTANT, value=[0,0,0]))
-    concatenada = cv2.hconcat(imagenes)
-    cv2.namedWindow('Imagenes', cv2.WINDOW_NORMAL)
-    cv2.imshow("Imagenes",concatenada)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-################################################################################
 ##                Test de la corrección Gamma (Parte 1)                       ##
 ################################################################################
 
 def test1():
     img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
     normalized = descriptorHOG.gammaNormalization(img)
-    pintaMI([img,normalized])
+    auxFunc.pintaMI([img,normalized])
 
 
 ################################################################################
@@ -71,9 +47,19 @@ def test3():
 
 
 ################################################################################
+##        Test del la normalización y descriptor por bloques (Parte 4)        ##
 ################################################################################
 
-print("Quiere realizar todo el test o alguna función concreta [t/1/2/3]")
+def test4RHOG():
+    img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
+    smoothed = descriptorHOG.rhog(img)
+    print("Imagen original a la izquierda y suavizado R-HOG a la derecha")
+    auxFunc.pintaMI([img,smoothed])
+
+################################################################################
+################################################################################
+
+print("Quiere realizar todo el test o alguna función concreta [t/1/2/3/4]")
 option = input()
 
 if option=='1' or option=='t':
@@ -106,5 +92,10 @@ elif option=='3' or option=='t':
     print("Test del cómputo del spatial/orientation binning (Parte 3)")
     print("############################################################\n\n")
     test3()
+elif option=='4' or option=='t':
+    print("############################################################")
+    print("Test del suavizado R-HOG (Parte 4)")
+    print("############################################################\n\n")
+    test4RHOG()
 else:
     print(option + " no es una opción válida")
