@@ -124,9 +124,8 @@ def spatialOrientationBinning(gradients,tam_cel=3,num_cols=9):
                 row_histograms.append(af.computeHistogramDiego(gradients[i:i+tam_cel,j:j+tam_cel],num_cols))
         if len(row_histograms)>0:
             histograms.append(row_histograms)
-        nrow+=1
+            nrow+=1
         contar=False
-    pdb.set_trace()
     return np.array(histograms).reshape((nrow,ncol,num_cols))
 
 ################################################################################
@@ -146,7 +145,6 @@ def rhog(histogramas,tam_bloque=3):
     @param tam_bloque Tamano del bloque debe ser una pareja e.g. (2,2)
     @return Devuelve un array que separa en bloques los histogramas
     '''
-    pdb.set_trace()
     n, m, k = histogramas.shape
     descriptores = []
     for i in range(n)-tam_bloque[0]:
