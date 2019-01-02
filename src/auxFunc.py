@@ -3,6 +3,7 @@ import numpy as np
 import pdb
 import os
 import re
+import random
 
 PATH_TO_INRIA = "../../INRIAPerson"
 
@@ -29,6 +30,31 @@ def pintaMI(vim):
     cv.imshow("Imagenes",concatenada)
     cv.waitKey(0)
     cv.destroyAllWindows()
+
+################################################################################
+##                          Preprocesamiento                                  ##
+################################################################################
+
+def obtainCropLimits(nrows,ncols,window_size=(64,128)):
+    x0 = random.randint(0,nrows)
+    y0 = random.randint(0,ncols)
+    while x0+window_size[0]>=ncols or y0+window_size[1]>=nrows:
+        x0 = random.randint(0,nrows)
+        y0 = random.randint(0,ncols)
+    x1 = x0+window_size[0]
+    y1 = y0+window_size[1]
+    return x0,y0,x1,y1
+
+def obtainNegativeSamples(neg_samples_dir="../../INRIAPerson/Train/neg/",dir_to_save="./cropped_neg/"):
+    list_images = os.listdir(neg_samples_dir)
+    for img_name in list_images:
+        img = cv.imread(neg_samples_dir + img_name,-1)
+        img_name_sp = img_name.split(".")[0]
+        format = img_name.split(".")[1]
+        for i in range(10):
+            x_min,y_min,x_max,y_max = obtainCropLimits(img.shape[0],img.shape[1])
+            crop = img[y_min:y_max, x_min:x_max]
+            cv.imwrite(dir_to_save+img_name_sp+"_c_"+str(i)+"."+format,crop)
 
 ################################################################################
 ##                         Funciones de cálculo                               ##
