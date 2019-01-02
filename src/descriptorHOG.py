@@ -135,7 +135,7 @@ def spatialOrientationBinning(gradients,tam_cel=3,num_cols=9):
 def normalizeDescriptor(bloque):
     ret = bloque.reshape(-1)
     norma = af.normaEuclidea(ret)
-    ret = np.array(list(map(lambda x: x/norma,ret)))
+    ret = list(map(lambda x: x/norma,ret))
     return ret
 
 def rhog(histogramas,tam_bloque=(2,2)):
@@ -151,9 +151,10 @@ def rhog(histogramas,tam_bloque=(2,2)):
     for i in range(n-tam_bloque[0]):
         descriptoresFila = []
         for j in range(m-tam_bloque[1]):
-            descriptor = normalizeDescriptor(histogramas[i:i+tam_bloque[0]][j:j+tam_bloque[1]])
+            descriptor = normalizeDescriptor(histogramas[i:i+tam_bloque[0],j:j+tam_bloque[1]])
             descriptoresFila.append(descriptor)
         descriptores.append(descriptoresFila)
+    pdb.set_trace()
     return np.array(descriptores)
 
 #def normalizechog(subseccion, radio_central, num_secciones, expansion):
