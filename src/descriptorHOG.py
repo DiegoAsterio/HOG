@@ -109,23 +109,24 @@ def spatialOrientationBinning(gradients,tam_cel=3,num_cols=9):
     cols = gradients.shape[1]
 
     # Inicializa los histogramas
-    histograms = np.array([])
+    histograms = []
+    nrow = 0
     ncol = 0
-    nrows = 0
+    contar = True
 
     # Divide la matriz en celdas y llama con cada una al cálculo de histogramas.
     for i in range(0,rows,tam_cel):
-        row_histograms = np.array([])
-        ncol = 0
+        row_histograms = []
         for j in range(0,cols,tam_cel):
             if i+tam_cel<rows and j+tam_cel<cols:
-                ncol+=1
+                ncol = ncol+1 if contar else ncol
                 # Añade el histograma de la célula
-                row_histograms = np.append(row_histograms,af.computeHistogramDiego(gradients[i:i+tam_cel,j:j+tam_cel],num_cols))
-        histograms = np.append(histograms,row_histograms)
-        nrows+=1
-
-    return histograms.reshape((nrows,ncol))
+                row_histograms.append(af.computeHistogramDiego(gradients[i:i+tam_cel,j:j+tam_cel],num_cols))
+        histograms.append(row_histograms)
+        nrow+=1
+        contar=False
+    pdb.set_trace()
+    return np.array(histograms).reshape((nrow,ncol,num_cols))
 
 ################################################################################
 ##                 4: Normalization and Descriptor Blocks                     ##

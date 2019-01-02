@@ -158,7 +158,7 @@ def computeHistogramDiego(cell, num_cols, threeSixtyQ=False):
             voto = normaEuclidea(gradient)
             histogram[indice1] += coef1*voto
             histogram[indice2] += coef2*voto
-    return histogram
+    return list(histogram)
 
 def computeHistogram(cell,num_cols):
     '''
