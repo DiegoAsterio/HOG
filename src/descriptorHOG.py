@@ -137,7 +137,7 @@ def normalizeDescriptor(bloque):
     ret = np.array(list(map(lambda x : x/af.normaEuclidea(x),ret)))
     return ret
 
-def rhog(histogramas,tam_bloque=3):
+def rhog(histogramas,tam_bloque=(2,2)):
     '''
     @brief Función que calcula los descriptores normalizados a partir de los
     histogramas de cada celula dentro de un mismo bloque
@@ -147,9 +147,9 @@ def rhog(histogramas,tam_bloque=3):
     '''
     n, m, k = histogramas.shape
     descriptores = []
-    for i in range(n)-tam_bloque[0]:
+    for i in range(n-tam_bloque[0]):
         descriptoresFila = []
-        for j in range(m)-tam_bloque[1]:
+        for j in range(m-tam_bloque[1]):
             descriptor = normalizeDescriptor(histogramas[i:i+tam_bloque[0]][j:j+tam_bloque[1]])
             descriptoresFila.append(descriptor)
         descriptores.append(descriptoresFila)
@@ -206,4 +206,4 @@ def obtainTrainData():
     img_descr = []
     for histo in histograms:
         img_descr.append(rhog(histo).reshape(-1))
-    return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp)
+    return cv.ml.TrainData_create(np.array(img_descr),cv.ml.ROW_SAMPLE,np.array(resp))
