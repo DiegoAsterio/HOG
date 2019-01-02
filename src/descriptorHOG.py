@@ -154,7 +154,6 @@ def rhog(histogramas,tam_bloque=(2,2)):
             descriptor = normalizeDescriptor(histogramas[i:i+tam_bloque[0],j:j+tam_bloque[1]])
             descriptoresFila.append(descriptor)
         descriptores.append(descriptoresFila)
-    pdb.set_trace()
     return np.array(descriptores)
 
 #def normalizechog(subseccion, radio_central, num_secciones, expansion):
@@ -209,4 +208,4 @@ def obtainTrainData():
     for histo in histograms:
         img_descr.append(rhog(histo).reshape(-1))
     pdb.set_trace()
-    return cv.ml.TrainData_create(np.array(img_descr),cv.ml.ROW_SAMPLE,np.array(resp))
+    return cv.ml.TrainData_create(np.array(img_descr,dtype=np.float32),cv.ml.ROW_SAMPLE,np.array(resp,dtype=np.float32))
