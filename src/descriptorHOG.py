@@ -174,6 +174,17 @@ def chog(histogramas, radio_central, num_secciones, expansion):
 ##                           5: Classification                                ##
 ################################################################################
 
+
+def trainSVM(trainData):
+    svm = cv.ml.SVM_create()
+    svm.setC(0.01)
+    svm.train(trainingData)
+    return svm
+
+def testSVM(svm, testData):
+    retval, results = svm.predict(testData)
+    return results
+
 def obtainTrainData():
     print("Cargando imágenes")
     imgs_pos,img_neg = af.loadTrainImgs()
