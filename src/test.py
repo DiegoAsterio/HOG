@@ -67,7 +67,7 @@ if option=='1' or option=='t':
     print("Test de la normalización gamma (Parte 1)")
     print("############################################################\n\n")
     test1()
-elif option=='2' or option=='t':
+if option=='2' or option=='t':
     print("############################################################")
     print("Test del cómputo del gradiente según el paper (Parte 2)")
     print("############################################################\n\n")
@@ -87,15 +87,15 @@ elif option=='2' or option=='t':
     print("Test del cómputo del gradiente alternativa 3 (Parte 2)")
     print("############################################################\n\n")
     test2Alt3()
-elif option=='3' or option=='t':
+if option=='3' or option=='t':
     print("############################################################")
     print("Test del cómputo del spatial/orientation binning (Parte 3)")
     print("############################################################\n\n")
     test3()
-elif option=='4' or option=='t':
+if option=='4' or option=='t':
     print("############################################################")
     print("Test del suavizado R-HOG (Parte 4)")
     print("############################################################\n\n")
     test4RHOG()
-else:
+if option != 't' and option!='1' and option!='2' and option!='3' and option!='4':
     print(option + " no es una opción válida")
