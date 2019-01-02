@@ -231,12 +231,12 @@ def loadTrainImgs():
     '''
     pos_imgs = []
     neg_imgs = []
-    pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Train/pos")
+    pos_imgs_names = os.listdir(PATH_TO_INRIA+"/cropped_pos")
     for pimg in pos_imgs_names:
-        pos_imgs.append(cv.imread(PATH_TO_INRIA+"/Train/pos/"+pimg,-1))
-    neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Train/neg")
+        pos_imgs.append(cv.imread(PATH_TO_INRIA+"/cropped_pos/"+pimg,-1))
+    neg_imgs_names = os.listdir(PATH_TO_INRIA+"/cropped_neg")
     for nimg in neg_imgs_names:
-        neg_imgs.append(cv.imread(PATH_TO_INRIA+"/Train/neg/"+nimg,-1))
+        neg_imgs.append(cv.imread(PATH_TO_INRIA+"/cropped_neg/"+nimg,-1))
     return pos_imgs,neg_imgs
 
 def loadTestImgs():
@@ -255,3 +255,8 @@ def loadTestImgs():
     for nimg in neg_imgs_names:
         neg_imgs.append(cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1))
     return pos_imgs,neg_imgs
+
+# def getAllWindows(im):
+#     ret = []
+#     m,n,k = im.shape
+#     for i in ran
