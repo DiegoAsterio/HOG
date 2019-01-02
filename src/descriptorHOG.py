@@ -204,7 +204,9 @@ def obtainTrainData():
     for gra in gradients:
         histograms.append(spatialOrientationBinning(gra))
     print("Calculando los descriptores de imagen")
-    img_descr = []
-    for histo in histograms:
-        img_descr.append(rhog(histo).reshape(-1).astype(np.float32))
+    img_descr = rhog(histograms[0]).reshape(-1).astype(np.float32)
+    for histo in histograms[1:]:
+        descr = rhog(histo).reshape(-1).astype(np.float32)
+        pdb.set_trace()
+        img_descr = np.vstack([img_descr,descr])
     return cv.ml.TrainData_create(np.array(img_descr),cv.ml.ROW_SAMPLE,resp.astype(np.float32))
