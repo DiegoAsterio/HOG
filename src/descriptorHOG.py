@@ -1,6 +1,7 @@
 import numpy as np
 import cv2 as cv
 import auxFunc as af
+import pdb
 
 ################################################################################
 ##                        1: Normalización Gamma                              ##
@@ -130,7 +131,7 @@ def normalizeDescriptor(bloque):
     ret = np.array(list(map(lambda x : x/af.normaEuclidea(x),ret)))
     return ret
 
-def rhog(histogramas,tam_bloque):
+def rhog(histogramas,tam_bloque=3):
     '''
     @brief Función que calcula los descriptores normalizados a partir de los
     histogramas de cada celula dentro de un mismo bloque
@@ -149,12 +150,13 @@ def rhog(histogramas,tam_bloque):
     return np.array(descriptores)
 
 #def normalizechog(subseccion, radio_central, num_secciones, expansion):
- 
+
 def chog(histogramas, radio_central, num_secciones, expansion):
+    pdb.set_trace()
     n, m, k = histogramas.shape
     descriptores = []
     R = radio_central*(1+expansion)
-    for i in range(R,n-R)):
+    for i in range(R,n-R):
         descriptoresFila = []
         for j in range(R,m-R):
             descriptor = normalizechog(histogramas[i-R:i+R][j-R:j+R],radio_central, num_secciones, ratio)
@@ -166,3 +168,26 @@ def chog(histogramas, radio_central, num_secciones, expansion):
 ################################################################################
 ##                           5: Classification                                ##
 ################################################################################
+
+def obtainTrainData():
+    print("Cargando imágenes")
+    imgs_pos,img_neg = af.loadTrainImgs()
+    resp = np.concatenate((np.ones(len(imgs_pos[:2])),-np.ones(len(img_neg[:2]))))
+    imgs = imgs_pos[:2]+img_neg[:2]
+    print("Normalización Gamma")
+    gamma_corrected = []
+    for im in imgs:
+        gamma_corrected.append(gammaNormalization(im))
+    print("Calculando los gradientes")
+    gradients = []
+    for gam in gamma_corrected:
+        gradients.append(gradientComputation1DPaper(gam,1))
+    print("Calculando los histogramas")
+    histograms = []
+    for gra in gradients:
+        histograms.append(spatialOrientationBinning(gra))
+    print("Calculando los descriptores de imagen")
+    img_descr = []
+    for histo in histograms:
+        img_descr.append(rhog(histo).reshape(-1))
+    return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp)
