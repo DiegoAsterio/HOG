@@ -109,18 +109,23 @@ def spatialOrientationBinning(gradients,tam_cel=3,num_cols=9):
     cols = gradients.shape[1]
 
     # Inicializa los histogramas
-    histograms = []
+    histograms = np.array([])
+    ncol = 0
+    nrows = 0
 
     # Divide la matriz en celdas y llama con cada una al cálculo de histogramas.
     for i in range(0,rows,tam_cel):
-        row_histograms = []
+        row_histograms = np.array([])
+        ncol = 0
         for j in range(0,cols,tam_cel):
             if i+tam_cel<rows and j+tam_cel<cols:
+                ncol+=1
                 # Añade el histograma de la célula
-                row_histograms.append(af.computeHistogramDiego(gradients[i:i+tam_cel,j:j+tam_cel],num_cols))
-        histograms.append(row_histograms)
+                row_histograms = np.append(row_histograms,af.computeHistogramDiego(gradients[i:i+tam_cel,j:j+tam_cel],num_cols))
+        histograms = np.append(histograms,row_histograms)
+        nrows+=1
 
-    return np.array(histograms)
+    return histograms.reshape((nrows,ncol))
 
 ################################################################################
 ##                 4: Normalization and Descriptor Blocks                     ##
@@ -139,6 +144,7 @@ def rhog(histogramas,tam_bloque=3):
     @param tam_bloque Tamano del bloque debe ser una pareja e.g. (2,2)
     @return Devuelve un array que separa en bloques los histogramas
     '''
+    pdb.set_trace()
     n, m, k = histogramas.shape
     descriptores = []
     for i in range(n)-tam_bloque[0]:
@@ -152,7 +158,6 @@ def rhog(histogramas,tam_bloque=3):
 #def normalizechog(subseccion, radio_central, num_secciones, expansion):
 
 def chog(histogramas, radio_central, num_secciones, expansion):
-    pdb.set_trace()
     n, m, k = histogramas.shape
     descriptores = []
     R = radio_central*(1+expansion)
@@ -172,8 +177,8 @@ def chog(histogramas, radio_central, num_secciones, expansion):
 def obtainTrainData():
     print("Cargando imágenes")
     imgs_pos,img_neg = af.loadTrainImgs()
-    resp = np.concatenate((np.ones(len(imgs_pos[:2])),-np.ones(len(img_neg[:2]))))
-    imgs = imgs_pos[:2]+img_neg[:2]
+    resp = np.concatenate((np.ones(len(imgs_pos[:1])),-np.ones(len(img_neg[:1]))))
+    imgs = imgs_pos[:1]+img_neg[:1]
     print("Normalización Gamma")
     gamma_corrected = []
     for im in imgs:
