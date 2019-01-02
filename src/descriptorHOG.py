@@ -179,34 +179,47 @@ def chog(histogramas, radio_central, num_secciones, expansion):
 def trainSVM(trainData):
     svm = cv.ml.SVM_create()
     svm.setC(0.01)
-    svm.train(trainingData)
+    svm.train(trainData)
     return svm
 
 def testSVM(svm, testData):
     retval, results = svm.predict(testData)
     return results
 
-def obtainTrainData():
-    print("Cargando imágenes")
-    imgs_pos,img_neg = af.loadTrainImgs()
-    resp = np.concatenate((np.ones(len(imgs_pos[:1])),-np.ones(len(img_neg[:1]))))
-    imgs = imgs_pos[:1]+img_neg[:1]
+def obtainDescriptors(imgs):
     print("Normalización Gamma")
+    contador=1
     gamma_corrected = []
     for im in imgs:
+        print("Normalizando " + str(contador) + "/" + str(len(imgs)))
+        contador+=1
         gamma_corrected.append(gammaNormalization(im))
     print("Calculando los gradientes")
+    contador=1
     gradients = []
     for gam in gamma_corrected:
+        print("Calculando los gradientes " + str(contador) + "/" + str(len(imgs)))
+        contador+=1
         gradients.append(gradientComputation1DPaper(gam,1))
     print("Calculando los histogramas")
+    contador=1
     histograms = []
     for gra in gradients:
+        print("Calculando los histogramas " + str(contador) + "/" + str(len(imgs)))
+        contador+=1
         histograms.append(spatialOrientationBinning(gra))
     print("Calculando los descriptores de imagen")
+    contador=1
     img_descr = rhog(histograms[0]).reshape(-1).astype(np.float32)
     for histo in histograms[1:]:
+        print("Calculando el descriptor final " + str(contador) + "/" + str(len(imgs)))
+        contador+=1
         descr = rhog(histo).reshape(-1).astype(np.float32)
-        pdb.set_trace()
         img_descr = np.vstack([img_descr,descr])
-    return cv.ml.TrainData_create(np.array(img_descr),cv.ml.ROW_SAMPLE,resp.astype(np.float32))
+    return np.array(img_descr)
+
+def obtainTrainData():
+    img_pos,img_neg = af.loadTrainImgs()
+    resp = np.concatenate((np.ones(len(img_pos)),-np.ones(len(img_neg))))
+    img_descr = obtainDescriptors(img_pos + img_neg)
+    return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
