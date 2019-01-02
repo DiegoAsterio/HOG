@@ -206,4 +206,4 @@ def obtainTrainData():
     img_descr = []
     for histo in histograms:
         img_descr.append(rhog(histo).reshape(-1))
-    return cv.ml.TrainData_create(np.array(img_descr),cv.ml.ROW_SAMPLE,np.array(resp))
+    return cv.ml.TrainData_create(np.array(img_descr),cv.ml.COL_SAMPLE,np.array(resp))
