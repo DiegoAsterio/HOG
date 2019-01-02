@@ -122,7 +122,8 @@ def spatialOrientationBinning(gradients,tam_cel=3,num_cols=9):
                 ncol = ncol+1 if contar else ncol
                 # Añade el histograma de la célula
                 row_histograms.append(af.computeHistogramDiego(gradients[i:i+tam_cel,j:j+tam_cel],num_cols))
-        histograms.append(row_histograms)
+        if len(row_histograms)>0:
+            histograms.append(row_histograms)
         nrow+=1
         contar=False
     pdb.set_trace()
