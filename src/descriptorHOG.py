@@ -125,30 +125,43 @@ def spatialOrientationBinning(gradients,tam_cel=3,num_cols=9):
 ##                 4: Normalization and Descriptor Blocks                     ##
 ################################################################################
 
-def rhog(img,tam_bloque=2,tam_cel=3):
+def normalizeDescriptor(bloque):
+    ret = bloque.reshape(-1)
+    ret = np.array(list(map(lambda x : x/af.normaEuclidea(x),ret)))
+    return ret
+
+def rhog(histogramas,tam_bloque):
     '''
-    @brief Función que divide la imagen img en bloques y aplica una gaussiana a
-    los mismos con sigma=0.5*tam_bloque
-    @param img Imagen a la que queremos aplicar la gaussiana localmente
-    @param tam_bloque Número de celdas por lado del bloque
-    @param tam_cel Número de píxeles por celda
-    @return Devuelve una imagen en la que se ha aplicado una gaussiana a cada
-    submatriz contenida en un bloque
+    @brief Función que calcula los descriptores normalizados a partir de los
+    histogramas de cada celula dentro de un mismo bloque
+    @param histogramas Todos los histogramas computados a partir de celulas
+    @param tam_bloque Tamano del bloque debe ser una pareja e.g. (2,2)
+    @return Devuelve un array que separa en bloques los histogramas
     '''
-    # Creamos una copia de la imagen
-    img_aux = np.copy(img)
-    # Sigma especificado en el paper
-    sigma = tam_bloque*0.5
-    # Tamaño en píxeles del bloque por lado
-    size_block = tam_cel*tam_bloque
-    for i in range(0,img_aux.shape[0],size_block):
-        for j in range(0,img_aux.shape[1],size_block):
-            if i+size_block<img.shape[0] and j+size_block<img.shape[1]:
-                # Obtenemos el suavizado en la submatriz
-                local_gauss = cv.GaussianBlur(img_aux[i:i+size_block,j:j+size_block],(0,0),sigma)
-                # Modificamos los valores de la imagen auxiliar con los de la gaussiana
-                img_aux = af.modifyLocalMatrix(img_aux,local_gauss,i,i+size_block,j,j+size_block)
-    return img_aux
+    n, m, k = histogramas.shape
+    descriptores = []
+    for i in range(n)-tam_bloque[0]:
+        descriptoresFila = []
+        for j in range(m)-tam_bloque[1]:
+            descriptor = normalizeDescriptor(histogramas[i:i+tam_bloque[0]][j:j+tam_bloque[1]])
+            descriptoresFila.append(descriptor)
+        descriptores.append(descriptoresFila)
+    return np.array(descriptores)
+
+#def normalizechog(subseccion, radio_central, num_secciones, expansion):
+ 
+def chog(histogramas, radio_central, num_secciones, expansion):
+    n, m, k = histogramas.shape
+    descriptores = []
+    R = radio_central*(1+expansion)
+    for i in range(R,n-R)):
+        descriptoresFila = []
+        for j in range(R,m-R):
+            descriptor = normalizechog(histogramas[i-R:i+R][j-R:j+R],radio_central, num_secciones, ratio)
+            descriptoresFila.append(descriptor)
+        descriptores.append(descriptoresFila)
+    return np.array(descriptores)
+
 
 ################################################################################
 ##                           5: Classification                                ##
