@@ -8,20 +8,22 @@ print("Entrenando la SVM")
 svm = descriptorHOG.trainSVM(td)
 print("Cargandos las imagenes de test")
 img_pos, img_neg = af.loadTestImgs()
-img_pos_res = []
-img_neg_res = []
-print("Obteniendo las ventanas")
+img_pos_res = 0
+img_neg_res = 0
+predicciones = []
+print("Obteniendo las ventanas y descriptores de las imágenes pregunta")
 for img in img_pos:
     windows = af.getAllWindows(img)
-    for win in windows:
-        img_pos_res.append(win)
+    desc = descriptorHOG.obtainDescriptors(windows)
+    img_pos_res+=len(windows)
+    for pred in svm.predict(desc)[1]:
+        predicciones.append(pred[0])
 for img in img_neg:
     windows = af.getAllWindows(img)
-    for win in windows:
-        img_neg_res.append(win)
-print("Obteniendo los descriptores de las imagenes pregunta")
-desc = descriptorHOG.obtainDescriptors(img_pos_res+img_neg_res)
-predicciones = svm.predict(desc)
+    desc = descriptorHOG.obtainDescriptors(windows)
+    img_neg_res+=len(windows)
+    for pred in svm.predict(desc)[1]:
+        predicciones.append(pred[0])
 
 print("\n\n##################################################")
 print("Predicción: ")
@@ -31,14 +33,14 @@ print("##################################################\n\n")
 
 npos=0
 nneg=0
-for i in range(len(predicciones[1])):
-    if i<len(img_pos):
-        if predicciones[1][i]==1:
+for i in range(len(predicciones)):
+    if i<img_pos_res:
+        if predicciones[i]==1:
             npos+=1
     else:
-        if predicciones[1][i]==-1:
+        if predicciones[i]==-1:
             nneg+=1
 print("\n\n##################################################")
-print("Positivos: " + str(npos) + "/" + str(len(img_pos_res)))
-print("Negativos: " + str(nneg) + "/" + str(len(img_neg_res)))
+print("Positivos: " + str(npos) + "/" + str(img_pos_res))
+print("Negativos: " + str(nneg) + "/" + str(img_neg_res))
 print("##################################################\n\n")

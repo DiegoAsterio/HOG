@@ -181,22 +181,41 @@ def chog(histogramas, radio_central, num_secciones, expansion):
 
 
 def trainSVM(trainData):
+    '''
+    @brief Función que crea una SVM y la entrena con los datos trainData
+    @param trainData Datos con los que queremos entrenar la SVM
+    @return Devuelve una SVM ya entrenada
+    '''
     svm = cv.ml.SVM_create()
+    # Ponemos una soft SVM como especifica en el paper
     svm.setC(0.01)
     svm.train(trainData)
     return svm
 
 def testSVM(svm, testData):
+    '''
+    @brief Función que dada una SVM ya entrenada y unos datos de prueba devuelve lo predicho
+    por la SVM para dichos datos
+    @param svm SVM con la que queremos realizar la predicción
+    @param testData Datos sobre los que queremos predecir
+    '''
     retval, results = svm.predict(testData)
     return results
 
 def obtainDescriptors(imgs):
+    '''
+    @brief Función que dada un vector de imágenes obtiene los descriptores asociados
+    a la misma y hace la unión. Las imágenes tienen que ser parches de 64x128
+    @param imgs Lista de imágenes sobre las que queremos extraer los descriptores
+    @return Devuelve un numpy array de descriptores, uno por imagen
+    '''
     print("Normalización Gamma")
     contador=1
     gamma_corrected = []
     for im in imgs:
         print("Normalizando " + str(contador) + "/" + str(len(imgs)))
         contador+=1
+        # Aplicamos la normalización gamma a cada imagen
         gamma_corrected.append(gammaNormalization(im))
     print("Calculando los gradientes")
     contador=1
@@ -204,6 +223,7 @@ def obtainDescriptors(imgs):
     for gam in gamma_corrected:
         print("Calculando los gradientes " + str(contador) + "/" + str(len(imgs)))
         contador+=1
+        # Calculamos los gradientes de cada imagen
         gradients.append(gradientComputation1DPaper(gam,1))
     print("Calculando los histogramas")
     contador=1
@@ -211,19 +231,31 @@ def obtainDescriptors(imgs):
     for gra in gradients:
         print("Calculando los histogramas " + str(contador) + "/" + str(len(imgs)))
         contador+=1
+        # Calculamos los histogramas de cada matriz de gradientes
         histograms.append(spatialOrientationBinning(gra))
     print("Calculando los descriptores de imagen")
     contador=1
+    # Normalizamos por bloques
     img_descr = rhog(histograms[0]).reshape(-1).astype(np.float32)
     for histo in histograms[1:]:
         print("Calculando el descriptor final " + str(contador) + "/" + str(len(imgs)))
         contador+=1
+        # Unimos los descriptores en una sola lista
         descr = rhog(histo).reshape(-1).astype(np.float32)
         img_descr = np.vstack([img_descr,descr])
     return np.array(img_descr)
 
 def obtainTrainData():
+    '''
+    @brief Función que obtiene todos los datos de entrenamiento cargando las imágenes
+    correspondientes y devuelve un objeto de tipo TrainData para SVM
+    @return Objeto de tipo TrainData para entrenar la SVM
+    '''
+    # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
+    # Generamos las respuestas
     resp = np.concatenate((np.ones(len(img_pos)),-np.ones(len(img_neg))))
+    # Obtenemos los descriptores, uno por imagen
     img_descr = obtainDescriptors(img_pos + img_neg)
+    # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
