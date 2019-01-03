@@ -1,6 +1,7 @@
 import descriptorHOG
 import cv2 as cv
 import auxFunc as af
+import pdb
 
 print("Obteniendo los datos de entrenamiento")
 td = descriptorHOG.obtainTrainData()
@@ -12,14 +13,17 @@ img_pos_res = 0
 img_neg_res = 0
 predicciones = []
 print("Obteniendo las ventanas y descriptores de las imágenes pregunta")
-for img in img_pos:
-    windows = af.getAllWindows(img)
+af.pintaMI(img_pos[:3])
+for img in img_pos[:3]:
+    windows = af.getAllWindows(img)[:5]
     desc = descriptorHOG.obtainDescriptors(windows)
     img_pos_res+=len(windows)
+    af.pintaMI(windows)
+    pdb.set_trace()
     for pred in svm.predict(desc)[1]:
         predicciones.append(pred[0])
-for img in img_neg:
-    windows = af.getAllWindows(img)
+for img in img_neg[:3]:
+    windows = af.getAllWindows(img)[:5]
     desc = descriptorHOG.obtainDescriptors(windows)
     img_neg_res+=len(windows)
     for pred in svm.predict(desc)[1]:
@@ -35,10 +39,10 @@ npos=0
 nneg=0
 for i in range(len(predicciones)):
     if i<img_pos_res:
-        if predicciones[i]==1:
+        if predicciones[i]==3:
             npos+=1
     else:
-        if predicciones[i]==-1:
+        if predicciones[i]==4:
             nneg+=1
 print("\n\n##################################################")
 print("Positivos: " + str(npos) + "/" + str(img_pos_res))
