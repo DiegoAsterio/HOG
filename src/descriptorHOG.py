@@ -264,8 +264,8 @@ def obtainTrainData():
     print(len(img_pos))
     print(len(img_neg))
     # Generamos las respuestas
-    resp = np.concatenate((1*np.ones(len(img_pos[:2])),2*np.ones(len(img_neg[:2]))))
+    resp = np.concatenate((1*np.ones(len(img_pos)),2*np.ones(len(img_neg))))
     # Obtenemos los descriptores, uno por imagen
-    img_descr = obtainDescriptors(img_pos[:2] + img_neg[:2])
+    img_descr = obtainDescriptors(img_pos + img_neg)
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))

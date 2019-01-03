@@ -14,15 +14,15 @@ img_pos_res = 0
 img_neg_res = 0
 predicciones = []
 print("Obteniendo las ventanas y descriptores de las imágenes pregunta")
-for img in img_pos[:3]:
-    windows = random.sample(af.getAllWindows(img),10)
+for img in img_pos:
+    windows = random.sample(af.getAllWindows(img),20)
     desc = descriptorHOG.obtainDescriptors(windows)
     img_pos_res+=len(windows)
     af.pintaMI(windows)
     for pred in svm.predict(desc)[1]:
         predicciones.append(pred[0])
-for img in img_neg[:3]:
-    windows = random.sample(af.getAllWindows(img),10)
+for img in img_neg:
+    windows = random.sample(af.getAllWindows(img),20)
     af.pintaMI(windows)
     desc = descriptorHOG.obtainDescriptors(windows)
     img_neg_res+=len(windows)
