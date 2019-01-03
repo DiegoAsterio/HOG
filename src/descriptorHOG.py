@@ -19,7 +19,7 @@ def gammaNormalization(img,c1=1,c2=0.5):
     reduced = img/255.0
     # Hace la correción de la luz
     corrected = np.power(reduced*c1,c2)
-    return (corrected*255).astype(np.uint8)
+    return (corrected*255).astype(np.float32)
 
 ################################################################################
 ##                        2: Cómputo del gradiente                            ##
@@ -37,8 +37,12 @@ def gradientComputation1DPaper(img,sigma):
         imgAux = np.copy(img)
     else:
         imgAux = cv.GaussianBlur(img,(0,0),sigma)
+    # Calculamos df/dx para todos los canales (RGB)
     outputSignalsdx = af.convoluteWith1DMask([-1,0,1],True,imgAux)
+    # Calculamos df/dy para todos los canales (RGB)
     outputSignalsdy = af.convoluteWith1DMask([-1,0,1],False,imgAux)
+    # En cada pixel el gradiente es el gradiente del canal con mayor norma (RGB)
+    # CUELLO DE BOTELLA
     return af.getGradient(outputSignalsdx, outputSignalsdy)
 
 def gradientComputation1DAlt1(img,sigma):

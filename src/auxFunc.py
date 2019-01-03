@@ -73,29 +73,30 @@ def convoluteWith1DMask(ker,horizontally,im):
     kerX = kerY = None
     if horizontally:
         # Si convolucionamos por filas el nucleo que no es trivial es kerX
-        kerX = np.array(ker) # Reversed porque filter hace correlacion
-        # Nucleo trivial [0,...,0,1,0,...,0]
-        kerY = np.zeros(len(ker),dtype='int64')
-        kerY[int(len(ker)/2)] = 1
+        # Reversed porque sepFilter2D hace correlacion
+        kerX = np.array(list(reversed(ker))) 
+        # Nucleo trivial [...,0,1,0,...]
+        kerY = np.array([1])
     else:
-        # Lo contrario
-        # Nucleo trivial [0,...,0,1,0,...,0]
-        kerX = np.zeros(len(ker),dtype='int64')
-        kerX[int(len(ker)/2)] = 1
+        # Analogamente
+        # Nucleo trivial [...,0,1,0,...]
+        kerX = np.array([1])
         # Si convolucionamos por filas el nucleo que no es trivial es kerY
-        kerY = np.array(ker)
+        # Reversed porque sepFilter2D hace correlacion
+        kerY = np.array(list(reversed(ker))) 
     if len(im.shape) == 3:      # Para imagenes RGB o LAB
         alto, ancho, profundo = im.shape
         # Se tratan los tres canales por separado
         inputSignals = cv.split(im)
         convolutedSignals = []
-        for i in range(profundo):
+        for i in range(profundo): 
             inputSignal = inputSignals[i]
-            # Se convoluciona la senal R,G o B
+            # Se convoluciona las senales R,G y B
             convolutedSignal = cv.sepFilter2D(inputSignal,-1,kerX,kerY)
             convolutedSignals.append(convolutedSignal)
         return convolutedSignals
-    else:                       # Para imagenes GRAYSCALE
+    else:
+        # Para imagenes GRAYSCALE
         return [cv.sepFilter2D(im,-1,kerX,kerY)]
 
 def normaEuclidea(v):
@@ -117,32 +118,30 @@ def getGradient(signalsdx,signalsdy):
     @return Devuelve el gradiente formado por en cada pixel el gradiente de mayor norma de entre todos
     los gradientes de todos los canales
     '''
-    shape = None
-    # Contient el gradiente final
+    n,m = signalsdx[0].shape
+    # Contiene el gradiente final
     ret = []
     # Contiene los gradientes de todos los canales de la imagen
     gradientes = []
     for i in range(len(signalsdx)):
-        dx = np.array(signalsdx[i])
-        dy = np.array(signalsdy[i])
-        shape = dx.shape
-        dxprima = dx.reshape(-1)
-        dyprima = dy.reshape(-1)
+        dx = np.array(signalsdx[i]).reshape(-1)
+        dy = np.array(signalsdy[i]).reshape(-1)
         # Formamos parejas de la forma (df/dx, df/dy)
-        gradiente = np.array([[ex,ey] for ex, ey in np.transpose(np.vstack([dxprima,dyprima]))])
+        gradiente = list(map(lambda x:list(x),list(zip(dx,dy))))
+        #pdb.set_trace()
         gradientes.append(gradiente)
-    N = len(gradientes[0])
-    for i in range(N):
+    for i in range(n*m):
         normas = []
         for k in range(3):
             v = gradientes[k][i]
+            # TODO: CUELLO DE BOTELLA
             f = normaEuclidea(v)
             normas.append(f)
         # Verificamos en cada pixel que
         indiceMax = np.argmax(normas, axis=None)
         ret.append(gradientes[indiceMax][i])
     ret = np.array(ret)
-    ret = ret.reshape((shape[0],shape[1],2))
+    ret = ret.reshape((n,m,2))
     return ret
 
 def obtainAngle(vector):
@@ -172,6 +171,13 @@ def convexCombOfTwo(point, vpoints):
     return False
 
 def computeHistogramDiego(cell, num_cols, threeSixtyQ=False):
+    '''
+    @brief Dada una célula con un vector gradiente en cada posición coge el ángulo
+    de cada vector y hace un histograma en forma de vector con los ángulos ponderados.
+    @param cell Matriz con los datos del gradiente que representa una célula
+    @return Devuelve un vector  de 180 elementos donde tiene un 0 si el ángulo no aparece
+    o un valor correspondiente a la interpolación bilineal al obtener el histograma.
+    '''
     possibleAngles = []
     histogram = np.zeros(num_cols)
     if threeSixtyQ:
@@ -260,7 +266,9 @@ def loadTrainImgs():
     neg_imgs = []
     pos_imgs_names = os.listdir(PATH_TO_INRIA+"/cropped_pos")
     for pimg in pos_imgs_names:
-        pos_imgs.append(cv.imread(PATH_TO_INRIA+"/cropped_pos/"+pimg,-1))
+        im = cv.imread(PATH_TO_INRIA+"/cropped_pos/"+pimg,-1)
+        im = np.float32(im)
+        pos_imgs.append(im)
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/cropped_neg")
     for nimg in neg_imgs_names:
         neg_imgs.append(cv.imread(PATH_TO_INRIA+"/cropped_neg/"+nimg,-1))
@@ -277,7 +285,9 @@ def loadTestImgs():
     neg_imgs = []
     pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/pos")
     for pimg in pos_imgs_names:
-        pos_imgs.append(cv.imread(PATH_TO_INRIA+"/Test/pos/"+pimg,-1))
+        im = cv.imread(PATH_TO_INRIA+"/Test/pos/"+pimg,-1)
+        im = np.float32(im)
+        pos_imgs.append()
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/neg")
     for nimg in neg_imgs_names:
         neg_imgs.append(cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1))
