@@ -233,6 +233,7 @@ def obtainDescriptors(imgs):
         contador+=1
         # Calculamos los gradientes de cada imagen
         gradients.append(gradientComputation1DPaper(gam,1))
+    del gamma_corrected
     print("Calculando los histogramas")
     contador=1
     histograms = []
@@ -241,6 +242,7 @@ def obtainDescriptors(imgs):
         contador+=1
         # Calculamos los histogramas de cada matriz de gradientes
         histograms.append(spatialOrientationBinning(gra))
+    del gradients
     print("Calculando los descriptores de imagen")
     contador=1
     # Normalizamos por bloques
@@ -251,6 +253,7 @@ def obtainDescriptors(imgs):
         # Unimos los descriptores en una sola lista
         descr = rhog(histo).reshape(-1).astype(np.float32)
         img_descr = np.vstack([img_descr,descr])
+    del histograms
     return np.array(img_descr)
 
 def obtainTrainData():
@@ -267,5 +270,11 @@ def obtainTrainData():
     resp = np.concatenate((1*np.ones(len(img_pos)),2*np.ones(len(img_neg))))
     # Obtenemos los descriptores, uno por imagen
     img_descr = obtainDescriptors(img_pos + img_neg)
+    del img_pos
+    del img_neg
+    #Escribe los descriptores en un fichero
+    f = open("./descriptores.txt","r+")
+    f.write(str(img_descr))
+    f.close()
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))

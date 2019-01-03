@@ -8,6 +8,7 @@ print("Obteniendo los datos de entrenamiento")
 td = descriptorHOG.obtainTrainData()
 print("Entrenando la SVM")
 svm = descriptorHOG.trainSVM(td)
+del td
 print("Cargandos las imagenes de test")
 img_pos, img_neg = af.loadTestImgs()
 img_pos_res = 0
@@ -28,6 +29,9 @@ for img in img_neg:
     img_neg_res+=len(windows)
     for pred in svm.predict(desc)[1]:
         predicciones.append(pred[0])
+
+del img_pos
+del img_neg
 
 print("\n\n##################################################")
 print("Predicción: ")
