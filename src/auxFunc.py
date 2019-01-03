@@ -74,7 +74,7 @@ def convoluteWith1DMask(ker,horizontally,im):
     if horizontally:
         # Si convolucionamos por filas el nucleo que no es trivial es kerX
         # Reversed porque sepFilter2D hace correlacion
-        kerX = np.array(list(reversed(ker))) 
+        kerX = np.array(list(reversed(ker)))
         # Nucleo trivial [...,0,1,0,...]
         kerY = np.array([1])
     else:
@@ -83,13 +83,13 @@ def convoluteWith1DMask(ker,horizontally,im):
         kerX = np.array([1])
         # Si convolucionamos por filas el nucleo que no es trivial es kerY
         # Reversed porque sepFilter2D hace correlacion
-        kerY = np.array(list(reversed(ker))) 
+        kerY = np.array(list(reversed(ker)))
     if len(im.shape) == 3:      # Para imagenes RGB o LAB
         alto, ancho, profundo = im.shape
         # Se tratan los tres canales por separado
         inputSignals = cv.split(im)
         convolutedSignals = []
-        for i in range(profundo): 
+        for i in range(profundo):
             inputSignal = inputSignals[i]
             # Se convoluciona las senales R,G y B
             convolutedSignal = cv.sepFilter2D(inputSignal,-1,kerX,kerY)
@@ -287,7 +287,7 @@ def loadTestImgs():
     for pimg in pos_imgs_names:
         im = cv.imread(PATH_TO_INRIA+"/Test/pos/"+pimg,-1)
         im = np.float32(im)
-        pos_imgs.append()
+        pos_imgs.append(im)
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/neg")
     for nimg in neg_imgs_names:
         neg_imgs.append(cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1))
