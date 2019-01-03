@@ -283,7 +283,17 @@ def loadTestImgs():
         neg_imgs.append(cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1))
     return pos_imgs,neg_imgs
 
-# def getAllWindows(im):
-#     ret = []
-#     m,n,k = im.shape
-#     for i in ran
+def getAllWindows(im,window_size=(64,128)):
+    '''
+    @brief Función que devuelve todas las submatrices de 64x128 de la imagen im
+    @param im Imagen de la que queremos sacar las submatrices
+    @param window_size Tupla que nos da las dimensiones de la ventana
+    @return Devuelve una lista con las submatrices de 64x128 extraídas
+    '''
+    ret = []
+    m = im.shape[0]
+    n = im.shape[1]
+    for i in range(m-window_size[0]):
+        for j in range(n-window_size[1]):
+            ret.append(im[i:i+window_size[0],j:j+window_size[1]])
+    return ret
