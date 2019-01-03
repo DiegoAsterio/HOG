@@ -187,6 +187,14 @@ def trainSVM(trainData):
     @return Devuelve una SVM ya entrenada
     '''
     svm = cv.ml.SVM_create()
+    svm.setCoef0(0.0)
+    svm.setDegree(3)
+    svm.setTermCriteria((cv.TERM_CRITERIA_COUNT or cv.TERM_CRITERIA_EPS, int(1e7), 1e-6));
+    svm.setGamma(0)
+    svm.setKernel(cv.ml.SVM_LINEAR);
+    svm.setNu(0.5)
+    svm.setP(0.1)
+    svm.setType(cv.ml.SVM_EPS_SVR)
     # Ponemos una soft SVM como especifica en el paper
     svm.setC(0.01)
     svm.train(trainData)
@@ -253,9 +261,11 @@ def obtainTrainData():
     '''
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
+    print(len(img_pos))
+    print(len(img_neg))
     # Generamos las respuestas
-    resp = np.concatenate((np.ones(len(img_pos)),-np.ones(len(img_neg))))
+    resp = np.concatenate((3*np.ones(len(img_pos[:2])),4*np.ones(len(img_neg[:2]))))
     # Obtenemos los descriptores, uno por imagen
-    img_descr = obtainDescriptors(img_pos + img_neg)
+    img_descr = obtainDescriptors(img_pos[:2] + img_neg[:2])
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
