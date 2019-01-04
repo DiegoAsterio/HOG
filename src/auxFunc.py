@@ -230,14 +230,14 @@ def loadTestImgs():
     '''
     pos_imgs = []
     neg_imgs = []
-    pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/pos")
+    pos_imgs_names = os.listdir(PATH_TO_INRIA+"/cropped_test_pos")
     for pimg in pos_imgs_names:
-        im = cv.imread(PATH_TO_INRIA+"/Test/pos/"+pimg,-1)
+        im = cv.imread(PATH_TO_INRIA+"/cropped_test_pos/"+pimg,-1)
         im = np.float32(im)
         pos_imgs.append(im)
-    neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/neg")
+    neg_imgs_names = os.listdir(PATH_TO_INRIA+"/cropped_test_neg")
     for nimg in neg_imgs_names:
-        neg_imgs.append(cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1))
+        neg_imgs.append(cv.imread(PATH_TO_INRIA+"/cropped_test_neg/"+nimg,-1))
     return pos_imgs,neg_imgs
 
 def getAllWindows(im,window_size=(64,128)):
