@@ -182,7 +182,7 @@ def trainSVM(trainData):
     svm = cv.ml.SVM_create()
     svm.setCoef0(0.0)
     svm.setDegree(3)
-    svm.setTermCriteria((cv.TERM_CRITERIA_COUNT or cv.TERM_CRITERIA_EPS, int(1e3), 1e-3));
+    svm.setTermCriteria((cv.TERM_CRITERIA_COUNT or cv.TERM_CRITERIA_EPS, int(1e7), 1e-6));
     svm.setGamma(0)
     svm.setKernel(cv.ml.SVM_LINEAR);
     svm.setNu(0.5)
@@ -265,11 +265,11 @@ def obtainTrainData():
     '''
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
-    img_pos = random.sample(img_pos,400)
+    #img_pos = random.sample(img_pos,200)
     # img_pos=[]
     # img_neg=[img_neg[5830]]
     #af.pintaMI(img_neg)
-    img_neg = random.sample(img_neg,1600)
+    #img_neg = random.sample(img_neg,800)
     # Generamos las respuestas
     resp = np.concatenate((1*np.ones(len(img_pos)),2*np.ones(len(img_neg))))
     # Obtenemos los descriptores, uno por imagen
