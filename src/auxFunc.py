@@ -120,48 +120,31 @@ def getGradient(signalsdx,signalsdy):
     '''
     n,m = signalsdx[0].shape
     # Contiene el gradiente final
-    ret = []
+    dx = []
+    dy = []
     # Contiene los gradientes de todos los canales de la imagen
-    gradientes = []
-    for i in range(len(signalsdx)):
-        dx = np.array(signalsdx[i]).reshape(-1)
-        dy = np.array(signalsdy[i]).reshape(-1)
-        # Formamos parejas de la forma (df/dx, df/dy)
-        gradiente = np.stack((dx,dy),axis=1)
-        gradientes.append(gradiente)
-    normasGradientes = [gradiente**2 for gradiente in gradientes]
-    for i in range(n*m):
-        normas = []
-        for k in range(3):
-            xx = normasGradientes[k][i,0]
-            yy = normasGradientes[k][i,1]
-            normas.append(xx+yy)
-        # Verificamos en cada pixel que
-        indiceMax = np.argmax(normas, axis=None)
-        ret.append(gradientes[indiceMax][i])
-    ret = np.array(ret)
-    ret = ret.reshape((n,m,2))
-    return ret
-
-def obtainAngle(vector):
-    '''
-    @brief Función que obtiene el ángulo del vector entre 0 y 180 grados
-    @param vector Vector del que queremos obtener el ángulo
-    @return Devuelve un valor real entre 0 y 180.
-    '''
-    angle_360=-1
-    if vector[0]==0:
-        angle_360 = 90
-    elif vector[1]==0:
-        angle_360 = 0
-    else:
-        angle_360 = np.rad2deg(np.arctan(vector[1]/vector[0]))
-
-    angle = angle_360 if angle_360<=180 else angle_360-180
-    return angle
+    cuadradoX = [gx**2 for gx in signalsdx]
+    cuadradoY = [gy**2 for gy in signalsdy]
+    for i in range(n):
+        for i in range(m):
+            normas = []
+            for k in range(3):
+                xx = cuadradoX[k][i,j]
+                yy = cuadradoY[k][i,j]
+                normas.append(xx+yy)
+            # Verificamos en cada pixel que
+            indiceMax = np.argmax(normas, axis=None)
+            dx.append(signalsdx[indiceMax][i,j])
+            dy.append(signalsdy[indiceMax][i,j])
+    dx = np.array(dx)
+    dy = np.array(dy)
+    dx.reshape((n,m))
+    dy.reshape((n,m))
+    return dx, dy
 
 def convexCombOfTwo(point, vpoints):
     for i in range(1,len(vpoints)):
+        pdb.set_trace()
         if vpoints[i]>point:
             tam = vpoints[1]-vpoints[0]
             coef1 = 1 - (point-vpoints[i-1])/tam
@@ -184,8 +167,9 @@ def computeHistogramDiego(cell, num_cols, threeSixtyQ=False):
     else:
         possibleAngles = np.linspace(0,180,num_cols)
     for row in cell:
-        for gradient in row:
-            angle = obtainAngle(gradient)
+        for g in row:
+            mag, angle = cv.cartToPolar(g[0], g[1], angleInDegrees=True)
+            pdb.set_trace()
             indice1, coef1, indice2, coef2 = convexCombOfTwo(angle,possibleAngles)
             voto = normaEuclidea(gradient)
             histogram[indice1] += coef1*voto
