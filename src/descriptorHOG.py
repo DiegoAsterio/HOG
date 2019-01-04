@@ -118,7 +118,7 @@ def spatialOrientationBinning(dx, dy, tam_cel=3, num_cols=9):
             if i+tam_cel<rows and j+tam_cel<cols:
                 subMag = mag[i:i+tam_cel,j:j+tam_cel]
                 subAng = angle[i:i+tam_cel,j:j+tam_cel]
-                hist = af.computeHistogramDiego(subMag,subAng,num_cols)
+                hist = af.computeHistogram(subMag,subAng,num_cols)
                 row_histograms.append(hist)
         if len(row_histograms)>0:
             histograms.append(row_histograms)

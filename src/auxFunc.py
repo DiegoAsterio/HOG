@@ -151,7 +151,7 @@ def convexCombOfTwo(point, vpoints):
             return i-1, coef1, i, coef2
     return False
 
-def computeHistogramDiego(subMag, subAng, num_cols, threeSixtyQ=False):
+def computeHistogram(subMag, subAng, num_cols, threeSixtyQ=False):
     '''
     @brief Dada una célula con un vector gradiente en cada posición coge el ángulo
     de cada vector y hace un histograma en forma de vector con los ángulos ponderados.
@@ -169,7 +169,10 @@ def computeHistogramDiego(subMag, subAng, num_cols, threeSixtyQ=False):
     for i in range(m):
         for j in range(m):
             mag = subMag[i,j]
-            angle = subAng[i,j] if subAng[i,j] < 180 else subAng[i,j]-180
+            if threeSixtyQ:
+                angle = subAng[i,j]
+            else:
+                angle = subAng[i,j] if subAng[i,j] < 180 else subAng[i,j]-180
             indice1, coef1, indice2, coef2 = convexCombOfTwo(angle,possibleAngles)
             histogram[indice1] += coef1*mag
             histogram[indice2] += coef2*mag
