@@ -266,8 +266,8 @@ def obtainTrainData():
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
     #img_pos = random.sample(img_pos,400)
-    img_pos=[]
-    img_neg=[img_neg[5830]]
+    # img_pos=[]
+    # img_neg=[img_neg[5830]]
     #af.pintaMI(img_neg)
     #img_neg = random.sample(img_neg,1600)
     # Generamos las respuestas
