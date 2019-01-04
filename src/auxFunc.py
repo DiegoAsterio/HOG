@@ -105,7 +105,7 @@ def normaEuclidea(v):
     @param im numpy array que contiene las coordenadas del vector
     @return Devuelve la norma de un vector
     '''
-    return np.sqrt(np.dot(v,v))
+    return np.linalg.norm(v)
 
 def getGradient(signalsdx,signalsdy):
     '''

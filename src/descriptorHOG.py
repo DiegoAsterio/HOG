@@ -2,6 +2,7 @@ import numpy as np
 import cv2 as cv
 import auxFunc as af
 import pdb
+from profilehooks import profile
 
 ################################################################################
 ##                        1: Normalización Gamma                              ##
@@ -134,9 +135,7 @@ def spatialOrientationBinning(gradients,tam_cel=3,num_cols=9):
 
 def normalizeDescriptor(bloque):
     ret = bloque.reshape(-1)
-    norma = af.normaEuclidea(ret)
-    ret = list(map(lambda x: x/norma,ret))
-    return ret
+    return list(ret/np.linalg.norm(ret))
 
 def rhog(histogramas,tam_bloque=(2,2)):
     '''
