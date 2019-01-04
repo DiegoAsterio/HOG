@@ -274,7 +274,8 @@ def obtainTrainData():
     del img_neg
     #Escribe los descriptores en un fichero
     f = open("./descriptores.txt","r+")
-    f.write(str(img_descr))
+    for des in img_descr:
+        f.write(str(des)+"\n")
     f.close()
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
