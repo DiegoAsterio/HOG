@@ -149,6 +149,8 @@ def convexCombOfTwo(point, vpoints):
             coef1 = 1 - (point-vpoints[i-1])/tam
             coef2 = (point-vpoints[i-1])/tam
             return i-1, coef1, i, coef2
+        elif vpoints[i]==point:
+            return i-1, 0, i, 1
     return False
 
 def computeHistogram(subMag, subAng, num_cols, threeSixtyQ=False):

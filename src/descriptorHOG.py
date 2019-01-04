@@ -2,7 +2,8 @@ import numpy as np
 import cv2 as cv
 import auxFunc as af
 import pdb
-from profilehooks import profile
+#from profilehooks import profile
+import random
 
 ################################################################################
 ##                        1: Normalización Gamma                              ##
@@ -130,7 +131,9 @@ def spatialOrientationBinning(dx, dy, tam_cel=3, num_cols=9):
 
 def normalizeDescriptor(bloque):
     ret = bloque.reshape(-1)
-    return list(ret/np.linalg.norm(ret))
+    norma = np.linalg.norm(ret)
+    value = list(ret/norma) if norma!=0 else list(np.zeros(ret.shape[0]))
+    return value
 
 def rhog(histogramas,tam_bloque=(2,2)):
     '''
@@ -184,7 +187,7 @@ def trainSVM(trainData):
     svm.setKernel(cv.ml.SVM_LINEAR);
     svm.setNu(0.5)
     svm.setP(0.1)
-    svm.setType(cv.ml.SVM_EPS_SVR)
+    svm.setType(cv.ml.SVM_C_SVC)
     # Ponemos una soft SVM como especifica en el paper
     svm.setC(0.01)
     svm.train(trainData)
@@ -200,45 +203,53 @@ def testSVM(svm, testData):
     retval, results = svm.predict(testData)
     return results
 
-def obtainDescriptors(imgs):
+def obtainDescriptors(imgs,silent=False):
     '''
     @brief Función que dada un vector de imágenes obtiene los descriptores asociados
     a la misma y hace la unión. Las imágenes tienen que ser parches de 64x128
     @param imgs Lista de imágenes sobre las que queremos extraer los descriptores
     @return Devuelve un numpy array de descriptores, uno por imagen
     '''
-    print("Normalización Gamma")
+    if not silent:
+        print("Normalización Gamma")
     contador=1
     gamma_corrected = []
     for im in imgs:
-        print("Normalizando " + str(contador) + "/" + str(len(imgs)))
+        if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
+            print("Normalizando " + str(contador) + "/" + str(len(imgs)))
         contador+=1
         # Aplicamos la normalización gamma a cada imagen
         gamma_corrected.append(gammaNormalization(im))
-    print("Calculando los gradientes")
+    if not silent:
+        print("Calculando los gradientes")
     contador=1
     gradients = []
     for gam in gamma_corrected:
-        print("Calculando los gradientes " + str(contador) + "/" + str(len(imgs)))
+        if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
+            print("Calculando los gradientes " + str(contador) + "/" + str(len(imgs)))
         contador+=1
         # Calculamos los gradientes de cada imagen
         gradients.append(gradientComputation1DPaper(gam,1))
     del gamma_corrected
-    print("Calculando los histogramas")
+    if not silent:
+        print("Calculando los histogramas")
     contador=1
     histograms = []
     for gra in gradients:
-        print("Calculando los histogramas " + str(contador) + "/" + str(len(imgs)))
+        if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
+            print("Calculando los histogramas " + str(contador) + "/" + str(len(imgs)))
         contador+=1
         # Calculamos los histogramas de cada matriz de gradientes
-        histograms.append(spatialOrientationBinning(gra))
+        histograms.append(spatialOrientationBinning(gra[0],gra[1]))
     del gradients
-    print("Calculando los descriptores de imagen")
+    if not silent:
+        print("Calculando los descriptores de imagen")
     contador=1
     # Normalizamos por bloques
     img_descr = rhog(histograms[0]).reshape(-1).astype(np.float32)
     for histo in histograms[1:]:
-        print("Calculando el descriptor final " + str(contador) + "/" + str(len(imgs)))
+        if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
+            print("Calculando el descriptor final " + str(contador) + "/" + str(len(imgs)))
         contador+=1
         # Unimos los descriptores en una sola lista
         descr = rhog(histo).reshape(-1).astype(np.float32)
@@ -254,8 +265,11 @@ def obtainTrainData():
     '''
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
-    print(len(img_pos))
-    print(len(img_neg))
+    #img_pos = random.sample(img_pos,400)
+    #img_pos=[]
+    #img_neg=[img_neg[5830]]
+    #af.pintaMI(img_neg)
+    #img_neg = random.sample(img_neg,1600)
     # Generamos las respuestas
     resp = np.concatenate((1*np.ones(len(img_pos)),2*np.ones(len(img_neg))))
     # Obtenemos los descriptores, uno por imagen
@@ -263,9 +277,11 @@ def obtainTrainData():
     del img_pos
     del img_neg
     #Escribe los descriptores en un fichero
+    '''
     f = open("./descriptores.txt","r+")
     for des in img_descr:
         f.write(str(des)+"\n")
     f.close()
+    '''
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
