@@ -175,48 +175,6 @@ def computeHistogramDiego(subMag, subAng, num_cols, threeSixtyQ=False):
             histogram[indice2] += coef2*mag
     return list(histogram)
 
-def computeHistogram(cell,num_cols):
-    '''
-    @brief Dada una célula con un vector gradiente en cada posición coge el ángulo
-    de cada vector y hace un histograma en forma de vector con los ángulos ponderados.
-    @param cell Matriz con los datos del gradiente que representa una célula
-    @return Devuelve un vector  de 180 elementos donde tiene un 0 si el ángulo no aparece
-    o un valor correspondiente a la interpolación bilineal al obtener el histograma.
-    '''
-    # Inicializamos el histograma
-    histogram = {}
-    histogram_vec = []
-
-    # Para cada elemento del histograma
-    for row in cell:
-        for gradient in row:
-            # Calculamos el ángulo
-            angle = obtainAngle(gradient)
-            # Obtenemos el floor y ceiling
-            ceil = int(np.ceil(angle))
-            floor = int(np.floor(angle))
-            value = 1 if ceil==floor else np.absolute(angle-ceil)
-            # Añadimos el valor de ceiling al histograma
-            if not str(ceil) in histogram:
-                histogram[str(ceil)] = value*normaEuclidea(gradient)
-            else:
-                histogram[str(ceil)]+=value*normaEuclidea(gradient)
-            # Cuando el resultado del ángulo no es entero añadimos el floor también
-            if ceil!=floor:
-                if not str(floor) in histogram:
-                    histogram[str(floor)] = np.absolute(angle-floor)*normaEuclidea(gradient)
-                else:
-                    histogram[str(floor)]+=np.absolute(angle-floor)*normaEuclidea(gradient)
-
-    # Convertimos el diccionario a un vector
-    for i in range(181):
-        if not str(i) in histogram:
-            histogram_vec.append(0)
-        else:
-            histogram_vec.append(histogram[str(i)])
-
-    return histogram_vec
-
 def modifyLocalMatrix(img,local_matrix,row_min,row_max,col_min,col_max):
     '''
     @brief Función que modifica la submatriz de img dada por los valores row_min,
