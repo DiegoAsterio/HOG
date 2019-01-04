@@ -265,11 +265,11 @@ def obtainTrainData():
     '''
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
-    #img_pos = random.sample(img_pos,400)
+    img_pos = random.sample(img_pos,400)
     # img_pos=[]
     # img_neg=[img_neg[5830]]
     #af.pintaMI(img_neg)
-    #img_neg = random.sample(img_neg,1600)
+    img_neg = random.sample(img_neg,1600)
     # Generamos las respuestas
     resp = np.concatenate((1*np.ones(len(img_pos)),2*np.ones(len(img_neg))))
     # Obtenemos los descriptores, uno por imagen
