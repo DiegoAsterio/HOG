@@ -127,16 +127,15 @@ def getGradient(signalsdx,signalsdy):
         dx = np.array(signalsdx[i]).reshape(-1)
         dy = np.array(signalsdy[i]).reshape(-1)
         # Formamos parejas de la forma (df/dx, df/dy)
-        gradiente = list(map(lambda x:list(x),list(zip(dx,dy))))
-        #pdb.set_trace()
+        gradiente = np.stack((dx,dy),axis=1)
         gradientes.append(gradiente)
+    normasGradientes = [gradiente**2 for gradiente in gradientes]
     for i in range(n*m):
         normas = []
         for k in range(3):
-            v = gradientes[k][i]
-            # TODO: CUELLO DE BOTELLA
-            f = normaEuclidea(v)
-            normas.append(f)
+            xx = normasGradientes[k][i,0]
+            yy = normasGradientes[k][i,1]
+            normas.append(xx+yy)
         # Verificamos en cada pixel que
         indiceMax = np.argmax(normas, axis=None)
         ret.append(gradientes[indiceMax][i])
