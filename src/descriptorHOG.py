@@ -2,6 +2,7 @@ import numpy as np
 import cv2 as cv
 import auxFunc as af
 import pdb
+from profilehooks import profile
 
 ################################################################################
 ##                        1: Normalización Gamma                              ##
@@ -15,11 +16,7 @@ def gammaNormalization(img,c1=1,c2=0.5):
     @param c1 Factor multiplicativo en la normalización, por defecto 1.
     @param c2 Exponente de la normalización, por defecto 1/2 (compressing normalization).
     '''
-    # Restringe los valores de la imagen entre 0 y 1
-    reduced = img/255.0
-    # Hace la correción de la luz
-    corrected = np.power(reduced*c1,c2)
-    return (corrected*255).astype(np.float32)
+    return ((np.power((img/255.0)*c1,c2))*255).astype(np.float32)
 
 ################################################################################
 ##                        2: Cómputo del gradiente                            ##
@@ -133,9 +130,7 @@ def spatialOrientationBinning(dx, dy, tam_cel=3, num_cols=9):
 
 def normalizeDescriptor(bloque):
     ret = bloque.reshape(-1)
-    norma = af.normaEuclidea(ret)
-    ret = list(map(lambda x: x/norma,ret))
-    return ret
+    return list(ret/np.linalg.norm(ret))
 
 def rhog(histogramas,tam_bloque=(2,2)):
     '''

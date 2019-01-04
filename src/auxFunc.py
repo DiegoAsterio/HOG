@@ -105,7 +105,7 @@ def normaEuclidea(v):
     @param im numpy array que contiene las coordenadas del vector
     @return Devuelve la norma de un vector
     '''
-    return np.sqrt(np.dot(v,v))
+    return np.linalg.norm(v)
 
 def getGradient(signalsdx,signalsdy):
     '''
@@ -249,7 +249,7 @@ def loadTrainImgs():
     pos_imgs_names = os.listdir(PATH_TO_INRIA+"/cropped_pos")
     for pimg in pos_imgs_names:
         im = cv.imread(PATH_TO_INRIA+"/cropped_pos/"+pimg,-1)
-        #im = np.float32(im)
+        im = np.float32(im)
         pos_imgs.append(im)
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/cropped_neg")
     for nimg in neg_imgs_names:
@@ -268,7 +268,7 @@ def loadTestImgs():
     pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/pos")
     for pimg in pos_imgs_names:
         im = cv.imread(PATH_TO_INRIA+"/Test/pos/"+pimg,-1)
-        #im = np.float32(im)
+        im = np.float32(im)
         pos_imgs.append(im)
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/neg")
     for nimg in neg_imgs_names:
