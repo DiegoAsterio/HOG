@@ -248,7 +248,7 @@ def getAllWindows(im,window_size=(64,128)):
     ret = []
     m = im.shape[0]
     n = im.shape[1]
-    for i in range(m-window_size[0]):
-        for j in range(n-window_size[1]):
-            ret.append(im[i:i+window_size[0],j:j+window_size[1]])
+    for i in range(m-window_size[1]):
+        for j in range(n-window_size[0]):
+            ret.append(im[i:i+window_size[1],j:j+window_size[0]])
     return ret
