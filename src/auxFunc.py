@@ -129,7 +129,7 @@ def getGradient(signalsdx,signalsdy):
         # Formamos parejas de la forma (df/dx, df/dy)
         gradiente = np.stack((dx,dy),axis=1)
         gradientes.append(gradiente)
-    normasGradientes = [gradiente**2 for gradiente in gradientes]
+    normasGradientes = np.multiply(gradientes,gradientes)
     for i in range(n*m):
         normas = []
         for k in range(3):

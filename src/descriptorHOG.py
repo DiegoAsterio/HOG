@@ -15,11 +15,7 @@ def gammaNormalization(img,c1=1,c2=0.5):
     @param c1 Factor multiplicativo en la normalización, por defecto 1.
     @param c2 Exponente de la normalización, por defecto 1/2 (compressing normalization).
     '''
-    # Restringe los valores de la imagen entre 0 y 1
-    reduced = img/255.0
-    # Hace la correción de la luz
-    corrected = np.power(reduced*c1,c2)
-    return (corrected*255).astype(np.float32)
+    return ((np.power((img/255.0)*c1,c2))*255).astype(np.float32)
 
 ################################################################################
 ##                        2: Cómputo del gradiente                            ##
