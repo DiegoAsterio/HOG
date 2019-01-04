@@ -189,7 +189,7 @@ def trainSVM(trainData):
     svm = cv.ml.SVM_create()
     svm.setCoef0(0.0)
     svm.setDegree(3)
-    svm.setTermCriteria((cv.TERM_CRITERIA_COUNT or cv.TERM_CRITERIA_EPS, int(1e7), 1e-6));
+    svm.setTermCriteria((cv.TERM_CRITERIA_COUNT or cv.TERM_CRITERIA_EPS, int(1e3), 1e-3));
     svm.setGamma(0)
     svm.setKernel(cv.ml.SVM_LINEAR);
     svm.setNu(0.5)
