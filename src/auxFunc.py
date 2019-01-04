@@ -126,7 +126,7 @@ def getGradient(signalsdx,signalsdy):
     cuadradoX = [gx**2 for gx in signalsdx]
     cuadradoY = [gy**2 for gy in signalsdy]
     for i in range(n):
-        for i in range(m):
+        for j in range(m):
             normas = []
             for k in range(3):
                 xx = cuadradoX[k][i,j]
@@ -138,13 +138,12 @@ def getGradient(signalsdx,signalsdy):
             dy.append(signalsdy[indiceMax][i,j])
     dx = np.array(dx)
     dy = np.array(dy)
-    dx.reshape((n,m))
-    dy.reshape((n,m))
+    dx = dx.reshape((n,m))
+    dy = dy.reshape((n,m))
     return dx, dy
 
 def convexCombOfTwo(point, vpoints):
     for i in range(1,len(vpoints)):
-        pdb.set_trace()
         if vpoints[i]>point:
             tam = vpoints[1]-vpoints[0]
             coef1 = 1 - (point-vpoints[i-1])/tam
@@ -152,7 +151,7 @@ def convexCombOfTwo(point, vpoints):
             return i-1, coef1, i, coef2
     return False
 
-def computeHistogramDiego(cell, num_cols, threeSixtyQ=False):
+def computeHistogramDiego(subMag, subAng, num_cols, threeSixtyQ=False):
     '''
     @brief Dada una célula con un vector gradiente en cada posición coge el ángulo
     de cada vector y hace un histograma en forma de vector con los ángulos ponderados.
@@ -160,20 +159,20 @@ def computeHistogramDiego(cell, num_cols, threeSixtyQ=False):
     @return Devuelve un vector  de 180 elementos donde tiene un 0 si el ángulo no aparece
     o un valor correspondiente a la interpolación bilineal al obtener el histograma.
     '''
+    m,n = subMag.shape
     possibleAngles = []
     histogram = np.zeros(num_cols)
     if threeSixtyQ:
         possibleAngles = np.linspace(0,360,num_cols)
     else:
         possibleAngles = np.linspace(0,180,num_cols)
-    for row in cell:
-        for g in row:
-            mag, angle = cv.cartToPolar(g[0], g[1], angleInDegrees=True)
-            pdb.set_trace()
+    for i in range(m):
+        for j in range(m):
+            mag = subMag[i,j]
+            angle = subAng[i,j] if subAng[i,j] < 180 else subAng[i,j]-180
             indice1, coef1, indice2, coef2 = convexCombOfTwo(angle,possibleAngles)
-            voto = normaEuclidea(gradient)
-            histogram[indice1] += coef1*voto
-            histogram[indice2] += coef2*voto
+            histogram[indice1] += coef1*mag
+            histogram[indice2] += coef2*mag
     return list(histogram)
 
 def computeHistogram(cell,num_cols):

@@ -42,7 +42,6 @@ def gradientComputation1DPaper(img,sigma):
     # Calculamos df/dy para todos los canales (RGB)
     outputSignalsdy = af.convoluteWith1DMask([-1,0,1],False,imgAux)
     # En cada pixel el gradiente es el gradiente del canal con mayor norma (RGB)
-    # CUELLO DE BOTELLA
     return af.getGradient(outputSignalsdx, outputSignalsdy)
 
 def gradientComputation1DAlt1(img,sigma):
@@ -100,7 +99,7 @@ def gradientComputation1DAlt3(img,sigma):
 ##                      3: Spatial/Orientation Binning                        ##
 ################################################################################
 
-def spatialOrientationBinning(gradients,tam_cel=3,num_cols=9):
+def spatialOrientationBinning(dx, dy, tam_cel=3, num_cols=9):
     '''
     @brief Función que dada una matriz de gradientes y un tamaño de célula divide la matriz en
     células, calcula los histogramas de todas y los devuelve en un vector.
@@ -109,28 +108,24 @@ def spatialOrientationBinning(gradients,tam_cel=3,num_cols=9):
     @param num_cols Numero de columnas del histograma, por defecto 9.
     '''
     # Obtiene el número de filas y columnas de la imagen
-    rows = gradients.shape[0]
-    cols = gradients.shape[1]
+    rows, cols = dx.shape
+    mag, angle = cv.cartToPolar(dx, dy, angleInDegrees=True)
 
     # Inicializa los histogramas
     histograms = []
-    nrow = 0
-    ncol = 0
-    contar = True
 
     # Divide la matriz en celdas y llama con cada una al cálculo de histogramas.
     for i in range(0,rows,tam_cel):
         row_histograms = []
         for j in range(0,cols,tam_cel):
             if i+tam_cel<rows and j+tam_cel<cols:
-                ncol = ncol+1 if contar else ncol
-                # Añade el histograma de la célula
-                row_histograms.append(af.computeHistogramDiego(gradients[i:i+tam_cel,j:j+tam_cel],num_cols))
+                subMag = mag[i:i+tam_cel,j:j+tam_cel]
+                subAng = angle[i:i+tam_cel,j:j+tam_cel]
+                hist = af.computeHistogramDiego(subMag,subAng,num_cols)
+                row_histograms.append(hist)
         if len(row_histograms)>0:
             histograms.append(row_histograms)
-            nrow+=1
-        contar=False
-    return np.array(histograms).reshape((nrow,ncol,num_cols))
+    return np.array(histograms).reshape((int(rows/tam_cel),int(cols/tam_cel),num_cols))
 
 ################################################################################
 ##                 4: Normalization and Descriptor Blocks                     ##
