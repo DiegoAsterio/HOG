@@ -3,6 +3,7 @@ import cv2 as cv
 import auxFunc as af
 import pdb
 import random
+import numpy as np
 
 print("Obteniendo los datos de entrenamiento")
 td = descriptorHOG.obtainTrainData()
