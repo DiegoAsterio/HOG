@@ -19,19 +19,23 @@ def test1():
 
 def test2Paper():
     img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
-    print(descriptorHOG.gradientComputation1DPaper(img,1))
+    normalized = descriptorHOG.gammaNormalization(img)
+    print(descriptorHOG.gradientComputation1DPaper(normalized,1))
 
 def test2Alt1():
     img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
-    print(descriptorHOG.gradientComputation1DAlt1(img,1))
+    normalized = descriptorHOG.gammaNormalization(img)
+    print(descriptorHOG.gradientComputation1DAlt1(normalized,1))
 
 def test2Alt2():
     img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
-    print(descriptorHOG.gradientComputation1DAlt2(img,1))
+    normalized = descriptorHOG.gammaNormalization(img)
+    print(descriptorHOG.gradientComputation1DAlt2(normalized,1))
 
 def test2Alt3():
     img = cv2.imread("../../INRIAPerson/Test/pos/crop001501.png",-1)
-    print(descriptorHOG.gradientComputation1DAlt3(img,1))
+    normalized = descriptorHOG.gammaNormalization(img)
+    print(descriptorHOG.gradientComputation1DAlt3(normalized,1))
 
 
 ################################################################################
