@@ -169,6 +169,7 @@ def computeHistogram(subMag, subAng, num_cols, threeSixtyQ=False):
     for i in range(m):
         for j in range(m):
             mag = subMag[i,j]
+            angle = None
             if threeSixtyQ:
                 angle = subAng[i,j]
             else:
