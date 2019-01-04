@@ -231,7 +231,7 @@ def loadTestImgs():
     pos_imgs = []
     neg_imgs = []
     pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/pos")
-    for pimg in pos_imgs_names[1197:]:
+    for pimg in pos_imgs_names:
         im = cv.imread(PATH_TO_INRIA+"/Test/pos/"+pimg,-1)
         im = np.float32(im)
         pos_imgs.append(im)
