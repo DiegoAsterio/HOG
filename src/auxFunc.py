@@ -147,7 +147,7 @@ def convexCombOfTwo(point, vpoints):
         if vpoints[i]>point:
             tam = vpoints[1]-vpoints[0]
             coef1 = 1 - (point-vpoints[i-1])/tam
-            coef2 = vpoints[i]-point/tam
+            coef2 = (point-vpoints[i-1])/tam
             return i-1, coef1, i, coef2
     return False
 
