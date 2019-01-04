@@ -2,7 +2,8 @@ import numpy as np
 import cv2 as cv
 import auxFunc as af
 import pdb
-from profilehooks import profile
+#from profilehooks import profile
+import random
 
 ################################################################################
 ##                        1: Normalización Gamma                              ##
@@ -254,6 +255,8 @@ def obtainTrainData():
     '''
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
+    img_pos = random.sample(img_pos,20)
+    img_neg = random.sample(img_neg,80)
     print(len(img_pos))
     print(len(img_neg))
     # Generamos las respuestas
