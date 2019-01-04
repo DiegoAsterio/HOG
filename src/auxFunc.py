@@ -143,12 +143,15 @@ def getGradient(signalsdx,signalsdy):
     return dx, dy
 
 def convexCombOfTwo(point, vpoints):
-    for i in range(1,len(vpoints)):
+    N = len(vpoints)
+    for i in range(1,N):
         if vpoints[i]>point:
             tam = vpoints[1]-vpoints[0]
             coef1 = 1 - (point-vpoints[i-1])/tam
             coef2 = (point-vpoints[i-1])/tam
             return i-1, coef1, i, coef2
+    if point == vpoints[N-1]:
+        return N-2, 0, N-1, 1
     return False
 
 def computeHistogram(subMag, subAng, num_cols, threeSixtyQ=False):
@@ -228,7 +231,7 @@ def loadTestImgs():
     pos_imgs = []
     neg_imgs = []
     pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/pos")
-    for pimg in pos_imgs_names:
+    for pimg in pos_imgs_names[1197:]:
         im = cv.imread(PATH_TO_INRIA+"/Test/pos/"+pimg,-1)
         im = np.float32(im)
         pos_imgs.append(im)
