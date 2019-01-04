@@ -231,7 +231,7 @@ def obtainDescriptors(imgs):
         print("Calculando los histogramas " + str(contador) + "/" + str(len(imgs)))
         contador+=1
         # Calculamos los histogramas de cada matriz de gradientes
-        histograms.append(spatialOrientationBinning(gra))
+        histograms.append(spatialOrientationBinning(gra[0],gra[1]))
     del gradients
     print("Calculando los descriptores de imagen")
     contador=1
@@ -263,9 +263,11 @@ def obtainTrainData():
     del img_pos
     del img_neg
     #Escribe los descriptores en un fichero
+    '''
     f = open("./descriptores.txt","r+")
     for des in img_descr:
         f.write(str(des)+"\n")
     f.close()
+    '''
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
