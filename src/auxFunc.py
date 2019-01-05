@@ -309,3 +309,29 @@ def gaussianPyramid(img,levels=3):
         img_pyr = cv2.pyrDown(img_pyr)
         pyr.append(img_pyr)
     return pyr
+
+def getPedestrianBoxes(img_name):
+    '''
+    @brief Función que dado el nombre de una imagen de la carpeta Test de INRIAPerson
+    por ejemplo crop001501.png devuelve las cajas en las que hay peatones
+    @param img_name Nombre de la imagen sobre la que queremos obtener las cajas de los peatones
+    @return Devuelve una lista de listas en las que en cada sublista se encuentran
+    los valores xmin, ymin, xmax, ymax que delimitan el rectángulo del peatón
+    '''
+    # Nos quedamos sólo con el nombre crop001501
+    name_only = img_name.split(".")[0]
+    # Leemos el fichero, en ISO porque si no da fallos de procesamiento
+    annotations_f = open(PATH_TO_INRIA+"/Test/annotations/"+name_only+".txt","r",encoding = "ISO-8859-1")
+    # Inicializamos la lista de cajas
+    boxes = []
+    for line in annotations_f:
+        # Si en la línea se da información sobre la caja de peatones
+        if "Bounding box" in line:
+            # Magia y saco los valores, mejor no preguntes
+            xmin = int(line.split(":")[1].split("-")[0].replace(" ","").split(",")[0].split("(")[-1])
+            ymin = int(line.split(":")[1].split("-")[0].replace(" ","").split(",")[1].split(")")[0])
+            xmax = int(line.split("-")[-1].replace(" ","").split(",")[0].split("(")[-1])
+            ymax = int(line.split("-")[-1].replace(" ","").split(",")[1].split(")")[0])
+            # Se une la lista a boxes
+            boxes.append([xmin,ymin,xmax,ymax])
+    return boxes
