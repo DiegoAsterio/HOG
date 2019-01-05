@@ -12,6 +12,10 @@ PATH_TO_INRIA = "../../INRIAPerson"
 ################################################################################
 
 def pintaMI(vim):
+    '''
+    @brief Función que dada una lista de imágenes las pinta en una misma ventana.
+    @param vim Lista de imágenes que queremos pintar
+    '''
     imagenes = []
     max_h = 0
     max_w = 0
@@ -36,6 +40,15 @@ def pintaMI(vim):
 ################################################################################
 
 def obtainCropLimits(nrows,ncols,window_size=(64,128)):
+    '''
+    @brief Función que dados el número de filas y columnas de la imagen original
+    da los límites de una ventana aleatoria de tamaño window_size
+    @param nrows Número de filas de la imagen original
+    @param ncols Número de columnas de la imagen original
+    @param window_size Tamaño de la ventana que queremos obtener, por defecto es
+    de tamaño 64x128
+    @return Devuelve las esquinas con valores mínimos y máximo de x e y
+    '''
     x0 = random.randint(0,nrows)
     y0 = random.randint(0,ncols)
     while x0+window_size[0]>=ncols or y0+window_size[1]>=nrows:
@@ -46,6 +59,12 @@ def obtainCropLimits(nrows,ncols,window_size=(64,128)):
     return x0,y0,x1,y1
 
 def obtainNegativeSamples(neg_samples_dir="../../INRIAPerson/Train/neg/",dir_to_save="./cropped_neg/"):
+    '''
+    @brief Función que dado un directorio con imágenes y un directorio para guardarlas
+    obtiene 10 ventanas aleatorias de la misma y las guarda en el directorio correspondiente
+    @param neg_samples_dir Directorio que contiene las imágenes
+    @param dir_to_save Directorio donde queremos guardar los resultados
+    '''
     list_images = os.listdir(neg_samples_dir)
     for img_name in list_images:
         img = cv.imread(neg_samples_dir + img_name,-1)
@@ -143,13 +162,26 @@ def getGradient(signalsdx,signalsdy):
     return dx, dy
 
 def convexCombOfTwo(point, vpoints):
+    '''
+    @brief Función que dado un ángulo y una lista de ángulos posibles nos dice
+    en qué porcentaje debemos sumar a cada índice del histograma
+    @param point Ángulo del que queremos obtener los coeficientes
+    @param vpoints Lista que contiene una división equiespaciada de los posibles
+    valores del ángulo point
+    @return Devuelve una 4-upla que contiene el valor del primer índice, su
+    coeficiente correspondiente, el valor del segundo índice y su coeficiente
+    correspondiente
+    '''
     N = len(vpoints)
     for i in range(1,N):
+        # En el momento en que encontremos el ángulo de la lista que es mayor que el nuestro
         if vpoints[i]>point:
+            # Calculamos los coeficientes y los devolvemos
             tam = vpoints[1]-vpoints[0]
             coef1 = 1 - (point-vpoints[i-1])/tam
             coef2 = (point-vpoints[i-1])/tam
             return i-1, coef1, i, coef2
+    # Si el ángulo es justo el último asignamos los coeficientes
     if point == vpoints[N-1]:
         return N-2, 0, N-1, 1
     return False
@@ -164,11 +196,15 @@ def computeHistogram(subMag, subAng, num_cols, threeSixtyQ=False):
     '''
     m,n = subMag.shape
     possibleAngles = []
+    # Inicializamos el histogama
     histogram = np.zeros(num_cols)
+    # Si estamos en 0,360 o en 0,180 hacemos la lista de posibles ángulos
     if threeSixtyQ:
         possibleAngles = np.linspace(0,360,num_cols)
     else:
         possibleAngles = np.linspace(0,180,num_cols)
+    # Para cada posición calculamos el ángulo y sumamos el valor proporcional a la
+    # magnitud a la posición correspondiente del histograma
     for i in range(m):
         for j in range(m):
             mag = subMag[i,j]
