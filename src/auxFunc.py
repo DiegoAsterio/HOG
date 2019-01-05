@@ -291,13 +291,14 @@ def getAllWindows(im,window_size=(64,128)):
             ret.append(im[i:i+window_size[1],j:j+window_size[0]])
     return ret
 
-'''
-@brief Esta función obtiene la pirámide gaussiana de la imagen dada.
-@param img Imagen a la que se le quiere calcular la pirámide gaussiana.
-@param levels Niveles de la pirámide gaussiana, por defecto 3.
-@return Devuelve la pirámide gaussiana de la imagen pasada.
-'''
+
 def gaussianPyramid(img,levels=3):
+    '''
+    @brief Esta función obtiene la pirámide gaussiana de la imagen dada.
+    @param img Imagen a la que se le quiere calcular la pirámide gaussiana.
+    @param levels Niveles de la pirámide gaussiana, por defecto 3.
+    @return Devuelve la pirámide gaussiana de la imagen pasada.
+    '''
     pyr = []
     # Se hace un downsample a la imagen. La función pyrDown implementa ya el blur.
     img_pyr = cv2.pyrDown(img)
