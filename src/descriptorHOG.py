@@ -2,7 +2,6 @@ import numpy as np
 import cv2 as cv
 import auxFunc as af
 import pdb
-#from profilehooks import profile
 import random
 
 ################################################################################
@@ -130,6 +129,11 @@ def spatialOrientationBinning(dx, dy, tam_cel=3, num_cols=9):
 ################################################################################
 
 def normalizeDescriptor(bloque):
+    '''
+    @brief Función que dada una submatriz la normaliza
+    @param bloque Submatriz que queremos normalizar
+    @return Pasamos el bloque a una lista 1-D y lo dividimos por su norma
+    '''
     ret = bloque.reshape(-1)
     norma = np.linalg.norm(ret)
     value = list(ret/norma) if norma!=0 else list(np.zeros(ret.shape[0]))
@@ -154,7 +158,7 @@ def rhog(histogramas,tam_bloque=(2,2)):
     return np.array(descriptores)
 
 #def normalizechog(subseccion, radio_central, num_secciones, expansion):
-
+'''
 def chog(histogramas, radio_central, num_secciones, expansion):
     n, m, k = histogramas.shape
     descriptores = []
@@ -166,7 +170,7 @@ def chog(histogramas, radio_central, num_secciones, expansion):
             descriptoresFila.append(descriptor)
         descriptores.append(descriptoresFila)
     return np.array(descriptores)
-
+'''
 
 ################################################################################
 ##                           5: Classification                                ##
@@ -266,11 +270,9 @@ def obtainTrainData():
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
     #img_pos = random.sample(img_pos,200)
-    # img_pos=[]
-    # img_neg=[img_neg[5830]]
-    #af.pintaMI(img_neg)
     #img_neg = random.sample(img_neg,800)
-    # Generamos las respuestas
+
+    # Generamos las respuestas 1 si es una persona, 2 si no lo es
     resp = np.concatenate((1*np.ones(len(img_pos)),2*np.ones(len(img_neg))))
     # Obtenemos los descriptores, uno por imagen
     img_descr = obtainDescriptors(img_pos + img_neg)
@@ -280,7 +282,11 @@ def obtainTrainData():
     '''
     f = open("./descriptores.txt","r+")
     for des in img_descr:
-        f.write(str(des)+"\n")
+        st = ""
+        for d in des:
+            st = str(d)+","
+        st = st[:-1]
+        f.write(st+"\n")
     f.close()
     '''
     # Creamos los datos de entrenamiento y los devolvemos
