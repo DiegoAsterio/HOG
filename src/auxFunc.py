@@ -75,7 +75,7 @@ def obtainNegativeSamples(neg_samples_dir="../../INRIAPerson/Train/neg/",dir_to_
             crop = img[y_min:y_max, x_min:x_max]
             cv.imwrite(dir_to_save+img_name_sp+"_c_"+str(i)+"."+format,crop)
 
-def obtainNegative(neg_samples_dir="../../INRIAPerson/Train/neg/"):
+def obtainNegatives(neg_samples_dir="../../INRIAPerson/Train/neg/"):
     '''
     @brief Función que dado un directorio con imágenes y un directorio para guardarlas
     obtiene 10 ventanas aleatorias de la misma y las guarda en el directorio correspondiente
