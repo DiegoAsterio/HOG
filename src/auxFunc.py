@@ -335,3 +335,44 @@ def getPedestrianBoxes(img_name):
             # Se une la lista a boxes
             boxes.append([xmin,ymin,xmax,ymax])
     return boxes
+
+def getWindowsandTagsPos(imgs,boxes):
+    windows = []
+    tags = []
+    for i in range(len(imgs)):
+        lwindow, ltag = calculateEveryWindowAndTag(imgs[i],boxes[i]))
+        windows = windows + lwindow
+        tags = tags + ltag
+    return windows tags
+
+def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
+    areaTotal = float((x2-x1)*(y2-y1))
+    areaParcial = float((u2-u1)*(v2-v1))
+    return areaTotal/areaParcial
+
+def calculateEveryWindowAndTag(img, boxes):
+    windows=[]
+    tags = []
+    pyr = gaussianPyramid(img)
+    for level in pyr:
+        y,x,z = level.shape
+        indiceX = 0
+        indiceY = 0
+        while indiceY+128<y:
+            while indiceX+64<x:
+                windows.append(img[indiceY:indiceY+128,indiceX:indiceX+64])
+                isAPerson = False
+                for xmin,ymin,xmax,ymax in boxes:
+                    x1 = max(indiceX, xmin)
+                    y1 = max(indiceY, ymin)
+                    x2 = min(indiceX+64,xmax)
+                    y2 = min(indiceY+128,ymax)
+                    if x1<x2 and y1<y2:
+                        if checkArea(xmin,ymin,xmax,ymax,x1,y1,x2,y2):
+                            isAPerson = True
+                        
+                if isAPerson:
+                    tags.append(2)
+                else:
+                    tags.append(1)
+    
