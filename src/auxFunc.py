@@ -75,6 +75,24 @@ def obtainNegativeSamples(neg_samples_dir="../../INRIAPerson/Train/neg/",dir_to_
             crop = img[y_min:y_max, x_min:x_max]
             cv.imwrite(dir_to_save+img_name_sp+"_c_"+str(i)+"."+format,crop)
 
+def obtainNegative(neg_samples_dir="../../INRIAPerson/Train/neg/"):
+    '''
+    @brief Función que dado un directorio con imágenes y un directorio para guardarlas
+    obtiene 10 ventanas aleatorias de la misma y las guarda en el directorio correspondiente
+    @param neg_samples_dir Directorio que contiene las imágenes
+    @param dir_to_save Directorio donde queremos guardar los resultados
+    '''
+    ret = []
+    list_images = os.listdir(neg_samples_dir)
+    for img_name in list_images:
+        img = cv.imread(neg_samples_dir + img_name,-1)
+        img_name_sp = img_name.split(".")[0]
+        format = img_name.split(".")[1]
+        for i in range(10):
+            x_min,y_min,x_max,y_max = obtainCropLimits(img.shape[0],img.shape[1])
+            crop = img[y_min:y_max, x_min:x_max]
+            ret.append(crop)
+    return ret
 ################################################################################
 ##                         Funciones de cálculo                               ##
 ################################################################################
@@ -301,12 +319,12 @@ def gaussianPyramid(img,levels=3):
     '''
     pyr = []
     # Se hace un downsample a la imagen. La función pyrDown implementa ya el blur.
-    img_pyr = cv2.pyrDown(img)
+    img_pyr = cv.pyrDown(img)
     pyr.append(img)
     pyr.append(img_pyr)
     # Se hace el downsample y el blur tantas veces como niveles se quieran a la imagen una y otra vez.
     for i in range(levels-2):
-        img_pyr = cv2.pyrDown(img_pyr)
+        img_pyr = cv.pyrDown(img_pyr)
         pyr.append(img_pyr)
     return pyr
 
@@ -336,19 +354,25 @@ def getPedestrianBoxes(img_name):
             boxes.append([xmin,ymin,xmax,ymax])
     return boxes
 
-def getWindowsandTagsPos(imgs,boxes):
+def getWindowsAndTagsPos(imgs,boxes):
     windows = []
     tags = []
     for i in range(len(imgs)):
-        lwindow, ltag = calculateEveryWindowAndTag(imgs[i],boxes[i]))
+        lwindow, ltag = calculateEveryWindowAndTag(imgs[i],boxes[i])
         windows = windows + lwindow
         tags = tags + ltag
-    return windows tags
+    return windows, tags
+
+def getWindowsAndTagsNeg(imgs):
+    windows = obtainNegatives(neg_samples_dir="../../INRIAPerson/Test/neg/")
+    tags = np.ones(len(windows))*2
+    return windows, tags
+
 
 def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
     areaTotal = float((x2-x1)*(y2-y1))
     areaParcial = float((u2-u1)*(v2-v1))
-    return areaTotal/areaParcial
+    return areaTotal/areaParcial < 0.5
 
 def calculateEveryWindowAndTag(img, boxes):
     windows=[]
@@ -375,4 +399,22 @@ def calculateEveryWindowAndTag(img, boxes):
                     tags.append(2)
                 else:
                     tags.append(1)
-    
+
+def getImagesAndTags():
+    pos_imgs = []
+    pos_boxes = []
+    neg_imgs = []
+    pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/pos")
+    for pimg in pos_imgs_names:
+        im = cv.imread(PATH_TO_INRIA+"/Test/pos/"+pimg,-1)
+        im = np.float32(im)
+        pos_imgs.append(im)
+        pos_boxes.append(getPedestrianBoxes(pimg))
+    neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/neg")
+    for nimg in neg_imgs_names:
+        neg_imgs.append(cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1))
+    pos_windows, tags_pos_windows = getWindowsAndTagsPos(pos_imgs,pos_boxes)
+    neg_windows, tags_neg_windows = getWindowsAndTagsNeg(neg_imgs)
+    resp = np.concatenate((tags_pos_windows,tags_neg_windows)).astype(np.int)
+    return pos_windows + neg_windows, resp
+

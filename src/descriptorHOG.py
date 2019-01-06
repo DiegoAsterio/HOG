@@ -293,24 +293,6 @@ def obtainTrainData():
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
 
 def createTestData():
-    pos_imgs = []
-    pos_boxes = []
-    neg_imgs = []
-    pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/pos")
-    for pimg in pos_imgs_names:
-        im = cv.imread(PATH_TO_INRIA+"/Test/pos/"+pimg,-1)
-        im = np.float32(im)
-        pos_imgs.append(im)
-        pos_boxes.append(af.getPedestrianBoxes(pimg))
-    neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/neg")
-    for nimg in neg_imgs_names:
-        neg_imgs.append(cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1))
-    pos_windows, tags = af.getWindowsAndTagsPos(pos_imgs,pos_boxes)
-    neg_windows = af.getNegWindows(neg_imgs)
-
-    img_descr = obtainDescriptors( pos_windows + neg_windows )
-    del pos_windows
-    del neg_windows
-    
-    resp = np.concatenate((tags,2*np.ones(len(neg_windows))))
-    return cv.ml.TrainData_create(img_descr, cv.ml.ROW_SAMPLE, resp.astype(np.int))
+    imgs, tags = af.getImagesAndTags()
+    img_descr = obtainDescriptors( imgs )
+    return cv.ml.TrainData_create(img_descr, cv.ml.ROW_SAMPLE, tags.astype(np.int))
