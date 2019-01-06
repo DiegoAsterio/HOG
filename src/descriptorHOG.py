@@ -295,4 +295,4 @@ def obtainTrainData():
 def createTestData():
     imgs, tags = af.getImagesAndTags()
     img_descr = obtainDescriptors( imgs )
-    return cv.ml.TrainData_create(img_descr, cv.ml.ROW_SAMPLE, tags.astype(np.int))
+    return img_descr, tags

@@ -365,7 +365,7 @@ def getWindowsAndTagsPos(imgs,boxes):
 
 def getWindowsAndTagsNeg(imgs):
     windows = obtainNegatives(neg_samples_dir="../../INRIAPerson/Test/neg/")
-    tags = np.ones(len(windows))*2
+    tags = 2*np.ones(len(windows))
     return windows, tags
 
 
@@ -376,16 +376,14 @@ def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
 
 def calculateEveryWindowAndTag(img, boxes):
     windows=[]
-    tags = []
     pyr = gaussianPyramid(img)
     for level in pyr:
         y,x,z = level.shape
         indiceX = 0
         indiceY = 0
         while indiceY+128<y:
+            indiceX = 0
             while indiceX+64<x:
-                windows.append(img[indiceY:indiceY+128,indiceX:indiceX+64])
-                isAPerson = False
                 for xmin,ymin,xmax,ymax in boxes:
                     x1 = max(indiceX, xmin)
                     y1 = max(indiceY, ymin)
@@ -393,12 +391,11 @@ def calculateEveryWindowAndTag(img, boxes):
                     y2 = min(indiceY+128,ymax)
                     if x1<x2 and y1<y2:
                         if checkArea(xmin,ymin,xmax,ymax,x1,y1,x2,y2):
-                            isAPerson = True
-                        
-                if isAPerson:
-                    tags.append(2)
-                else:
-                    tags.append(1)
+                            windows.append(img[indiceY:indiceY+128,indiceX:indiceX+64])
+                indiceX = indiceX + 32
+            indiceY = indiceY + 64
+    return windows, np.ones(len(windows))
+
 
 def getImagesAndTags():
     pos_imgs = []
