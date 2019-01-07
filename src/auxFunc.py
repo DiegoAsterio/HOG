@@ -396,7 +396,6 @@ def calculateEveryWindow(img, boxes):
             indiceY = indiceY + 64
     return windows
 
-
 def getImagesAndTags():
     pos_imgs = []
     pos_boxes = []
@@ -407,13 +406,17 @@ def getImagesAndTags():
         im = np.float32(im)
         pos_imgs.append(im)
         pos_boxes.append(getPedestrianBoxes(pimg))
+    del pos_imgs_names
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/neg")
     for nimg in neg_imgs_names:
         im = cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1)
         im = np.float32(im)
         neg_imgs.append(im)
+    del neg_imgs_names
     pos_windows, tags_pos_windows = getWindowsAndTagsPos(pos_imgs,pos_boxes)
+    del pos_imgs
+    del pos_boxes
     neg_windows, tags_neg_windows = getWindowsAndTagsNeg(neg_imgs)
+    del neg_imgs
     resp = np.concatenate((tags_pos_windows,tags_neg_windows)).astype(np.int)
     return pos_windows + neg_windows, resp
-
