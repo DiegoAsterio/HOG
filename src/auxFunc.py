@@ -358,9 +358,9 @@ def getWindowsAndTagsPos(imgs,boxes):
     windows = []
     tags = []
     for i in range(len(imgs)):
-        lwindow, ltag = calculateEveryWindowAndTag(imgs[i],boxes[i])
+        lwindow= calculateEveryWindowAndTag(imgs[i],boxes[i])
         windows = windows + lwindow
-        tags = tags + ltag
+        tags = tags + [ 1 for i in range(len(windows)) ]
     return windows, tags
 
 def getWindowsAndTagsNeg(imgs):
@@ -372,7 +372,7 @@ def getWindowsAndTagsNeg(imgs):
 def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
     areaTotal = float((x2-x1)*(y2-y1))
     areaParcial = float((u2-u1)*(v2-v1))
-    return areaTotal/areaParcial < 0.5
+    return areaParcial/areaTotal < 0.5
 
 def calculateEveryWindowAndTag(img, boxes):
     windows=[]
@@ -389,7 +389,7 @@ def calculateEveryWindowAndTag(img, boxes):
                     y1 = max(indiceY, ymin)
                     x2 = min(indiceX+64,xmax)
                     y2 = min(indiceY+128,ymax)
-                    if x1<x2 and y1<y2:
+                    if x1<x2 or y1<y2:
                         if checkArea(xmin,ymin,xmax,ymax,x1,y1,x2,y2):
                             windows.append(img[indiceY:indiceY+128,indiceX:indiceX+64])
                 indiceX = indiceX + 32
@@ -409,7 +409,9 @@ def getImagesAndTags():
         pos_boxes.append(getPedestrianBoxes(pimg))
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/neg")
     for nimg in neg_imgs_names:
-        neg_imgs.append(cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1))
+        im = cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1)
+        im = np.float32(im)
+        neg_imgs.append(im)
     pos_windows, tags_pos_windows = getWindowsAndTagsPos(pos_imgs,pos_boxes)
     neg_windows, tags_neg_windows = getWindowsAndTagsNeg(neg_imgs)
     resp = np.concatenate((tags_pos_windows,tags_neg_windows)).astype(np.int)
