@@ -372,7 +372,7 @@ def getWindowsAndTagsNeg(imgs):
 def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
     areaTotal = float((x2-x1)*(y2-y1))
     areaParcial = float((u2-u1)*(v2-v1))
-    return areaParcial/areaTotal < 0.5
+    return areaParcial/areaTotal >= 0.5
 
 def calculateEveryWindow(img, boxes):
     windows=[]
