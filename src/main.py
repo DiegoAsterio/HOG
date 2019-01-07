@@ -51,7 +51,7 @@ for i in range(len(predicciones)):
         else:
             nneg+=1
     else:
-        if predicciones[i]==1:
+        if predicciones[i]==2:
             img_pos_incorrectas.append(np.uint8(imgs[i]))
 print("\n\n##################################################")
 print("Positivos: " + str(npos) + "/" + str(total_pos) + "===>" + str(100*npos/total_pos) + "%")
