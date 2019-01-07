@@ -5,7 +5,7 @@ import os
 import re
 import random
 
-PATH_TO_INRIA = "../../INRIAPerson"
+PATH_TO_INRIA = "../INRIAPerson"
 
 ################################################################################
 ##                       Funciones de dibujado                                ##
@@ -58,7 +58,7 @@ def obtainCropLimits(nrows,ncols,window_size=(64,128)):
     y1 = y0+window_size[1]
     return x0,y0,x1,y1
 
-def obtainNegativeSamples(neg_samples_dir="../../INRIAPerson/Train/neg/",dir_to_save="./cropped_neg/"):
+def obtainNegativeSamples(neg_samples_dir=PATH_TO_INRIA+"/Train/neg/",dir_to_save="./cropped_neg/"):
     '''
     @brief Función que dado un directorio con imágenes y un directorio para guardarlas
     obtiene 10 ventanas aleatorias de la misma y las guarda en el directorio correspondiente
@@ -75,7 +75,7 @@ def obtainNegativeSamples(neg_samples_dir="../../INRIAPerson/Train/neg/",dir_to_
             crop = img[y_min:y_max, x_min:x_max]
             cv.imwrite(dir_to_save+img_name_sp+"_c_"+str(i)+"."+format,crop)
 
-def obtainNegatives(neg_samples_dir="../../INRIAPerson/Train/neg/"):
+def obtainNegatives(neg_samples_dir=PATH_TO_INRIA+"/Train/neg/"):
     '''
     @brief Función que dado un directorio con imágenes y un directorio para guardarlas
     obtiene 10 ventanas aleatorias de la misma y las guarda en el directorio correspondiente
@@ -364,7 +364,7 @@ def getWindowsAndTagsPos(imgs,boxes):
     return windows, tags
 
 def getWindowsAndTagsNeg(imgs):
-    windows = obtainNegatives(neg_samples_dir="../../INRIAPerson/Test/neg/")
+    windows = obtainNegatives(neg_samples_dir=PATH_TO_INRIA+"/Test/neg/")
     tags = 2*np.ones(len(windows))
     return windows, tags
 
