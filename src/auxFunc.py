@@ -358,7 +358,7 @@ def getWindowsAndTagsPos(imgs,boxes):
     windows = []
     tags = []
     for i in range(len(imgs)):
-        lwindow= calculateEveryWindowAndTag(imgs[i],boxes[i])
+        lwindow= calculateEveryWindow(imgs[i],boxes[i])
         windows = windows + lwindow
         tags = tags + [ 1 for i in range(len(windows)) ]
     return windows, tags
@@ -374,7 +374,7 @@ def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
     areaParcial = float((u2-u1)*(v2-v1))
     return areaParcial/areaTotal < 0.5
 
-def calculateEveryWindowAndTag(img, boxes):
+def calculateEveryWindow(img, boxes):
     windows=[]
     pyr = gaussianPyramid(img)
     for level in pyr:
@@ -394,7 +394,7 @@ def calculateEveryWindowAndTag(img, boxes):
                             windows.append(img[indiceY:indiceY+128,indiceX:indiceX+64])
                 indiceX = indiceX + 32
             indiceY = indiceY + 64
-    return windows, np.ones(len(windows))
+    return windows
 
 
 def getImagesAndTags():
