@@ -356,17 +356,14 @@ def getPedestrianBoxes(img_name):
 
 def getWindowsAndTagsPos(imgs,boxes):
     windows = []
-    tags = []
     for i in range(len(imgs)):
         lwindow= calculateEveryWindow(imgs[i],boxes[i])
         windows = windows + lwindow
-        tags = tags + [ 1 for i in range(len(windows)) ]
-    return windows, tags
+    return windows
 
 def getWindowsAndTagsNeg(imgs):
     windows = obtainNegatives(neg_samples_dir=PATH_TO_INRIA+"/Test/neg/")
-    tags = 2*np.ones(len(windows))
-    return windows, tags
+    return windows
 
 
 def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
@@ -413,10 +410,11 @@ def getImagesAndTags():
         im = np.float32(im)
         neg_imgs.append(im)
     del neg_imgs_names
-    pos_windows, tags_pos_windows = getWindowsAndTagsPos(pos_imgs,pos_boxes)
+    pos_windows = getWindowsAndTagsPos(pos_imgs,pos_boxes)
+    tags_pos_windows = [1 for i in range(len(pos_windows))]
     del pos_imgs
     del pos_boxes
-    neg_windows, tags_neg_windows = getWindowsAndTagsNeg(neg_imgs)
+    neg_windows = getWindowsAndTagsNeg(neg_imgs)
+    tags_neg_windows = [2 for i in range(len(neg_windows))]
     del neg_imgs
-    resp = np.concatenate((tags_pos_windows,tags_neg_windows)).astype(np.int)
-    return pos_windows + neg_windows, resp
+    return pos_windows + neg_windows, tags_pos_windows+tags_neg_windows
