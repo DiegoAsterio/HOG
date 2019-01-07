@@ -374,6 +374,7 @@ def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
 def calculateEveryWindow(img, boxes):
     windows=[]
     pyr = gaussianPyramid(img)
+    reduce=1
     for level in pyr:
         y,x,z = level.shape
         indiceX = 0
@@ -382,15 +383,16 @@ def calculateEveryWindow(img, boxes):
             indiceX = 0
             while indiceX+64<x:
                 for xmin,ymin,xmax,ymax in boxes:
-                    x1 = max(indiceX, xmin)
-                    y1 = max(indiceY, ymin)
-                    x2 = min(indiceX+64,xmax)
-                    y2 = min(indiceY+128,ymax)
+                    x1 = max(indiceX, xmin//reduce)
+                    y1 = max(indiceY, ymin//reduce)
+                    x2 = min(indiceX+64,xmax//reduce)
+                    y2 = min(indiceY+128,ymax//reduce)
                     if x1<x2 or y1<y2:
-                        if checkArea(xmin,ymin,xmax,ymax,x1,y1,x2,y2):
-                            windows.append(img[indiceY:indiceY+128,indiceX:indiceX+64])
+                        if checkArea(xmin//reduce,ymin//reduce,xmax//reduce,ymax//reduce,x1,y1,x2,y2):
+                            windows.append(level[indiceY:indiceY+128,indiceX:indiceX+64])
                 indiceX = indiceX + 32
             indiceY = indiceY + 64
+        reduce*=2
     return windows
 
 def getImagesAndTags():

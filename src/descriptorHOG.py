@@ -294,5 +294,13 @@ def obtainTrainData():
 
 def createTestData():
     imgs, tags = af.getImagesAndTags()
+    '''
+    n_pos = 0
+    for t in tags:
+        if t==1:
+            n_pos+=1
+    print(n_pos)
+    af.pintaMI([np.uint8(img) for img in random.sample(imgs[:400],50)])
+    '''
     img_descr = obtainDescriptors( imgs )
     return img_descr, tags
