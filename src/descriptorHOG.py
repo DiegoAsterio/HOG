@@ -310,10 +310,10 @@ def chunkPrediccions(vim, vpred):
     for i in range(len(vim)):
         encontradoUnaPersona = False
         for j in range(len(vim[i])):
-            if vpred[i+j] == 2:
+            if vpred[i+j] == 1:
                 encontradoUnaPersona = True
         if encontradoUnaPersona:
-            ret.append(2)
-        else:
             ret.append(1)
+        else:
+            ret.append(2)
     return ret
