@@ -272,7 +272,9 @@ def loadTrainImgs():
         pos_imgs.append(im)
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/cropped_neg")
     for nimg in neg_imgs_names:
-        neg_imgs.append(cv.imread(PATH_TO_INRIA+"/cropped_neg/"+nimg,-1))
+        im = cv.imread(PATH_TO_INRIA+"/cropped_neg/"+nimg,-1)
+        im = np.float32(im)
+        neg_imgs.append(im)
     return pos_imgs,neg_imgs
 
 def loadTestImgs():
@@ -291,7 +293,9 @@ def loadTestImgs():
         pos_imgs.append(im)
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/cropped_test_neg")
     for nimg in neg_imgs_names:
-        neg_imgs.append(cv.imread(PATH_TO_INRIA+"/cropped_test_neg/"+nimg,-1))
+        im = cv.imread(PATH_TO_INRIA+"/cropped_test_neg/"+nimg,-1)
+        im = np.float32(im)
+        neg_imgs.append(im)
     return pos_imgs,neg_imgs
 
 def getAllWindows(im,window_size=(64,128)):
