@@ -304,3 +304,16 @@ def createTestData():
     imgs, trueTags = af.getImagesAndTags( )
     img_descr = obtainDescriptors( imgs )
     return img_descr, trueTags
+
+def chunkPrediccions(vim, vpred):
+    ret = []
+    for i in range(len(vim)):
+        encontradoUnaPersona = False
+        for j in range(len(vim[i])):
+            if vpred[i+j] == 2:
+                encontradoUnaPersona = True
+        if encontradoUnaPersona:
+            ret.append(2)
+        else:
+            ret.append(1)
+    return ret

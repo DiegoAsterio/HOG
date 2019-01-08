@@ -25,6 +25,7 @@ imgs, _ = af.getImagesAndTags()
 
 descr, tags = descriptorHOG.createTestData()
 predicciones = svm.predict(descr)[1]
+predicciones = [pred[0] for pred in predicciones]
 chunkedPred = descriptorHOG.chunkPredictions(imgs, predicciones)
 
 del descr
@@ -51,16 +52,16 @@ for t in tags:
 img_pos_correctas = []
 img_pos_incorrectas = []
 # Calculamos el número de aciertos
-for i in range(len(predicciones)):
-    if tags[i]==predicciones[i]:
-        if predicciones[i]==1:
+for i in range(len(chunkedPred)):
+    if tags[i]==chunkedPred[i]:
+        if chunkedPred[i]==1:
             npos+=1
-            img_pos_correctas.append(np.uint8(imgs[i]))
-        elif predicciones[i]==2:
+            img_pos_correctas.append(np.uint8(imgs[i][0]))
+        elif chunkedPred[i]==2:
             nneg+=1
     else:
-        if predicciones[i]==2:
-            img_pos_incorrectas.append(np.uint8(imgs[i]))
+        if chunkedPred[i]==2:
+            img_pos_incorrectas.append(np.uint8(imgs[i][0]))
 print("\n\n##################################################")
 print("Positivos: " + str(npos) + "/" + str(total_pos) + "===>" + str(100*npos/total_pos) + "%")
 print("Negativos: " + str(nneg) + "/" + str(total_neg) + "===>" + str(100*nneg/total_neg) + "%")
