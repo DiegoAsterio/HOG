@@ -5,7 +5,7 @@ import pdb
 import random
 import numpy as np
 
-
+'''
 print("Obteniendo los datos de entrenamiento")
 # Obtenemos los datos de entrenamiento
 td = descriptorHOG.obtainTrainData()
@@ -16,8 +16,8 @@ svm.save("svm.txt")
 del td
 '''
 print("Cargando la SVM de fichero")
-svm = cv.ml.SVM_load("svm_version_antigua.txt")
-'''
+svm = cv.ml.SVM_load("svm.txt")
+
 print("Cargandos el test")
 descr, tags = descriptorHOG.createTestData()
 predicciones = svm.predict(descr)[1]
@@ -32,25 +32,22 @@ print(predicciones)
 print("##################################################\n\n")
 
 
-npos=0
-nneg=0
-total_neg = 0
-total_pos = 0
-img_pos_correctas = []
-img_pos_incorrectas = []
 imgs_pos, imgs_neg = af.loadTestImgs()
 imgs=imgs_pos+imgs_neg
+
+npos=0
+nneg=0
+total_neg = len(imgs_neg)
+total_pos = len(imgs_pos)
+img_pos_correctas = []
+img_pos_incorrectas = []
 # Calculamos el número de aciertos
 for i in range(len(predicciones)):
-    if tags[i]==1:
-        total_pos+=1
-    else:
-        total_neg+=1
     if tags[i]==predicciones[i]:
         if predicciones[i]==1:
             npos+=1
             img_pos_correctas.append(np.uint8(imgs[i]))
-        else:
+        elif predicciones[i]==2:
             nneg+=1
     else:
         if predicciones[i]==2:
