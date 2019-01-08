@@ -34,13 +34,19 @@ print(predicciones)
 print("##################################################\n\n")
 
 
-imgs_pos, imgs_neg = af.loadTestImgs()
-imgs=imgs_pos+imgs_neg
+imgs, _ = af.getImagesAndTags()
 
 npos=0
 nneg=0
-total_neg = len(imgs_neg)
-total_pos = len(imgs_pos)
+total_neg = 0
+total_pos = 0
+
+for t in tags:
+    if t==1:
+        total_pos+=1
+    elif t==2:
+        total_neg+=1
+
 img_pos_correctas = []
 img_pos_incorrectas = []
 # Calculamos el número de aciertos
