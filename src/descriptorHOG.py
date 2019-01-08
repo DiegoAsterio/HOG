@@ -292,6 +292,7 @@ def createTestData():
     print(n_pos)
     af.pintaMI([np.uint8(img) for img in random.sample(imgs[:400],50)])
     '''
+    '''
     imgs_pos,imgs_neg = af.loadTestImgs()
     tags_pos = [1 for i in range(len(imgs_pos))]
     tags_neg = [2 for i in range(len(imgs_neg))]
@@ -299,3 +300,8 @@ def createTestData():
     tags = tags_pos+tags_neg
     img_descr = obtainDescriptors( imgs )
     return img_descr, tags
+    '''
+    imgs, trueTags = getImagesAndTags( )
+    img_descr = obtainDescriptors( imgs )
+    return img_descr, trueTags
+    

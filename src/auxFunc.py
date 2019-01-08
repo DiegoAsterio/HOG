@@ -423,4 +423,4 @@ def getImagesAndTags():
     neg_windows = getWindowsAndTagsNeg(neg_imgs)
     tags_neg_windows = [2 for i in range(len(neg_windows))]
     del neg_imgs
-    return pos_windows + neg_windows, tags_pos_windows+tags_neg_windows
+    return pos_windows + neg_windows, tags_pos_windows + tags_neg_windows
