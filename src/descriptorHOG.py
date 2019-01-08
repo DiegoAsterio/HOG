@@ -282,7 +282,7 @@ def obtainTrainData():
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
 
-def createTestData():
+def createTestData(chunk_size=100):
     '''
     imgs, tags = af.getImagesAndTags()
     n_pos = 0
@@ -301,12 +301,30 @@ def createTestData():
     img_descr = obtainDescriptors( imgs )
     return img_descr, tags
     '''
+    # Cargo las imagenes y las tags
     imgs, trueTags = af.getImagesAndTags( )
+
+    # Las pongo en una lista
     imgs_lista = []
     for lim in imgs:
         for im in lim:
             imgs_lista.append(im)
-    img_descr = obtainDescriptors( imgs_lista )
+
+    # Calculo los descriptores por chunks
+    num_chunks = len(imgs)//chunk_size
+    img_descr=None
+    primera_vez=True
+    for i in range(num_chunks-1):
+        print("Calculando los descriptores " + str(i*chunk_size) + "-" + str((i+1)*chunk_size) + " del total de: " + str(len(imgs_lista)))
+        if primera_vez:
+            img_descr = obtainDescriptors(imgs_lista[i*chunk_size:(i+1)*chunk_size],True)
+            primera_vez=False
+        else:
+            img_descr=np.concatenate((img_descr,obtainDescriptors(imgs_lista[i*chunk_size:(i+1)*chunk_size],True)))
+
+    if num_chunks*chunk_size<len(imgs_lista):
+        img_descr = np.concatenate((img_descr,obtainDescriptors(imgs_lista[num_chunks*chunk_size:],True)))
+
     del imgs
     return img_descr, trueTags
 
