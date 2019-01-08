@@ -375,10 +375,10 @@ def getWindowsAndTagsNeg(imgs):
 def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
     areaTotal = float((x2-x1)*(y2-y1))
     areaParcial = float((u2-u1)*(v2-v1))
-    return areaParcial/areaTotal >= 0.5
+    return areaParcial/areaTotal >= 0.7
 
 # Originalmente stepY=128, stepX=64
-def calculateEveryWindow(img, boxes, stepY=1, stepX=1):
+def calculateEveryWindow(img, boxes, stepY=10, stepX=10):
     windows=[]
     pyr = gaussianPyramid(img)
     reduce=1
@@ -420,10 +420,20 @@ def getImagesAndTags():
         neg_imgs.append(im)
     del neg_imgs_names
     pos_windows = getWindowsAndTagsPos(pos_imgs,pos_boxes)
-    tags_pos_windows = [1 for i in range(len(pos_windows))]
+    pos_windows_notEmpty = []
+    for windows in pos_windows:
+        if len(windows)>0:
+            pos_windows_notEmpty.append(windows)
+    tags_pos_windows = [1 for i in range(len(pos_windows_notEmpty))]
     del pos_imgs
     del pos_boxes
+    del pos_windows
     neg_windows = getWindowsAndTagsNeg(neg_imgs)
-    tags_neg_windows = [2 for i in range(len(neg_windows))]
+    neg_windows_notEmpty = []
+    for windows in neg_windows:
+        if len(windows)>0:
+            neg_windows_notEmpty.append(windows)
+    tags_neg_windows = [2 for i in range(len(neg_windows_notEmpty))]
     del neg_imgs
-    return pos_windows + neg_windows, tags_pos_windows + tags_neg_windows
+    del neg_windows
+    return pos_windows_notEmpty + neg_windows_notEmpty, tags_pos_windows + tags_neg_windows
