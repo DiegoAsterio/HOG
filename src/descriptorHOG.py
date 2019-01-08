@@ -304,4 +304,3 @@ def createTestData():
     imgs, trueTags = getImagesAndTags( )
     img_descr = obtainDescriptors( imgs )
     return img_descr, trueTags
-    
