@@ -18,7 +18,7 @@ del td
 print("Cargando la SVM de fichero")
 svm = cv.ml.SVM_load("svm.txt")
 
-print("Cargandos el test")
+print("Cargando el test")
 
 
 imgs, _ = af.getImagesAndTags()
@@ -56,18 +56,19 @@ for i in range(len(chunkedPred)):
     if tags[i]==chunkedPred[i]:
         if chunkedPred[i]==1:
             npos+=1
-            img_pos_correctas.append(np.uint8(imgs[i][0]))
+            #img_pos_correctas.append(np.uint8(imgs[i][0]))
         elif chunkedPred[i]==2:
             nneg+=1
-    else:
-        if chunkedPred[i]==2:
-            img_pos_incorrectas.append(np.uint8(imgs[i][0]))
+    #else:
+        #if chunkedPred[i]==2:
+            #img_pos_incorrectas.append(np.uint8(imgs[i][0]))
 print("\n\n##################################################")
 print("Positivos: " + str(npos) + "/" + str(total_pos) + "===>" + str(100*npos/total_pos) + "%")
 print("Negativos: " + str(nneg) + "/" + str(total_neg) + "===>" + str(100*nneg/total_neg) + "%")
 print("Porcentaje de acierto total: " + str(100*(npos+nneg)/(total_pos+total_neg)))
 print("##################################################\n\n")
 
+'''
 print("Pintando las imagenes positivas acertadas: ")
 if len(img_pos_correctas)>50:
     af.pintaMI(random.sample(img_pos_correctas,50))
@@ -79,3 +80,4 @@ if len(img_pos_incorrectas)>50:
     af.pintaMI(random.sample(img_pos_incorrectas,50))
 else:
     af.pintaMI(img_pos_incorrectas)
+'''
