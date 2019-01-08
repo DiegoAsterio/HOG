@@ -302,7 +302,12 @@ def createTestData():
     return img_descr, tags
     '''
     imgs, trueTags = af.getImagesAndTags( )
-    img_descr = obtainDescriptors( imgs )
+    imgs_lista = []
+    for lim in imgs:
+        for im in lim:
+            imgs_lista.append(im)
+    img_descr = obtainDescriptors( imgs_lista )
+    del imgs
     return img_descr, trueTags
 
 def chunkPrediccions(vim, vpred):
