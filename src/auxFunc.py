@@ -88,10 +88,12 @@ def obtainNegatives(neg_samples_dir=PATH_TO_INRIA+"/Train/neg/"):
         img = cv.imread(neg_samples_dir + img_name,-1)
         img_name_sp = img_name.split(".")[0]
         format = img_name.split(".")[1]
+        windows = []
         for i in range(10):
             x_min,y_min,x_max,y_max = obtainCropLimits(img.shape[0],img.shape[1])
             crop = img[y_min:y_max, x_min:x_max]
-            ret.append(crop)
+            windows.append(crop)
+        ret.append(windows)
     return ret
 ################################################################################
 ##                         Funciones de cálculo                               ##
@@ -362,7 +364,7 @@ def getWindowsAndTagsPos(imgs,boxes):
     windows = []
     for i in range(len(imgs)):
         lwindow= calculateEveryWindow(imgs[i],boxes[i])
-        windows = windows + lwindow
+        windows.append(lwindow)
     return windows
 
 def getWindowsAndTagsNeg(imgs):
