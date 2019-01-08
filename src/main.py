@@ -19,6 +19,8 @@ print("Cargando la SVM de fichero")
 svm = cv.ml.SVM_load("svm.txt")
 
 print("Cargandos el test")
+
+
 descr, tags = descriptorHOG.createTestData()
 predicciones = svm.predict(descr)[1]
 predicciones = [pred[0] for pred in predicciones]
