@@ -377,7 +377,8 @@ def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
     areaParcial = float((u2-u1)*(v2-v1))
     return areaParcial/areaTotal >= 0.5
 
-def calculateEveryWindow(img, boxes):
+# Originalmente stepY=128, stepX=64
+def calculateEveryWindow(img, boxes, stepY=1, stepX=1):
     windows=[]
     pyr = gaussianPyramid(img)
     reduce=1
@@ -396,8 +397,8 @@ def calculateEveryWindow(img, boxes):
                     if x1<x2 or y1<y2:
                         if checkArea(xmin//reduce,ymin//reduce,xmax//reduce,ymax//reduce,x1,y1,x2,y2):
                             windows.append(level[indiceY:indiceY+128,indiceX:indiceX+64])
-                indiceX = indiceX + 32
-            indiceY = indiceY + 64
+                indiceX = indiceX + stepX
+            indiceY = indiceY + stepY
         reduce*=2
     return windows
 
