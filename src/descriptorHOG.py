@@ -279,17 +279,6 @@ def obtainTrainData():
     img_descr = obtainDescriptors(img_pos + img_neg)
     del img_pos
     del img_neg
-    #Escribe los descriptores en un fichero
-    '''
-    f = open("./descriptores.txt","r+")
-    for des in img_descr:
-        st = ""
-        for d in des:
-            st = str(d)+","
-        st = st[:-1]
-        f.write(st+"\n")
-    f.close()
-    '''
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
 
