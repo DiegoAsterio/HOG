@@ -21,9 +21,11 @@ svm = cv.ml.SVM_load("svm.txt")
 print("Cargandos el test")
 
 
+imgs, _ = af.getImagesAndTags()
+
 descr, tags = descriptorHOG.createTestData()
 predicciones = svm.predict(descr)[1]
-predicciones = [pred[0] for pred in predicciones]
+chunkedPred = descriptorHOG.chunkPredictions(imgs, predicciones)
 
 del descr
 del svm
@@ -34,7 +36,6 @@ print(predicciones)
 print("##################################################\n\n")
 
 
-imgs, _ = af.getImagesAndTags()
 
 npos=0
 nneg=0
