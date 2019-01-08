@@ -312,11 +312,13 @@ def createTestData():
 
 def chunkPredictions(vim, vpred):
     ret = []
+    pos_vpred=0
     for i in range(len(vim)):
         encontradoUnaPersona = False
         for j in range(len(vim[i])):
-            if vpred[i+j] == 1:
+            if vpred[pos_vpred] == 1:
                 encontradoUnaPersona = True
+            pos_vpred+=1
         if encontradoUnaPersona:
             ret.append(1)
         else:
