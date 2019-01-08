@@ -38,7 +38,8 @@ total_neg = 0
 total_pos = 0
 img_pos_correctas = []
 img_pos_incorrectas = []
-imgs, tags = af.getImagesAndTags()
+imgs_pos, imgs_neg = af.loadTestImgs()
+imgs=imgs_pos+imgs_neg
 # Calculamos el número de aciertos
 for i in range(len(predicciones)):
     if tags[i]==1:
