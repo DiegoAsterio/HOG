@@ -301,6 +301,6 @@ def createTestData():
     img_descr = obtainDescriptors( imgs )
     return img_descr, tags
     '''
-    imgs, trueTags = getImagesAndTags( )
+    imgs, trueTags = af.getImagesAndTags( )
     img_descr = obtainDescriptors( imgs )
     return img_descr, trueTags
