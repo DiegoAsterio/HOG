@@ -5,19 +5,20 @@ import pdb
 import random
 import numpy as np
 
-'''
+
 print("Obteniendo los datos de entrenamiento")
 # Obtenemos los datos de entrenamiento
 td = descriptorHOG.obtainTrainData()
 print("Entrenando la SVM")
 # Entrenamos la SVM
 svm = descriptorHOG.trainSVM(td)
+svm.save("svm.txt")
 del td
 '''
 print("Cargando la SVM de fichero")
-svm = cv.ml.SVM_load("svm.txt")
-print("Cargandos las imagenes de test")
-print("Obteniendo las ventanas y descriptores de las imágenes pregunta")
+svm = cv.ml.SVM_load("svm_version_antigua.txt")
+'''
+print("Cargandos el test")
 descr, tags = descriptorHOG.createTestData()
 predicciones = svm.predict(descr)[1]
 predicciones = [pred[0] for pred in predicciones]
@@ -59,13 +60,13 @@ print("Negativos: " + str(nneg) + "/" + str(total_neg) + "===>" + str(100*nneg/t
 print("Porcentaje de acierto total: " + str(100*(npos+nneg)/(total_pos+total_neg)))
 print("##################################################\n\n")
 
-print("Pintando las imagenes positivas correctas: ")
+print("Pintando las imagenes positivas acertadas: ")
 if len(img_pos_correctas)>50:
     af.pintaMI(random.sample(img_pos_correctas,50))
 else:
     af.pintaMI(img_pos_correctas)
 
-print("Pintando las imagenes positivas incorrectas: ")
+print("Pintando las imagenes positivas falladas: ")
 if len(img_pos_incorrectas)>50:
     af.pintaMI(random.sample(img_pos_incorrectas,50))
 else:

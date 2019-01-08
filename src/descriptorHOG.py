@@ -273,7 +273,8 @@ def obtainTrainData():
     #img_neg = random.sample(img_neg,800)
 
     # Generamos las respuestas 1 si es una persona, 2 si no lo es
-    resp = np.concatenate((1*np.ones(len(img_pos)),2*np.ones(len(img_neg))))
+    resp = [1 for i in range(len(img_pos))]+[2 for i in range(len(img_neg))]
+    resp = np.array(resp)
     # Obtenemos los descriptores, uno por imagen
     img_descr = obtainDescriptors(img_pos + img_neg)
     del img_pos
@@ -293,8 +294,8 @@ def obtainTrainData():
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
 
 def createTestData():
-    imgs, tags = af.getImagesAndTags()
     '''
+    imgs, tags = af.getImagesAndTags()
     n_pos = 0
     for t in tags:
         if t==1:
@@ -302,5 +303,10 @@ def createTestData():
     print(n_pos)
     af.pintaMI([np.uint8(img) for img in random.sample(imgs[:400],50)])
     '''
+    imgs_pos,imgs_neg = af.loadTestImgs()
+    tags_pos = [1 for i in range(len(imgs_pos))]
+    tags_neg = [2 for i in range(len(imgs_neg))]
+    imgs = imgs_pos+imgs_neg
+    tags = tags_pos+tags_neg
     img_descr = obtainDescriptors( imgs )
     return img_descr, tags
