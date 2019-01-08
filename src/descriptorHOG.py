@@ -310,7 +310,7 @@ def createTestData():
     del imgs
     return img_descr, trueTags
 
-def chunkPrediccions(vim, vpred):
+def chunkPredictions(vim, vpred):
     ret = []
     for i in range(len(vim)):
         encontradoUnaPersona = False
