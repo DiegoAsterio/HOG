@@ -129,7 +129,7 @@ def obtainHardExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_examples"):
         fail_count = 0
         for j in range(len(predicted)):
             if predicted[j]==1:
-                cv.imwrite(hard_training_dir+names[i]+"_image"+str(i)+"_failed"+str(fail_count)+formats[i],np.uint8(windows[j]))
+                cv.imwrite(hard_training_dir+names[i]+"_image"+str(i)+"_failed"+str(fail_count)+"."+formats[i],np.uint8(windows[j]))
                 fail_count+=1
 
 ################################################################################
