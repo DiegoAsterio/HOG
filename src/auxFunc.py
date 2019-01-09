@@ -375,10 +375,10 @@ def getWindowsAndTagsNeg(imgs):
 def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
     areaTotal = float((x2-x1)*(y2-y1))
     areaParcial = float((u2-u1)*(v2-v1))
-    return areaParcial/areaTotal >= 0.7
+    return areaParcial/areaTotal >= 0.5
 
-# Originalmente stepY=128, stepX=64
-def calculateEveryWindow(img, boxes, stepY=10, stepX=10):
+# Originalmente stepY=64, stepX=32
+def calculateEveryWindow(img, boxes, stepY=20, stepX=20):
     windows=[]
     pyr = gaussianPyramid(img)
     reduce=1
