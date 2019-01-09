@@ -8,5 +8,6 @@ td = descriptorHOG.obtainTrainData()
 print("Entrenando la SVM")
 # Entrenamos la SVM
 svm = descriptorHOG.trainSVM(td)
+del td
 print("Obteniendo los ejemplos dificiles")
 af.obtainHardExamples(svm)
