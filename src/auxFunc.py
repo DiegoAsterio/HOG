@@ -97,7 +97,7 @@ def obtainNegatives(neg_samples_dir=PATH_TO_INRIA+"/Train/neg/"):
         ret.append(windows)
     return ret
 
-def obtainHardExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_examples"):
+def obtainHardExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_examples/"):
     negatives = obtainNegativesRaw()
     names = [name.split(".")[0] for name in os.listdir(PATH_TO_INRIA+"/Train/neg/")]
     formats = [name.split(".")[1] for name in os.listdir(PATH_TO_INRIA+"/Train/neg/")]
