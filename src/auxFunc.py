@@ -121,7 +121,7 @@ def obtainHardExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_examples"):
                     indiceX = indiceX + 20
                 indiceY = indiceY + 20
         # Obtenemos los descriptores
-        descr = descriptorHOG.obtainDescriptors(windows)
+        descr = descriptorHOG.obtainDescriptors(windows,True)
         # Predecimos y damos formato a las predicciones
         predicted = svm.predict(descr)[1]
         predicted = [pred[0] for pred in predicted]
