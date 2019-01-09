@@ -157,6 +157,7 @@ def rhog(histogramas,tam_bloque=(2,2)):
         descriptores.append(descriptoresFila)
     return np.array(descriptores)
 
+
 ################################################################################
 ##                           5: Classification                                ##
 ################################################################################
