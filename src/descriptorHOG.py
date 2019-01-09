@@ -310,6 +310,9 @@ def createTestData(chunk_size=100):
         for im in lim:
             imgs_lista.append(im)
 
+    img_descr = obtainDescriptors(imgs_lista)
+
+    '''
     # Calculo los descriptores por chunks
     num_chunks = len(imgs)//chunk_size
     img_descr=None
@@ -326,6 +329,7 @@ def createTestData(chunk_size=100):
         img_descr = np.concatenate((img_descr,obtainDescriptors(imgs_lista[num_chunks*chunk_size:],True)))
 
     del imgs
+    '''
     return img_descr, trueTags
 
 def chunkPredictions(vim, vpred):
