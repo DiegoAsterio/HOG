@@ -157,20 +157,6 @@ def rhog(histogramas,tam_bloque=(2,2)):
         descriptores.append(descriptoresFila)
     return np.array(descriptores)
 
-#def normalizechog(subseccion, radio_central, num_secciones, expansion):
-'''
-def chog(histogramas, radio_central, num_secciones, expansion):
-    n, m, k = histogramas.shape
-    descriptores = []
-    R = radio_central*(1+expansion)
-    for i in range(R,n-R):
-        descriptoresFila = []
-        for j in range(R,m-R):
-            descriptor = normalizechog(histogramas[i-R:i+R][j-R:j+R],radio_central, num_secciones, ratio)
-            descriptoresFila.append(descriptor)
-        descriptores.append(descriptoresFila)
-    return np.array(descriptores)
-'''
 
 ################################################################################
 ##                           5: Classification                                ##
