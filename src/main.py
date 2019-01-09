@@ -12,7 +12,7 @@ td = descriptorHOG.obtainHardTrainData()
 print("Entrenando la SVM")
 # Entrenamos la SVM
 svm = descriptorHOG.trainSVM(td)
-#svm.save("svm.txt")
+svm.save("svm.txt")
 del td
 '''
 print("Cargando la SVM de fichero")
