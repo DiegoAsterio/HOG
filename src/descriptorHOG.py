@@ -297,7 +297,7 @@ def obtainTrainData():
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
 
-def obtainHardTrainData():
+def obtainHardTrainData(perc=0.5):
     '''
     @brief Función que obtiene todos los datos de entrenamiento 
     cargando las imágenes correspondientes + ejemplos dificiles 
@@ -307,6 +307,7 @@ def obtainHardTrainData():
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
     hard_examples = af.loadHardExamples()
+    hard_examples = hard_examples[0:len(hard_examples)*perc]
     # Generamos las respuestas 1 si es una persona, 2 si no lo es
     tags_pos = [1 for i in range(len(img_pos))]
     tags_neg = [2 for i in range(len(img_neg))]
