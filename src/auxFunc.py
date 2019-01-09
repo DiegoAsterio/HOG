@@ -4,6 +4,7 @@ import pdb
 import os
 import re
 import random
+import descriptorHOG
 
 PATH_TO_INRIA = "../INRIAPerson"
 
@@ -97,17 +98,16 @@ def obtainNegatives(neg_samples_dir=PATH_TO_INRIA+"/Train/neg/"):
     return ret
 
 def obtainHardExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_examples"):
-    negatives_windows = obtainNegatives()
-    negatives = []
-    # Convierte a una lista
-    for window in negatives_windows:
-        for neg in window:
-            negatives.append(neg)
+    negatives = obtainNegativesRaw()
+    names = [name.split(".")[0] for name in os.listdir(PATH_TO_INRIA+"/Train/neg/")]
+    formats = [name.split(".")[1] for name in os.listdir(PATH_TO_INRIA+"/Train/neg/")]
     contador = 1
-    for img in negatives:
+    for i in range(len(negatives)):
         print("Encontrando ejemplos dificiles "+str(contador)+"/"+str(len(negatives)))
-        pyr = gaussianPyramid(img)
-        # Para cada nivel
+        contador += 1
+        # Es una lista de listas en la que en cada posición tiene las pirámides gaussianas de cada imagen en la ventana
+        pyr = gaussianPyramid(negatives[i])
+        windows=[]
         for level in pyr:
             y,x,z = level.shape
             indiceX = 0
@@ -116,14 +116,21 @@ def obtainHardExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_examples"):
             while indiceY+128<y:
                 indiceX = 0
                 while indiceX+64<x:
-                    # Cogemos las cajas de los peatones
-                    subImg = pyr[indiceY:indiceY+128,indiceX:indiceX+64]
-                    indiceX += 32
-                    descr = obtainDescriptors(subImg)
-                    if svm.predict(descr) ==  1:
-                        cv.imwrite(hard_training_dir+img_name_sp+"_c_"+str(indiceX)+"_"+str(indiceY)+"."+format,crop)
-            indiceY +=64
-        contador += 1
+                    # Tomamos el crop del subnivel
+                    windows.append(level[indiceY:indiceY+128,indiceX:indiceX+64])
+                    indiceX = indiceX + 20
+                indiceY = indiceY + 20
+        # Obtenemos los descriptores
+        descr = descriptorHOG.obtainDescriptors(windows)
+        # Predecimos y damos formato a las predicciones
+        predicted = svm.predict(descr)[1]
+        predicted = [pred[0] for pred in predicted]
+        # Contador para el nombre
+        fail_count = 0
+        for j in range(len(predicted)):
+            if predicted[j]==1:
+                cv.imwrite(hard_training_dir+names[i]+"_image"+str(i)+"_failed"+str(fail_count)+formats[i],windows[j])
+                fail_count+=1
 
 ################################################################################
 ##                         Funciones de cálculo                               ##
