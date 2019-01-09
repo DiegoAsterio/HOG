@@ -97,10 +97,15 @@ def obtainNegatives(neg_samples_dir=PATH_TO_INRIA+"/Train/neg/"):
     return ret
 
 def obtainHardExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_examples"):
-    negatives = obtainNegatives()
+    negatives_windows = obtainNegatives()
+    negatives = []
+    # Convierte a una lista
+    for window in negatives_windows:
+        for neg in window:
+            negatives.append(neg)
     contador = 1
     for img in negatives:
-        print("Encontrando ejemplos dificiles en la imagen numero "+str(contador))
+        print("Encontrando ejemplos dificiles "+str(contador)+"/"+str(len(negatives)))
         pyr = gaussianPyramid(img)
         # Para cada nivel
         for level in pyr:
