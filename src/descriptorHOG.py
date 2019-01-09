@@ -297,6 +297,30 @@ def obtainTrainData():
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
 
+def obtainHardTrainData():
+    '''
+    @brief Función que obtiene todos los datos de entrenamiento 
+    cargando las imágenes correspondientes + ejemplos dificiles 
+    y devuelve un objeto de tipo TrainData para SVM
+    @return Objeto de tipo TrainData para entrenar la SVM
+    '''
+    # Cargamos las imágenes de entrenamiento
+    img_pos,img_neg = af.loadTrainImgs()
+    hard_examples = af.loadHardExamples()
+    # Generamos las respuestas 1 si es una persona, 2 si no lo es
+    tags_pos = [1 for i in range(len(img_pos))]
+    tags_neg = [2 for i in range(len(img_neg))]
+    tags_hard = [2 for i in range(len(hard_examples))]
+    resp = tags_pos + tags_neg + tags_hard
+    resp = np.array(resp).astype(np.int)
+    # Obtenemos los descriptores, uno por imagen
+    img_descr = obtainDescriptors(img_pos + img_neg + hard_examples)
+    del img_pos
+    del img_neg
+    del hard_examples
+    # Creamos los datos de entrenamiento y los devolvemos
+    return cv.ml.TrainData_create(img_descr, cv.ml.ROW_SAMPLE, resp)
+
 def createTestData(chunk_size=100):
     # Este codigo es para usar los croped test
     '''
