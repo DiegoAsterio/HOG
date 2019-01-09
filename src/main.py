@@ -5,19 +5,19 @@ import pdb
 import random
 import numpy as np
 
-'''
+
 print("Obteniendo los datos de entrenamiento")
 # Obtenemos los datos de entrenamiento
-td = descriptorHOG.obtainTrainData()
+td = descriptorHOG.obtainHardTrainData()
 print("Entrenando la SVM")
 # Entrenamos la SVM
 svm = descriptorHOG.trainSVM(td)
-svm.save("svm.txt")
+#svm.save("svm.txt")
 del td
 '''
 print("Cargando la SVM de fichero")
 svm = cv.ml.SVM_load("svm.txt")
-
+'''
 print("Cargando el test")
 
 
