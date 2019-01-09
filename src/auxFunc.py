@@ -360,80 +360,150 @@ def getPedestrianBoxes(img_name):
             boxes.append([xmin,ymin,xmax,ymax])
     return boxes
 
-def getWindowsAndTagsPos(imgs,boxes):
+def getWindowsPos(imgs,boxes):
+    '''
+    @brief Función que dado un vector de imágenes positivas (con peatones en ellas)
+    y una lista de cajas que delimitan la posición de los peatones obtiene ventanas
+    dentro de dicha imagen de tamaño 128x64 que solapan con el rectángulo del peatón.
+    @param imgs Vector de imágenes
+    @param boxes Lista de listas que contiene la delimitación del rectángulo del peatón
+    @return Devuelve una lista de listas en las que cada posición tiene una lista
+    para la imagen correspondiente de ventanas de 128x64
+    '''
     windows = []
     for i in range(len(imgs)):
         lwindow= calculateEveryWindow(imgs[i],boxes[i])
         windows.append(lwindow)
     return windows
 
-def getWindowsAndTagsNeg(imgs):
+def getWindowsNeg(imgs):
+    '''
+    @brief Función que obtiene las ventanas de las imágenes negativas (no tienen peatones)
+    @param imgs Lista de imágenes
+    @return Devuelve una lista de listas en la que en cada posición tiene una lista
+    de ventanas para la imagen correspondiente
+    '''
     windows = obtainNegatives(neg_samples_dir=PATH_TO_INRIA+"/Test/neg/")
     return windows
 
 
 def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
+    '''
+    @brief Función que dados dos rectángulos comprueba si el segundo de ellos tiene
+    al menos un 50% del área del primero.
+    @param x1 Indice inferior en el eje X del rectángulo grande
+    @param y1 Indice inferior en el eje Y del rectángulo grande
+    @param x2 Indice superior en el eje X del rectángulo grande
+    @param y2 Indice superior en el eje Y del rectángulo grande
+    @param u1 Indice inferior en el eje X del rectángulo pequeño
+    @param v1 Indice inferior en el eje Y del rectángulo pequeño
+    @param u2 Indice superior en el eje X del rectángulo pequeño
+    @param v2 Indice superior en el eje Y del rectángulo pequeño
+    @return Devuelve un valor booleano que indica si el rectángulo delimitado por
+    u1,v1,u2,v2 tiene al menos el 50% del área del rectángulo delimitado por
+    x1,y1,x2,y2.
+    '''
     areaTotal = float((x2-x1)*(y2-y1))
     areaParcial = float((u2-u1)*(v2-v1))
     return areaParcial/areaTotal >= 0.5
 
 # Originalmente stepY=64, stepX=32
 def calculateEveryWindow(img, boxes, stepY=20, stepX=20):
+    '''
+    @brief Función que dada una imagen y la delimitación de sus peatones obtiene
+    todas las ventanas que al menos solapan un 50% con los rectángulos de los peatones.
+    El proceso se hace para todos los niveles de la pirámide Gaussiana
+    @param img Imagen de la que queremos obtener las ventanas
+    @param boxes Lista de listas que nos da la delimitación de los peatones en la imagen
+    @param stepY Cantidad de píxeles en los que se avanza para obtener la siguiente ventana
+    en el eje X de la imagen
+    @param stepX Cantidad de píxeles en los que se avanza para obtener la siguiente ventana
+    en el eje Y de la imagen
+    @return Devuelve una lista de subimagenes de 128x64 para la imagen pasada
+    '''
     windows=[]
+    # Calculamos la pirámide gaussiana, la primera imagen de la misma es la original
     pyr = gaussianPyramid(img)
     reduce=1
+    # Para cada nivel
     for level in pyr:
         y,x,z = level.shape
         indiceX = 0
         indiceY = 0
+        # Comprobamos si nos salimos de los límites de la imagen
         while indiceY+128<y:
             indiceX = 0
             while indiceX+64<x:
+                # Cogemos las cajas de los peatones
                 for xmin,ymin,xmax,ymax in boxes:
+                    # Hallamos el rectángulo intersección
                     x1 = max(indiceX, xmin//reduce)
                     y1 = max(indiceY, ymin//reduce)
                     x2 = min(indiceX+64,xmax//reduce)
                     y2 = min(indiceY+128,ymax//reduce)
+                    # Comprobamos si es un rectángulo bien definido
                     if x1<x2 or y1<y2:
+                        # Si el área del rectángulo intersección tiene al menos un 50% del área total de la caja del peatón
                         if checkArea(xmin//reduce,ymin//reduce,xmax//reduce,ymax//reduce,x1,y1,x2,y2):
+                            # Añadimos la ventana de 128x64
                             windows.append(level[indiceY:indiceY+128,indiceX:indiceX+64])
                 indiceX = indiceX + stepX
             indiceY = indiceY + stepY
+        # Escalamos para obtener las coordenadas adecuadas en cada nivel de la pirámide Gaussiana
         reduce*=2
     return windows
 
 def getImagesAndTags():
+    '''
+    @brief Función que lee las imágenes positivas y negativas, obtiene sus ventanas
+    y etiquetas correspondientes y las devuelve
+    @return Devuelve dos valores, el primero es la lista de listas de ventanas de
+    cada imagen y el segundo es la lista de etiquetas correspondientes para cada imagen
+    (no para cada ventana)
+    '''
     pos_imgs = []
     pos_boxes = []
     neg_imgs = []
+    # Obtenemos la lista de nombres de imagenes de test positivas
     pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/pos")
     for pimg in pos_imgs_names:
         im = cv.imread(PATH_TO_INRIA+"/Test/pos/"+pimg,-1)
         im = np.float32(im)
+        # Añadimos las imagenes positivas
         pos_imgs.append(im)
         pos_boxes.append(getPedestrianBoxes(pimg))
     del pos_imgs_names
+    # Obtenemos la lista de nombres dde imagenes de test negativas
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Test/neg")
     for nimg in neg_imgs_names:
         im = cv.imread(PATH_TO_INRIA+"/Test/neg/"+nimg,-1)
         im = np.float32(im)
+        # Añadimos las imagenes negativas
         neg_imgs.append(im)
     del neg_imgs_names
-    pos_windows = getWindowsAndTagsPos(pos_imgs,pos_boxes)
+    # Obtenemos las ventanas de las imagenes positivas
+    pos_windows = getWindowsPos(pos_imgs,pos_boxes)
+    # Eliminamos las imagenes que no tienen ventanas
     pos_windows_notEmpty = []
     for windows in pos_windows:
         if len(windows)>0:
             pos_windows_notEmpty.append(windows)
+    # Calculamos las etiquetas en función del número de imagenes con ventanas
     tags_pos_windows = [1 for i in range(len(pos_windows_notEmpty))]
     del pos_imgs
     del pos_boxes
     del pos_windows
-    neg_windows = getWindowsAndTagsNeg(neg_imgs)
+    # Calculamos las ventanas de las imagenes negativas
+    neg_windows = getWindowsNeg(neg_imgs)
+    # Eliminamos las imagenes que no tienen ventanas
     neg_windows_notEmpty = []
     for windows in neg_windows:
         if len(windows)>0:
             neg_windows_notEmpty.append(windows)
+
+    # Calculamos las etiquetas en función del número de imagenes con ventanas
     tags_neg_windows = [2 for i in range(len(neg_windows_notEmpty))]
     del neg_imgs
     del neg_windows
+    # Devolvemos las imagenes y sus etiquetas
     return pos_windows_notEmpty + neg_windows_notEmpty, tags_pos_windows + tags_neg_windows
