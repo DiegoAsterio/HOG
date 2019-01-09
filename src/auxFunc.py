@@ -95,6 +95,31 @@ def obtainNegatives(neg_samples_dir=PATH_TO_INRIA+"/Train/neg/"):
             windows.append(crop)
         ret.append(windows)
     return ret
+
+def obtainHardExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_examples"):
+    negatives = obtainNegatives()
+    contador = 1
+    for img in negatives:
+        print("Encontrando ejemplos dificiles en la imagen numero "+str(contador))
+        pyr = gaussianPyramid(img)
+        # Para cada nivel
+        for level in pyr:
+            y,x,z = level.shape
+            indiceX = 0
+            indiceY = 0
+            # Comprobamos si nos salimos de los límites de la imagen
+            while indiceY+128<y:
+                indiceX = 0
+                while indiceX+64<x:
+                    # Cogemos las cajas de los peatones
+                    subImg = pyr[indiceY:indiceY+128,indiceX:indiceX+64]
+                    indiceX += 32
+                    descr = obtainDescriptors(subImg)
+                    if svm.predict(descr) ==  1:
+                        cv.imwrite(hard_training_dir+img_name_sp+"_c_"+str(indiceX)+"_"+str(indiceY)+"."+format,crop)
+            indiceY +=64
+        contador += 1
+    
 ################################################################################
 ##                         Funciones de cálculo                               ##
 ################################################################################
