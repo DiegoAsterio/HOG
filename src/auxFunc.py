@@ -363,7 +363,7 @@ def loadTestImgs():
         neg_imgs.append(im)
     return pos_imgs,neg_imgs
 
-def loadNegativesRaw():
+def obtainNegativesRaw():
     vim = []
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Train/neg")
     for imname in neg_imgs_names:
