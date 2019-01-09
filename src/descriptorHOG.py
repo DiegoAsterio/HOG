@@ -22,7 +22,7 @@ def gammaNormalization(img,c1=1,c2=0.5):
 ##                        2: Cómputo del gradiente                            ##
 ################################################################################
 
-def gradientComputation1DPaper(img,sigma):
+def gradientComputation1DPaper(img,sigma=0):
     '''
     @brief Funcion que computa el gradiente utilizando la mascara 1D [-1,0,1]
     @param img Imagen sobre la que calcular el gradiente
@@ -41,7 +41,7 @@ def gradientComputation1DPaper(img,sigma):
     # En cada pixel el gradiente es el gradiente del canal con mayor norma (RGB)
     return af.getGradient(outputSignalsdx, outputSignalsdy)
 
-def gradientComputation1DAlt1(img,sigma):
+def gradientComputation1DAlt1(img,sigma=0):
     '''
     @brief Funcion que computa el gradiente usando la mascara [-1,1]
     @param img Imagen sobre la que calcular el gradiente
@@ -57,7 +57,7 @@ def gradientComputation1DAlt1(img,sigma):
     outputSignalsdy = af.convoluteWith1DMask([-1,1],False,imgAux)
     return af.getGradient(outputSignalsdx, outputSignalsdy)
 
-def gradientComputation1DAlt2(img,sigma):
+def gradientComputation1DAlt2(img,sigma=0):
     '''
     @brief Funcion que computa el gradiente usando la mascara [1,-8,0,8,-1]
     @param img Imagen sobre la que calcular el gradiente
@@ -73,7 +73,7 @@ def gradientComputation1DAlt2(img,sigma):
     outputSignalsdy = af.convoluteWith1DMask([1,-8,0,8,-1],False,imgAux)
     return af.getGradient(outputSignalsdx, outputSignalsdy)
 
-def gradientComputation1DAlt3(img,sigma):
+def gradientComputation1DAlt3(img,sigma=0):
     '''
     @brief Funcion que computa el gradiente usando una mascara 2D
     @param img Imagen sobre la que calcular el gradiente
@@ -157,21 +157,6 @@ def rhog(histogramas,tam_bloque=(2,2)):
         descriptores.append(descriptoresFila)
     return np.array(descriptores)
 
-#def normalizechog(subseccion, radio_central, num_secciones, expansion):
-'''
-def chog(histogramas, radio_central, num_secciones, expansion):
-    n, m, k = histogramas.shape
-    descriptores = []
-    R = radio_central*(1+expansion)
-    for i in range(R,n-R):
-        descriptoresFila = []
-        for j in range(R,m-R):
-            descriptor = normalizechog(histogramas[i-R:i+R][j-R:j+R],radio_central, num_secciones, ratio)
-            descriptoresFila.append(descriptor)
-        descriptores.append(descriptoresFila)
-    return np.array(descriptores)
-'''
-
 ################################################################################
 ##                           5: Classification                                ##
 ################################################################################
@@ -214,47 +199,78 @@ def obtainDescriptors(imgs,silent=False):
     @param imgs Lista de imágenes sobre las que queremos extraer los descriptores
     @return Devuelve un numpy array de descriptores, uno por imagen
     '''
+    #---- Print de información ----#
     if not silent:
         print("Normalización Gamma")
     contador=1
+    #---- Fin del print de información ----#
+
     gamma_corrected = []
     for im in imgs:
+
+        #---- Print de información ----#
         if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
             print("Normalizando " + str(contador) + "/" + str(len(imgs)))
         contador+=1
+        #---- Fin del print de información ----#
+
         # Aplicamos la normalización gamma a cada imagen
         gamma_corrected.append(gammaNormalization(im))
+
+    #---- Print de información ----#
     if not silent:
         print("Calculando los gradientes")
     contador=1
+    #---- Fin del print de información ----#
+
     gradients = []
     for gam in gamma_corrected:
+
+        #---- Print de información ----#
         if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
             print("Calculando los gradientes " + str(contador) + "/" + str(len(imgs)))
         contador+=1
+        #---- Fin del print de información ----#
+
         # Calculamos los gradientes de cada imagen
-        gradients.append(gradientComputation1DPaper(gam,1))
+        gradients.append(gradientComputation1DPaper(gam))
     del gamma_corrected
+
+    #---- Print de información ----#
     if not silent:
         print("Calculando los histogramas")
     contador=1
+    #---- Fin del print de información ----#
+
     histograms = []
     for gra in gradients:
+
+        #---- Print de información ----#
         if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
             print("Calculando los histogramas " + str(contador) + "/" + str(len(imgs)))
         contador+=1
+        #---- Fin del print de información ----#
+
         # Calculamos los histogramas de cada matriz de gradientes
         histograms.append(spatialOrientationBinning(gra[0],gra[1]))
     del gradients
+
+    #---- Print de información ----#
     if not silent:
         print("Calculando los descriptores de imagen")
     contador=1
+    #---- Fin del print de información ----#
+
     # Normalizamos por bloques
     img_descr = rhog(histograms[0]).reshape(-1).astype(np.float32)
     for histo in histograms[1:]:
+
+        #---- Print de información ----#
         if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
             print("Calculando el descriptor final " + str(contador) + "/" + str(len(imgs)))
         contador+=1
+        #---- Fin del print de información ----#
+
         # Unimos los descriptores en una sola lista
         descr = rhog(histo).reshape(-1).astype(np.float32)
         img_descr = np.vstack([img_descr,descr])
@@ -269,8 +285,6 @@ def obtainTrainData():
     '''
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
-    #img_pos = random.sample(img_pos,200)
-    #img_neg = random.sample(img_neg,800)
 
     # Generamos las respuestas 1 si es una persona, 2 si no lo es
     resp = [1 for i in range(len(img_pos))]+[2 for i in range(len(img_neg))]
@@ -283,15 +297,7 @@ def obtainTrainData():
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
 
 def createTestData(chunk_size=100):
-    '''
-    imgs, tags = af.getImagesAndTags()
-    n_pos = 0
-    for t in tags:
-        if t==1:
-            n_pos+=1
-    print(n_pos)
-    af.pintaMI([np.uint8(img) for img in random.sample(imgs[:400],50)])
-    '''
+    # Este codigo es para usar los croped test
     '''
     imgs_pos,imgs_neg = af.loadTestImgs()
     tags_pos = [1 for i in range(len(imgs_pos))]
@@ -311,36 +317,30 @@ def createTestData(chunk_size=100):
             imgs_lista.append(im)
 
     img_descr = obtainDescriptors(imgs_lista)
-
-    '''
-    # Calculo los descriptores por chunks
-    num_chunks = len(imgs)//chunk_size
-    img_descr=None
-    primera_vez=True
-    for i in range(num_chunks-1):
-        print("Calculando los descriptores " + str(i*chunk_size) + "-" + str((i+1)*chunk_size) + " del total de: " + str(len(imgs_lista)))
-        if primera_vez:
-            img_descr = obtainDescriptors(imgs_lista[i*chunk_size:(i+1)*chunk_size],True)
-            primera_vez=False
-        else:
-            img_descr=np.concatenate((img_descr,obtainDescriptors(imgs_lista[i*chunk_size:(i+1)*chunk_size],True)))
-
-    if num_chunks*chunk_size<len(imgs_lista):
-        img_descr = np.concatenate((img_descr,obtainDescriptors(imgs_lista[num_chunks*chunk_size:],True)))
-
-    del imgs
-    '''
     return img_descr, trueTags
 
 def chunkPredictions(vim, vpred):
+    '''
+    @brief Función que devuelve el vector de predicciones corregidas y obtenidas
+    comprobando por ventanas
+    @param vim Lista de listas de ventanas
+    @param vpred Vector de predicciones para cada ventana
+    @return Devuelve una predicción para cada imagen y no para cada ventana
+    '''
     ret = []
     pos_vpred=0
+    # Para cada lista de ventanas
     for i in range(len(vim)):
         encontradoUnaPersona = False
+        # Para cada ventana en la lista de ventanas
         for j in range(len(vim[i])):
+            # Con que una sola de las etiquetas predichas para una ventana de una imagen
+            # sea un 1 (hay peaton) entonces decimos que la respuesta general para la imagen
+            # es 1, hay peatón en la misma
             if vpred[pos_vpred] == 1:
                 encontradoUnaPersona = True
             pos_vpred+=1
+        # Si hemos encontrado una persona añadimos un 1 y si no un 2
         if encontradoUnaPersona:
             ret.append(1)
         else:
