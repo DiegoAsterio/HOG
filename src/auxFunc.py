@@ -356,6 +356,15 @@ def loadTestImgs():
         neg_imgs.append(im)
     return pos_imgs,neg_imgs
 
+def loadNegativesRaw():
+    vim = []
+    neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Train/neg")
+    for imname in neg_imgs_names:
+        im = cv.imread(PATH_TO_INRIA+"/Train/neg/"+imname)
+        im = np.float32(im)
+        vim.append(im)
+    return vim
+
 def getAllWindows(im,window_size=(64,128)):
     '''
     @brief Función que devuelve todas las submatrices de 64x128 de la imagen im
