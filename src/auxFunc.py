@@ -283,6 +283,23 @@ def modifyLocalMatrix(img,local_matrix,row_min,row_max,col_min,col_max):
             img_aux[i][j]=local_matrix[i-row_min][j-col_min]
     return img_aux
 
+def getReflectedImage(img):
+    '''
+    @brief Función que devuelve la imagen reflejada con respecto al borde derecho de
+    la imagen img
+    @param img Imagen de la que queremos obtener la reflejada
+    @return Devuelve una imagen del mismo tamaño que representa la reflejada de la original
+    '''
+    n_rows = img.shape[0]
+    n_cols = img.shape[1]
+    # Inicializamos la imagen
+    reflected = np.zeros((n_rows,n_cols))
+    # Obtenemos la  imagen reflejada
+    for i in range(n_rows):
+        for j in range(n_cols-1,-1,-1):
+            reflected[i][n_cols-1-j] = img[i][j]
+    return reflected
+
 def loadTrainImgs():
     '''
     @brief Función que devuelve las imágenes de entrenamiento como dos listas
@@ -296,7 +313,9 @@ def loadTrainImgs():
     for pimg in pos_imgs_names:
         im = cv.imread(PATH_TO_INRIA+"/cropped_pos/"+pimg,-1)
         im = np.float32(im)
+        im_reflected = getReflectedImage(im)
         pos_imgs.append(im)
+        pos_imgs.append(im_reflected)
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/cropped_neg")
     for nimg in neg_imgs_names:
         im = cv.imread(PATH_TO_INRIA+"/cropped_neg/"+nimg,-1)
