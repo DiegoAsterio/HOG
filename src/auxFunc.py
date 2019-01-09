@@ -323,6 +323,20 @@ def loadTrainImgs():
         neg_imgs.append(im)
     return pos_imgs,neg_imgs
 
+def loadHardExamples():
+    '''
+    @brief Funcion que devuelve las imagenes que son ejemplos 
+    dificiles 
+    @return Lista que contiene imagenes 
+    '''
+    vim = []
+    hard_examples_names = os.listdir(PATH_TO_INRIA+"/hard_examples")
+    for pimg in hard_examples_names:
+        im = cv.imread(PATH_TO_INRIA+"/hard_examples/"+pimg,-1)
+        im = np.float32(im)
+        vim.append(im)
+    return vim
+
 def loadTestImgs():
     '''
     @brief Función que devuelve las imágenes de test como dos listas
