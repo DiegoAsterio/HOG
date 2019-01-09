@@ -119,7 +119,7 @@ def obtainHardExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_examples"):
                         cv.imwrite(hard_training_dir+img_name_sp+"_c_"+str(indiceX)+"_"+str(indiceY)+"."+format,crop)
             indiceY +=64
         contador += 1
-    
+
 ################################################################################
 ##                         Funciones de cálculo                               ##
 ################################################################################
@@ -293,7 +293,7 @@ def getReflectedImage(img):
     n_rows = img.shape[0]
     n_cols = img.shape[1]
     # Inicializamos la imagen
-    reflected = np.zeros((n_rows,n_cols))
+    reflected = np.zeros((n_rows,n_cols,3))
     # Obtenemos la  imagen reflejada
     for i in range(n_rows):
         for j in range(n_cols-1,-1,-1):
@@ -325,9 +325,9 @@ def loadTrainImgs():
 
 def loadHardExamples():
     '''
-    @brief Funcion que devuelve las imagenes que son ejemplos 
-    dificiles 
-    @return Lista que contiene imagenes 
+    @brief Funcion que devuelve las imagenes que son ejemplos
+    dificiles
+    @return Lista que contiene imagenes
     '''
     vim = []
     hard_examples_names = os.listdir(PATH_TO_INRIA+"/hard_examples")
