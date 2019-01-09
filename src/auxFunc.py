@@ -290,15 +290,8 @@ def getReflectedImage(img):
     @param img Imagen de la que queremos obtener la reflejada
     @return Devuelve una imagen del mismo tamaño que representa la reflejada de la original
     '''
-    n_rows = img.shape[0]
-    n_cols = img.shape[1]
-    # Inicializamos la imagen
-    reflected = np.zeros((n_rows,n_cols,3))
     # Obtenemos la  imagen reflejada
-    for i in range(n_rows):
-        for j in range(n_cols-1,-1,-1):
-            reflected[i][n_cols-1-j] = img[i][j]
-    return reflected
+    return np.flip(img,axis=1)
 
 def loadTrainImgs():
     '''
