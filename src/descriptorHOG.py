@@ -149,9 +149,9 @@ def rhog(histogramas,tam_bloque=(2,2)):
     '''
     n, m, k = histogramas.shape
     descriptores = []
-    for i in range(n-tam_bloque[0]):
+    for i in range(0,n-tam_bloque[0],4):
         descriptoresFila = []
-        for j in range(m-tam_bloque[1]):
+        for j in range(0,m-tam_bloque[1],4):
             descriptor = normalizeDescriptor(histogramas[i:i+tam_bloque[0],j:j+tam_bloque[1]])
             descriptoresFila.append(descriptor)
         descriptores.append(descriptoresFila)
