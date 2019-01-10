@@ -169,17 +169,18 @@ def obtainHardPositiveExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_posit
                     indiceX = indiceX + 20
                 indiceY = indiceY + 20
             reduce*=2
-        # Obtenemos los descriptores
-        descr = descriptorHOG.obtainDescriptors(windows,True)
-        # Predecimos y damos formato a las predicciones
-        predicted = svm.predict(descr)[1]
-        predicted = [pred[0] for pred in predicted]
-        # Contador para el nombre
-        fail_count = 0
-        for j in range(len(predicted)):
-            if predicted[j]==2:
-                cv.imwrite(hard_training_dir+names[i]+"_image"+str(i)+"_failed"+str(fail_count)+"."+formats[i],np.uint8(windows[j]))
-                fail_count+=1
+        if len(windows>1):
+            # Obtenemos los descriptores
+            descr = descriptorHOG.obtainDescriptors(windows,True)
+            # Predecimos y damos formato a las predicciones
+            predicted = svm.predict(descr)[1]
+            predicted = [pred[0] for pred in predicted]
+            # Contador para el nombre
+            fail_count = 0
+            for j in range(len(predicted)):
+                if predicted[j]==2:
+                    cv.imwrite(hard_training_dir+names[i]+"_image"+str(i)+"_failed"+str(fail_count)+"."+formats[i],np.uint8(windows[j]))
+                    fail_count+=1
 
 ################################################################################
 ##                         Funciones de cálculo                               ##
