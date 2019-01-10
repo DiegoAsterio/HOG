@@ -302,19 +302,21 @@ def obtainHardTrainData(perc=0.5):
     '''
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
-    hard_examples = af.loadHardExamples()
-    #hard_examples = hard_examples[0:int(len(hard_examples)*perc)]
+    hard_negative_examples = af.loadHardNegativeExamples()
+    hard_positive_examples = af.loadHardPositiveExamples()
     # Generamos las respuestas 1 si es una persona, 2 si no lo es
     tags_pos = [1 for i in range(len(img_pos))]
     tags_neg = [2 for i in range(len(img_neg))]
-    tags_hard = [2 for i in range(len(hard_examples))]
-    resp = tags_pos + tags_neg + tags_hard
+    tags_hard_negative = [2 for i in range(len(hard_negative_examples))]
+    tags_hard_positive = [1 for i in range(len(hard_positive_examples))]
+    resp = tags_pos + tags_hard_positive + tags_neg + tags_hard_negative
     resp = np.array(resp).astype(np.int)
     # Obtenemos los descriptores, uno por imagen
-    img_descr = obtainDescriptors(img_pos + img_neg + hard_examples)
+    img_descr = obtainDescriptors(img_pos + hard_positive_examples + img_neg + hard_negative_examples)
     del img_pos
     del img_neg
-    del hard_examples
+    del hard_negative_examples
+    del hard_positive_examples
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr, cv.ml.ROW_SAMPLE, resp)
 
