@@ -206,7 +206,7 @@ def obtainDescriptors(imgs,silent=False):
     contador=1
     #---- Fin del print de información ----#
 
-    gamma_corrected = []
+    img_descr = []
     for im in imgs:
 
         #---- Print de información ----#
@@ -216,7 +216,7 @@ def obtainDescriptors(imgs,silent=False):
         #---- Fin del print de información ----#
 
         # Aplicamos la normalización gamma a cada imagen
-        gamma_corrected.append(gammaNormalization(im))
+        img_descr.append(gammaNormalization(im))
 
     #---- Print de información ----#
     if not silent:
@@ -224,8 +224,7 @@ def obtainDescriptors(imgs,silent=False):
     contador=1
     #---- Fin del print de información ----#
 
-    gradients = []
-    for gam in gamma_corrected:
+    for i in range(len(img_descr)):
 
         #---- Print de información ----#
         if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
@@ -234,8 +233,7 @@ def obtainDescriptors(imgs,silent=False):
         #---- Fin del print de información ----#
 
         # Calculamos los gradientes de cada imagen
-        gradients.append(gradientComputation1DPaper(gam))
-    del gamma_corrected
+        img_descr[i] = gradientComputation1DPaper(img_descr[i])
 
     #---- Print de información ----#
     if not silent:
@@ -243,8 +241,7 @@ def obtainDescriptors(imgs,silent=False):
     contador=1
     #---- Fin del print de información ----#
 
-    histograms = []
-    for gra in gradients:
+    for i in range(len(img_descr)):
 
         #---- Print de información ----#
         if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
@@ -253,8 +250,7 @@ def obtainDescriptors(imgs,silent=False):
         #---- Fin del print de información ----#
 
         # Calculamos los histogramas de cada matriz de gradientes
-        histograms.append(spatialOrientationBinning(gra[0],gra[1]))
-    del gradients
+        img_descr[i] = spatialOrientationBinning(img_descr[i][0],img_descr[i][1])
 
     #---- Print de información ----#
     if not silent:
@@ -263,8 +259,8 @@ def obtainDescriptors(imgs,silent=False):
     #---- Fin del print de información ----#
 
     # Normalizamos por bloques
-    img_descr = rhog(histograms[0]).reshape(-1).astype(np.float32)
-    for histo in histograms[1:]:
+    img_descr_final = rhog(img_descr[0]).reshape(-1).astype(np.float32)
+    for histo in img_descr[1:]:
 
         #---- Print de información ----#
         if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
@@ -274,9 +270,9 @@ def obtainDescriptors(imgs,silent=False):
 
         # Unimos los descriptores en una sola lista
         descr = rhog(histo).reshape(-1).astype(np.float32)
-        img_descr = np.vstack([img_descr,descr])
-    del histograms
-    return np.array(img_descr)
+        img_descr_final = np.vstack([img_descr_final,descr])
+    del img_descr
+    return np.array(img_descr_final)
 
 def obtainTrainData():
     '''
