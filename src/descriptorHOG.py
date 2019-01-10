@@ -96,12 +96,12 @@ def gradientComputation1DAlt3(img,sigma=0):
 ##                      3: Spatial/Orientation Binning                        ##
 ################################################################################
 
-def spatialOrientationBinning(dx, dy, tam_cel=3, num_cols=9):
+def spatialOrientationBinning(dx, dy, tam_cel=6, num_cols=9):
     '''
     @brief Función que dada una matriz de gradientes y un tamaño de célula divide la matriz en
     células, calcula los histogramas de todas y los devuelve en un vector.
     @param gradients Matriz con los gradientes
-    @param tam_cel Tamaño de la célula, por defecto 3.
+    @param tam_cel Tamaño de la célula, por defecto 6.
     @param num_cols Numero de columnas del histograma, por defecto 9.
     '''
     # Obtiene el número de filas y columnas de la imagen
@@ -139,12 +139,12 @@ def normalizeDescriptor(bloque):
     value = list(ret/norma) if norma!=0 else list(np.zeros(ret.shape[0]))
     return value
 
-def rhog(histogramas,tam_bloque=(2,2)):
+def rhog(histogramas,tam_bloque=(3,3)):
     '''
     @brief Función que calcula los descriptores normalizados a partir de los
     histogramas de cada celula dentro de un mismo bloque
     @param histogramas Todos los histogramas computados a partir de celulas
-    @param tam_bloque Tamano del bloque debe ser una pareja e.g. (2,2)
+    @param tam_bloque Tamano del bloque debe ser una pareja e.g. (3,3)
     @return Devuelve un array que separa en bloques los histogramas
     '''
     n, m, k = histogramas.shape
