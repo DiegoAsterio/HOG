@@ -149,9 +149,9 @@ def rhog(histogramas,tam_bloque=(2,2)):
     '''
     n, m, k = histogramas.shape
     descriptores = []
-    for i in range(0,n-tam_bloque[0],4):
+    for i in range(0,n-tam_bloque[0],1):
         descriptoresFila = []
-        for j in range(0,m-tam_bloque[1],4):
+        for j in range(0,m-tam_bloque[1],1):
             descriptor = normalizeDescriptor(histogramas[i:i+tam_bloque[0],j:j+tam_bloque[1]])
             descriptoresFila.append(descriptor)
         descriptores.append(descriptoresFila)
@@ -303,7 +303,7 @@ def obtainHardTrainData(perc=0.5):
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
     hard_examples = af.loadHardExamples()
-    hard_examples = hard_examples[0:int(len(hard_examples)*perc)]
+    #hard_examples = hard_examples[0:int(len(hard_examples)*perc)]
     # Generamos las respuestas 1 si es una persona, 2 si no lo es
     tags_pos = [1 for i in range(len(img_pos))]
     tags_neg = [2 for i in range(len(img_neg))]
