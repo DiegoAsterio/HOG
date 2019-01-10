@@ -169,6 +169,7 @@ def obtainHardPositiveExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_posit
                     indiceX = indiceX + 20
                 indiceY = indiceY + 20
             reduce*=2
+        # Solo si hay suficientes para predecir, podemos perder datos
         if len(windows>1):
             # Obtenemos los descriptores
             descr = descriptorHOG.obtainDescriptors(windows,True)
