@@ -299,15 +299,15 @@ def obtainTrainData():
 
 def obtainHardTrainData(perc=0.5):
     '''
-    @brief Función que obtiene todos los datos de entrenamiento 
-    cargando las imágenes correspondientes + ejemplos dificiles 
+    @brief Función que obtiene todos los datos de entrenamiento
+    cargando las imágenes correspondientes + ejemplos dificiles
     y devuelve un objeto de tipo TrainData para SVM
     @return Objeto de tipo TrainData para entrenar la SVM
     '''
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
     hard_examples = af.loadHardExamples()
-    hard_examples = hard_examples[0:len(hard_examples)*perc]
+    hard_examples = hard_examples[0:int(len(hard_examples)*perc)]
     # Generamos las respuestas 1 si es una persona, 2 si no lo es
     tags_pos = [1 for i in range(len(img_pos))]
     tags_neg = [2 for i in range(len(img_neg))]
