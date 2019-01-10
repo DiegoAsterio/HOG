@@ -5,7 +5,7 @@ import pdb
 import random
 import numpy as np
 
-
+'''
 print("Obteniendo los datos de entrenamiento")
 # Obtenemos los datos de entrenamiento
 td = descriptorHOG.obtainHardTrainData()
@@ -17,7 +17,7 @@ del td
 '''
 print("Cargando la SVM de fichero")
 svm = cv.ml.SVM_load("svm.txt")
-'''
+
 print("Cargando el test")
 
 
