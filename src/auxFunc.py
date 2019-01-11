@@ -76,7 +76,7 @@ def obtainNegativeSamples(neg_samples_dir=PATH_TO_INRIA+"/Train/neg/",dir_to_sav
             crop = img[y_min:y_max, x_min:x_max]
             cv.imwrite(dir_to_save+img_name_sp+"_c_"+str(i)+"."+format,crop)
 
-def obtainNegatives(svm,neg_samples_dir=PATH_TO_INRIA+"/Train/neg/", num_windows=10):
+def obtainNegatives(imgs,svm,neg_samples_dir=PATH_TO_INRIA+"/Train/neg/", num_windows=10):
     '''
     @brief Función que dado un directorio con imágenes y un directorio para guardarlas
     obtiene 10 ventanas aleatorias de la misma y las guarda en el directorio correspondiente
@@ -84,18 +84,16 @@ def obtainNegatives(svm,neg_samples_dir=PATH_TO_INRIA+"/Train/neg/", num_windows
     @param dir_to_save Directorio donde queremos guardar los resultados
     '''
     pred = []
-    list_images = os.listdir(neg_samples_dir)
-    for img_name in list_images:
-        img = cv.imread(neg_samples_dir + img_name,-1)
-        img_name_sp = img_name.split(".")[0]
-        format = img_name.split(".")[1]
+    contador=1
+    for img in imgs:
+        print("Obteniendo predicción de la imagen " + str(contador) + "/" + str(len(imgs)))
+        contador+=1
         windows = []
         for i in range(num_windows):
             x_min,y_min,x_max,y_max = obtainCropLimits(img.shape[0],img.shape[1])
             crop = img[y_min:y_max, x_min:x_max]
             windows.append(crop)
-        pred.append(windows)
-        descr = af.obtainDescriptors(windows)
+        descr = descriptorHOG.obtainDescriptors(windows)
         pred_windows = svm.predict(descr)[1]
         pred_windows = [pred[0] for pred in pred_windows]
         pred.append(pred_windows)
@@ -448,6 +446,7 @@ def getPredPos(imgs,boxes,svm):
     '''
     boxes_pred = []
     for i in range(len(imgs)):
+        print("Obteniendo predicción de la imagen " + str(i+1) + "/" + str(len(imgs)))
         box_pred= getPredPosImg(svm,imgs[i],boxes[i])
         boxes_pred.append(box_pred)
     return boxes_pred
@@ -459,7 +458,7 @@ def getPredNeg(svm,imgs):
     @return Devuelve una lista de listas en la que en cada posición tiene una lista
     de ventanas para la imagen correspondiente
     '''
-    pred = obtainNegatives(svm,neg_samples_dir=PATH_TO_INRIA+"/Test/neg/")
+    pred = obtainNegatives(svm,imgs,neg_samples_dir=PATH_TO_INRIA+"/Test/neg/")
     return pred
 
 
@@ -515,7 +514,7 @@ def getPredPosImg(svm, img, boxes, stepY=64, stepX=32):
                 coord.append((indiceY, indiceX))
                 indiceX = indiceX + stepX
             indiceY = indiceY + stepY
-        descr = descriptorHOG.obtainDescriptors(windows)
+        descr = descriptorHOG.obtainDescriptors(windows,True)
         prediction = list(map(lambda x:x[0],svm.predict(descr)[1]))
         heatMap = buildHeatMap((y,x),prediction,coord)
         ret |= checkOccurrences(heatMap, boxes, scale)
@@ -659,6 +658,7 @@ def getPredictions(svm):
 
 
     # Obtenemos las respuestas de las imagenes positivas
+    print("Obteniendo las predicciones de las imagenes positivas")
     box_pred = getPredPos(pos_imgs,pos_boxes,svm)
     pred_pos = []
     for predictions in box_pred:
@@ -668,6 +668,7 @@ def getPredictions(svm):
                 tot+=1
         pred_pos.append(tot/len(predictions))
     # Calculamos las respuestas de las imagenes negativas
+    print("Obteniendo las predicciones de las imagenes negativas")
     pred_neg_windows = getPredNeg(neg_imgs,svm)
     pred_neg = []
     for predictions in pred_neg_windows:
