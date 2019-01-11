@@ -480,7 +480,7 @@ def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
     return areaParcial/areaTotal >= 0.5
 
 # Originalmente stepY=64, stepX=32
-def calculateEveryWindow(img, boxes, stepY=20, stepX=20):
+def getPredPosImg(svm, img, boxes, stepY=20, stepX=20):
     '''
     @brief Función que dada una imagen y la delimitación de sus peatones obtiene
     todas las ventanas que al menos solapan un 50% con los rectángulos de los peatones.
@@ -493,37 +493,129 @@ def calculateEveryWindow(img, boxes, stepY=20, stepX=20):
     en el eje Y de la imagen
     @return Devuelve una lista de subimagenes de 128x64 para la imagen pasada
     '''
-    windows=[]
+    ret = np.zeros(len(boxes)).astype(np.bool)
     # Calculamos la pirámide gaussiana, la primera imagen de la misma es la original
     pyr = gaussianPyramid(img)
-    reduce=1
+    scale=1
     # Para cada nivel
     for level in pyr:
+        windows=[]
+        coord = []
         y,x,z = level.shape
-        indiceX = 0
-        indiceY = 0
+        indiceY = indiceX = 0
         # Comprobamos si nos salimos de los límites de la imagen
         while indiceY+128<y:
             indiceX = 0
             while indiceX+64<x:
-                # Cogemos las cajas de los peatones
-                for xmin,ymin,xmax,ymax in boxes:
-                    # Hallamos el rectángulo intersección
-                    x1 = max(indiceX, xmin//reduce)
-                    y1 = max(indiceY, ymin//reduce)
-                    x2 = min(indiceX+64,xmax//reduce)
-                    y2 = min(indiceY+128,ymax//reduce)
-                    # Comprobamos si es un rectángulo bien definido
-                    if x1<x2 or y1<y2:
-                        # Si el área del rectángulo intersección tiene al menos un 50% del área total de la caja del peatón
-                        if checkArea(xmin//reduce,ymin//reduce,xmax//reduce,ymax//reduce,x1,y1,x2,y2):
-                            # Añadimos la ventana de 128x64
-                            windows.append(level[indiceY:indiceY+128,indiceX:indiceX+64])
+                windows.append(level[indiceY:indiceY+128,indiceX:indiceX+64])
+                coord.append((indiceY, indiceX))
                 indiceX = indiceX + stepX
             indiceY = indiceY + stepY
+        descr = descriptorHOG.obtainDescriptors(windows)
+        prediction = list(map(lambda(x:x[0]),svm.predict(descr)[1]))
+        heatMap = buildHeatMap((y,x),prediction,coord)
+        ret |= checkOccurrences(heatMap, boxes, scale)
         # Escalamos para obtener las coordenadas adecuadas en cada nivel de la pirámide Gaussiana
-        reduce*=2
-    return windows
+        scale*=2
+    return ret
+
+def buildHeatMap(size, prediction, coord):
+    HeatMap = np.zeros(size)
+    for i in range(len(prediction)):
+        if prediction == 1:
+            y, x = coord[i]
+            HeatMap[y:y+128,x:x+64] += 1
+    return HeatMap
+
+def differentFromZero(heatMap):
+    indexes = []
+    y, x = heatMap.shape
+    for i in range(y):
+        for j in range(x):
+            indexes.append((i,j))
+    return indexes
+    
+
+def checkOccurrences(heatMap, boxes, scale):
+    umbral = 3
+    m = cutBeneathRate(umbral,heatMap)
+    indexes = differentFromZero(m)
+    while len(indexes) != 0:
+        region = DFSiterative(indexes[0],heatMap)
+        indexes = substractRegion(region,indexes)
+        regions.append(region)
+    ourBoxes = createBoxes(regions,scale)
+    answer = np.zeros(len(boxes)).astype(np.bool)
+    for xmin, ymin, xmax, ymax in ourBoxes:
+        for i in range(boxes):
+            x1, y1, x2, y2 = boxes[i]
+            if checkArea(x1//scale, y1//scale, x2//scale, y2//scale, xmin, ymin, xmax, ymax):
+                answer[i] = True
+    return answer
+
+def createBoxes(regions,scale):
+    boxes = []
+    for region in region:
+        x, y = getCenter(region)
+        boxes.append((x-32, y-64, x+32, y+64))
+    return boxes
+
+def getCenter(region):
+    xmin = min(list(map(lambda(x:x[0]),region)))
+    ymin = min(list(map(lambda(x:x[1]),region)))
+    xmax = max(list(map(lambda(x:x[0]),region)))
+    ymax = max(list(map(lambda(x:x[1]),region)))
+    x = int((xmin + xmax)/2)
+    y = int((ymin + ymax)/2)
+    return x, y
+
+def DFSiterative(elem, G):
+    discovered = []
+    S = []
+    S.append(elem)
+    while S:
+        vert = S.pop()
+        if vert not in discovered:
+            discovered.append(vert)
+            adjacent = getAdjacents(vert,G)
+            for w in adjacent:
+                S.append(w)
+    return discovered
+
+def getAdjacents(vert, G):
+    adjacents = []
+    i1 = (vert[0]+1,vert[1])
+    if G[i1] != 0:
+        adjacents.append(vert)
+    i2 = (vert[0],vert[1]+1)
+    if G[i2] != 0:
+        adjacents.append(vert)
+    i3 = (vert[0]-1,vert[1])
+    if G[i3] != 0:
+        adjacents.append(vert)
+    i4 = (vert[0],vert[1]-1)
+    if G[i4] != 0:
+        adjacents.append(vert)
+    return adjacents
+
+def substractRegion(subset, theset):
+    for e in subset:
+        theset.remove(e)
+    return theset
+    
+                # # Cogemos las cajas de los peatones
+                # for xmin,ymin,xmax,ymax in boxes:
+                #     # Hallamos el rectángulo intersección
+                #     x1 = max(indiceX, xmin//reduce)
+                #     y1 = max(indiceY, ymin//reduce)
+                #     x2 = min(indiceX+64,xmax//reduce)
+                #     y2 = min(indiceY+128,ymax//reduce)
+                #     # Comprobamos si es un rectángulo bien definido
+                #     if x1<x2 or y1<y2:
+                #         # Si el área del rectángulo intersección tiene al menos un 50% del área total de la caja del peatón
+                #         if checkArea(xmin//reduce,ymin//reduce,xmax//reduce,ymax//reduce,x1,y1,x2,y2):
+                #             # Añadimos la ventana de 128x64
+
 
 def getImagesAndTags():
     '''
