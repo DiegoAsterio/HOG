@@ -263,7 +263,7 @@ def obtainDescriptors(imgs,silent=False):
     for histo in img_descr[1:]:
 
         #---- Print de información ----#
-        if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
+        if not silent and (contador%100==0 or contador==len(imgs)-1 or contador==1):
             print("Calculando el descriptor final " + str(contador) + "/" + str(len(imgs)))
         contador+=1
         #---- Fin del print de información ----#
