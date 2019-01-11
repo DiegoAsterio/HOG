@@ -559,7 +559,7 @@ def checkOccurrences(heatMap, boxes, scale):
     ourBoxes = createBoxes(regions,scale)
     answer = np.zeros(len(boxes)).astype(np.bool)
     for xmin, ymin, xmax, ymax in ourBoxes:
-        for i in range(boxes):
+        for i in range(len(boxes)):
             x1, y1, x2, y2 = boxes[i]
             if checkArea(x1//scale, y1//scale, x2//scale, y2//scale, xmin, ymin, xmax, ymax):
                 answer[i] = True
