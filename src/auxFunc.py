@@ -604,9 +604,9 @@ def getAdjacents(vert, G):
         adjacents.append(vert)
     if checkInGNPos(i2,G):
         adjacents.append(vert)
-    if checkInGPos(i3,G):
+    if checkInGNPos(i3,G):
         adjacents.append(vert)
-    if checkInGPos(i4,G):
+    if checkInGNPos(i4,G):
         adjacents.append(vert)
     return adjacents
 
