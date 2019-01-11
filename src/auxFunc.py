@@ -555,7 +555,7 @@ def checkOccurrences(heatMap, boxes, scale):
         region = DFSiterative(indexes[0],heatMap)
         indexes = substractRegion(region,indexes)
         regions.append(region)
-    ourBoxes = createBoxes(regions,scale,G)
+    ourBoxes = createBoxes(regions,scale,heatMap)
     answer = np.zeros(len(boxes)).astype(np.bool)
     for xmin, ymin, xmax, ymax in ourBoxes:
         for i in range(len(boxes)):
@@ -671,7 +671,7 @@ def getPredictions(svm):
 
     # Obtenemos las respuestas de las imagenes positivas
     print("Obteniendo las predicciones de las imagenes positivas")
-    box_pred = getPredPos(pos_imgs,pos_boxes,svm)
+    box_pred = getPredPos(pos_imgs[:1],pos_boxes[:1],svm)
     pred_pos = []
     for predictions in box_pred:
         tot = 0
@@ -681,7 +681,7 @@ def getPredictions(svm):
         pred_pos.append(tot/len(predictions))
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
-    pred_neg_windows = getPredNeg(neg_imgs,svm)
+    pred_neg_windows = getPredNeg(neg_imgs[:1],svm)
     pred_neg = []
     for predictions in pred_neg_windows:
         tot = 0
