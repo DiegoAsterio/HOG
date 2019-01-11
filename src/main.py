@@ -20,7 +20,6 @@ svm = cv.ml.SVM_load("svm.txt")
 '''
 print("Cargando el test")
 
-
 imgs, _ = af.getImagesAndTags()
 
 descr, tags = descriptorHOG.createTestData()

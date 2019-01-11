@@ -96,12 +96,12 @@ def gradientComputation1DAlt3(img,sigma=0):
 ##                      3: Spatial/Orientation Binning                        ##
 ################################################################################
 
-def spatialOrientationBinning(dx, dy, tam_cel=3, num_cols=9):
+def spatialOrientationBinning(dx, dy, tam_cel=6, num_cols=9):
     '''
     @brief Función que dada una matriz de gradientes y un tamaño de célula divide la matriz en
     células, calcula los histogramas de todas y los devuelve en un vector.
     @param gradients Matriz con los gradientes
-    @param tam_cel Tamaño de la célula, por defecto 3.
+    @param tam_cel Tamaño de la célula, por defecto 6.
     @param num_cols Numero de columnas del histograma, por defecto 9.
     '''
     # Obtiene el número de filas y columnas de la imagen
@@ -139,19 +139,19 @@ def normalizeDescriptor(bloque):
     value = list(ret/norma) if norma!=0 else list(np.zeros(ret.shape[0]))
     return value
 
-def rhog(histogramas,tam_bloque=(2,2)):
+def rhog(histogramas,tam_bloque=(3,3)):
     '''
     @brief Función que calcula los descriptores normalizados a partir de los
     histogramas de cada celula dentro de un mismo bloque
     @param histogramas Todos los histogramas computados a partir de celulas
-    @param tam_bloque Tamano del bloque debe ser una pareja e.g. (2,2)
+    @param tam_bloque Tamano del bloque debe ser una pareja e.g. (3,3)
     @return Devuelve un array que separa en bloques los histogramas
     '''
     n, m, k = histogramas.shape
     descriptores = []
-    for i in range(0,n-tam_bloque[0],4):
+    for i in range(0,n-tam_bloque[0],1):
         descriptoresFila = []
-        for j in range(0,m-tam_bloque[1],4):
+        for j in range(0,m-tam_bloque[1],1):
             descriptor = normalizeDescriptor(histogramas[i:i+tam_bloque[0],j:j+tam_bloque[1]])
             descriptoresFila.append(descriptor)
         descriptores.append(descriptoresFila)
@@ -206,7 +206,7 @@ def obtainDescriptors(imgs,silent=False):
     contador=1
     #---- Fin del print de información ----#
 
-    gamma_corrected = []
+    img_descr = []
     for im in imgs:
 
         #---- Print de información ----#
@@ -216,7 +216,7 @@ def obtainDescriptors(imgs,silent=False):
         #---- Fin del print de información ----#
 
         # Aplicamos la normalización gamma a cada imagen
-        gamma_corrected.append(gammaNormalization(im))
+        img_descr.append(gammaNormalization(im))
 
     #---- Print de información ----#
     if not silent:
@@ -224,8 +224,7 @@ def obtainDescriptors(imgs,silent=False):
     contador=1
     #---- Fin del print de información ----#
 
-    gradients = []
-    for gam in gamma_corrected:
+    for i in range(len(img_descr)):
 
         #---- Print de información ----#
         if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
@@ -234,8 +233,7 @@ def obtainDescriptors(imgs,silent=False):
         #---- Fin del print de información ----#
 
         # Calculamos los gradientes de cada imagen
-        gradients.append(gradientComputation1DPaper(gam))
-    del gamma_corrected
+        img_descr[i] = gradientComputation1DPaper(img_descr[i])
 
     #---- Print de información ----#
     if not silent:
@@ -243,8 +241,7 @@ def obtainDescriptors(imgs,silent=False):
     contador=1
     #---- Fin del print de información ----#
 
-    histograms = []
-    for gra in gradients:
+    for i in range(len(img_descr)):
 
         #---- Print de información ----#
         if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
@@ -253,8 +250,7 @@ def obtainDescriptors(imgs,silent=False):
         #---- Fin del print de información ----#
 
         # Calculamos los histogramas de cada matriz de gradientes
-        histograms.append(spatialOrientationBinning(gra[0],gra[1]))
-    del gradients
+        img_descr[i] = spatialOrientationBinning(img_descr[i][0],img_descr[i][1])
 
     #---- Print de información ----#
     if not silent:
@@ -263,8 +259,8 @@ def obtainDescriptors(imgs,silent=False):
     #---- Fin del print de información ----#
 
     # Normalizamos por bloques
-    img_descr = rhog(histograms[0]).reshape(-1).astype(np.float32)
-    for histo in histograms[1:]:
+    img_descr_final = rhog(img_descr[0]).reshape(-1).astype(np.float32)
+    for histo in img_descr[1:]:
 
         #---- Print de información ----#
         if not silent and (contador%100==0 or contador==len(imgs) or contador==1):
@@ -274,9 +270,9 @@ def obtainDescriptors(imgs,silent=False):
 
         # Unimos los descriptores en una sola lista
         descr = rhog(histo).reshape(-1).astype(np.float32)
-        img_descr = np.vstack([img_descr,descr])
-    del histograms
-    return np.array(img_descr)
+        img_descr_final = np.vstack([img_descr_final,descr])
+    del img_descr
+    return np.array(img_descr_final)
 
 def obtainTrainData():
     '''
@@ -306,19 +302,24 @@ def obtainHardTrainData(perc=0.5):
     '''
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
-    hard_examples = af.loadHardExamples()
-    hard_examples = hard_examples[0:int(len(hard_examples)*perc)]
+    hard_negative_examples = af.loadHardNegativeExamples()
+    hard_positive_examples = af.loadHardPositiveExamples()[:8000]
     # Generamos las respuestas 1 si es una persona, 2 si no lo es
     tags_pos = [1 for i in range(len(img_pos))]
     tags_neg = [2 for i in range(len(img_neg))]
-    tags_hard = [2 for i in range(len(hard_examples))]
-    resp = tags_pos + tags_neg + tags_hard
+    tags_hard_negative = [2 for i in range(len(hard_negative_examples))]
+    tags_hard_positive = [1 for i in range(len(hard_positive_examples))]
+    resp = tags_pos + tags_hard_positive + tags_neg + tags_hard_negative
     resp = np.array(resp).astype(np.int)
     # Obtenemos los descriptores, uno por imagen
-    img_descr = obtainDescriptors(img_pos + img_neg + hard_examples)
-    del img_pos
-    del img_neg
-    del hard_examples
+    img_descr = obtainDescriptors(img_pos)
+    img_pos = None
+    img_descr = np.concatenate((img_descr,obtainDescriptors(hard_positive_examples)))
+    hard_positive_examples = None
+    img_descr = np.concatenate((img_descr,obtainDescriptors(img_neg)))
+    img_neg = None
+    img_descr = np.concatenate((img_descr,obtainDescriptors(hard_negative_examples)))
+    hard_negative_examples = None
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr, cv.ml.ROW_SAMPLE, resp)
 
