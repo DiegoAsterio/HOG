@@ -600,25 +600,28 @@ def getAdjacents(vert, G):
     i2 = (vert[0],vert[1]+1)
     i3 = (vert[0]-1,vert[1])
     i4 = (vert[0],vert[1]-1)
-    if G[i1] != 0 and checkInG(i1,G):
+    if checkInGNPos(i1,G):
         adjacents.append(vert)
-    if G[i2] != 0 and checkInG(i2,G):
+    if checkInGNPos(i2,G):
         adjacents.append(vert)
-    if G[i3] != 0 and checkInG(i3,G):
+    if checkInGPos(i3,G):
         adjacents.append(vert)
-    if G[i4] != 0 and checkInG(i4,G):
+    if checkInGPos(i4,G):
         adjacents.append(vert)
     return adjacents
 
-def checkInG(index, graph):
-    in = True
+def checkInGNPos(index, graph):
+    inside = True
     alto, ancho  = graph.shape
     y, x = index
     if y<0 or y>=alto:
-        in = False
-    if x<0 or x>=alto:
-        in = False
-    return in
+        inside = False
+    if x<0 or x>=ancho:
+        inside = False
+    if inside:
+        return graph[index] != 0
+    else:
+        return False
 
 def substractRegion(subset, theset):
     for e in subset:
