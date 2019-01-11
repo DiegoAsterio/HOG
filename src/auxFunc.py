@@ -555,7 +555,7 @@ def checkOccurrences(heatMap, boxes, scale):
         region = DFSiterative(indexes[0],heatMap)
         indexes = substractRegion(region,indexes)
         regions.append(region)
-    ourBoxes = createBoxes(regions,scale)
+    ourBoxes = createBoxes(regions,scale,G)
     answer = np.zeros(len(boxes)).astype(np.bool)
     for xmin, ymin, xmax, ymax in ourBoxes:
         for i in range(len(boxes)):
@@ -564,12 +564,24 @@ def checkOccurrences(heatMap, boxes, scale):
                 answer[i] = True
     return answer
 
-def createBoxes(regions,scale):
+def createBoxes(regions,scale,G):
     boxes = []
     for region in regions:
-        x, y = getCenter(region)
+        subRegion = getElemsMax(G,region)
+        x, y = getCenter(subRegion)
         boxes.append((x-32//scale, y-64//scale, x+32//scale, y+64//scale))
     return boxes
+
+def getElemsMax(G,region):
+    maxim = -1
+    for i,j in region:
+        if maxim < G[i,j]:
+            maxim = G[i,j]
+    ret = []
+    for i,j in region:
+        if G[i,j] == maxim:
+            ret.append((i,j))
+    return ret
 
 def getCenter(region):
     xmin = min(list(map(lambda x:x[0],region)))
