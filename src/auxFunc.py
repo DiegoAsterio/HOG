@@ -132,57 +132,6 @@ def obtainHardNegativeExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_negat
                 cv.imwrite(hard_training_dir+names[i]+"_image"+str(i)+"_failed"+str(fail_count)+"."+formats[i],np.uint8(windows[j]))
                 fail_count+=1
 
-def obtainHardPositiveExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_positive_examples/"):
-    positives = obtainPositivesRaw()
-    names = [name.split(".")[0] for name in os.listdir(PATH_TO_INRIA+"/Train/pos/")]
-    formats = [name.split(".")[1] for name in os.listdir(PATH_TO_INRIA+"/Train/pos/")]
-    contador = 1
-    for i in range(len(positives)):
-        print("Encontrando ejemplos dificiles "+str(contador)+"/"+str(len(positives)))
-        contador += 1
-        # Es una lista de listas en la que en cada posición tiene las pirámides gaussianas de cada imagen en la ventana
-        pyr = gaussianPyramid(positives[i])
-        boxes = getPedestrianBoxes(names[i]+"."+formats[i],"/Train/annotations/")
-        windows=[]
-        reduce=1
-        for level in pyr:
-            y,x,z = level.shape
-            indiceX = 0
-            indiceY = 0
-            # Comprobamos si nos salimos de los límites de la imagen
-            while indiceY+128<y:
-                indiceX = 0
-                while indiceX+64<x:
-                    # Cogemos las cajas de los peatones
-                    for xmin,ymin,xmax,ymax in boxes:
-                        # Hallamos el rectángulo intersección
-                        x1 = max(indiceX, xmin//reduce)
-                        y1 = max(indiceY, ymin//reduce)
-                        x2 = min(indiceX+64,xmax//reduce)
-                        y2 = min(indiceY+128,ymax//reduce)
-                        # Comprobamos si es un rectángulo bien definido
-                        if x1<x2 or y1<y2:
-                            # Si el área del rectángulo intersección tiene al menos un 50% del área total de la caja del peatón
-                            if checkArea(xmin//reduce,ymin//reduce,xmax//reduce,ymax//reduce,x1,y1,x2,y2):
-                                # Tomamos el crop del subnivel
-                                windows.append(level[indiceY:indiceY+128,indiceX:indiceX+64])
-                    indiceX = indiceX + 20
-                indiceY = indiceY + 20
-            reduce*=2
-        # Solo si hay suficientes para predecir, podemos perder datos
-        if len(windows)>1:
-            # Obtenemos los descriptores
-            descr = descriptorHOG.obtainDescriptors(windows,True)
-            # Predecimos y damos formato a las predicciones
-            predicted = svm.predict(descr)[1]
-            predicted = [pred[0] for pred in predicted]
-            # Contador para el nombre
-            fail_count = 0
-            for j in range(len(predicted)):
-                if predicted[j]==2:
-                    cv.imwrite(hard_training_dir+names[i]+"_image"+str(i)+"_failed"+str(fail_count)+"."+formats[i],np.uint8(windows[j]))
-                    fail_count+=1
-
 ################################################################################
 ##                         Funciones de cálculo                               ##
 ################################################################################
@@ -393,20 +342,6 @@ def loadHardNegativeExamples():
         vim.append(im)
     return vim
 
-def loadHardPositiveExamples():
-    '''
-    @brief Funcion que devuelve las imagenes que son ejemplos
-    dificiles
-    @return Lista que contiene imagenes
-    '''
-    vim = []
-    hard_examples_names = os.listdir(PATH_TO_INRIA+"/hard_positive_examples")
-    for pimg in hard_examples_names:
-        im = cv.imread(PATH_TO_INRIA+"/hard_positive_examples/"+pimg,-1)
-        im = np.float32(im)
-        vim.append(im)
-    return vim
-
 def loadTestImgs():
     '''
     @brief Función que devuelve las imágenes de test como dos listas
@@ -433,15 +368,6 @@ def obtainNegativesRaw():
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Train/neg")
     for imname in neg_imgs_names:
         im = cv.imread(PATH_TO_INRIA+"/Train/neg/"+imname)
-        im = np.float32(im)
-        vim.append(im)
-    return vim
-
-def obtainPositivesRaw():
-    vim = []
-    pos_imgs_names = os.listdir(PATH_TO_INRIA+"/Train/pos")
-    for imname in pos_imgs_names:
-        im = cv.imread(PATH_TO_INRIA+"/Train/pos/"+imname)
         im = np.float32(im)
         vim.append(im)
     return vim
