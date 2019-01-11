@@ -303,7 +303,7 @@ def obtainHardTrainData(perc=0.5):
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
     hard_negative_examples = af.loadHardNegativeExamples()
-    hard_positive_examples = af.loadHardPositiveExamples()
+    hard_positive_examples = af.loadHardPositiveExamples()[:8000]
     # Generamos las respuestas 1 si es una persona, 2 si no lo es
     tags_pos = [1 for i in range(len(img_pos))]
     tags_neg = [2 for i in range(len(img_neg))]
