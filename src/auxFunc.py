@@ -538,7 +538,14 @@ def differentFromZero(heatMap):
         for j in range(x):
             indexes.append((i,j))
     return indexes
-    
+
+def cutBeneathRate(rate, heatMap):
+    y, x = heatMap.shape
+    for i in range(len(y)):
+        for j in range(len(x)):
+            if heatMap[i,j] < rate:
+                heatMap[i,j] = 0
+    return heatMap
 
 def checkOccurrences(heatMap, boxes, scale):
     umbral = 3
@@ -561,7 +568,7 @@ def createBoxes(regions,scale):
     boxes = []
     for region in region:
         x, y = getCenter(region)
-        boxes.append((x-32, y-64, x+32, y+64))
+        boxes.append((x-32//scale, y-64//scale, x+32//scale, y+64//scale))
     return boxes
 
 def getCenter(region):
@@ -606,20 +613,6 @@ def substractRegion(subset, theset):
     for e in subset:
         theset.remove(e)
     return theset
-    
-                # # Cogemos las cajas de los peatones
-                # for xmin,ymin,xmax,ymax in boxes:
-                #     # Hallamos el rectángulo intersección
-                #     x1 = max(indiceX, xmin//reduce)
-                #     y1 = max(indiceY, ymin//reduce)
-                #     x2 = min(indiceX+64,xmax//reduce)
-                #     y2 = min(indiceY+128,ymax//reduce)
-                #     # Comprobamos si es un rectángulo bien definido
-                #     if x1<x2 or y1<y2:
-                #         # Si el área del rectángulo intersección tiene al menos un 50% del área total de la caja del peatón
-                #         if checkArea(xmin//reduce,ymin//reduce,xmax//reduce,ymax//reduce,x1,y1,x2,y2):
-                #             # Añadimos la ventana de 128x64
-
 
 def getPredictions(svm):
     '''
