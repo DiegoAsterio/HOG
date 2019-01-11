@@ -541,8 +541,8 @@ def differentFromZero(heatMap):
 
 def cutBeneathRate(rate, heatMap):
     y, x = heatMap.shape
-    for i in range(len(y)):
-        for j in range(len(x)):
+    for i in range(y):
+        for j in range(x):
             if heatMap[i,j] < rate:
                 heatMap[i,j] = 0
     return heatMap
