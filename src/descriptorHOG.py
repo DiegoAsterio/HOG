@@ -303,73 +303,18 @@ def obtainHardTrainData(perc=0.5):
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
     hard_negative_examples = af.loadHardNegativeExamples()
-    hard_positive_examples = af.loadHardPositiveExamples()[:8000]
     # Generamos las respuestas 1 si es una persona, 2 si no lo es
     tags_pos = [1 for i in range(len(img_pos))]
     tags_neg = [2 for i in range(len(img_neg))]
     tags_hard_negative = [2 for i in range(len(hard_negative_examples))]
-    tags_hard_positive = [1 for i in range(len(hard_positive_examples))]
-    resp = tags_pos + tags_hard_positive + tags_neg + tags_hard_negative
+    resp = tags_pos + tags_neg + tags_hard_negative
     resp = np.array(resp).astype(np.int)
     # Obtenemos los descriptores, uno por imagen
     img_descr = obtainDescriptors(img_pos)
     img_pos = None
-    img_descr = np.concatenate((img_descr,obtainDescriptors(hard_positive_examples)))
-    hard_positive_examples = None
     img_descr = np.concatenate((img_descr,obtainDescriptors(img_neg)))
     img_neg = None
     img_descr = np.concatenate((img_descr,obtainDescriptors(hard_negative_examples)))
     hard_negative_examples = None
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr, cv.ml.ROW_SAMPLE, resp)
-
-def createTestData(chunk_size=100):
-    # Este codigo es para usar los croped test
-    '''
-    imgs_pos,imgs_neg = af.loadTestImgs()
-    tags_pos = [1 for i in range(len(imgs_pos))]
-    tags_neg = [2 for i in range(len(imgs_neg))]
-    imgs = imgs_pos+imgs_neg
-    tags = tags_pos+tags_neg
-    img_descr = obtainDescriptors( imgs )
-    return img_descr, tags
-    '''
-    # Cargo las imagenes y las tags
-    imgs, trueTags = af.getImagesAndTags( )
-
-    # Las pongo en una lista
-    imgs_lista = []
-    for lim in imgs:
-        for im in lim:
-            imgs_lista.append(im)
-
-    img_descr = obtainDescriptors(imgs_lista)
-    return img_descr, trueTags
-
-def chunkPredictions(vim, vpred):
-    '''
-    @brief Función que devuelve el vector de predicciones corregidas y obtenidas
-    comprobando por ventanas
-    @param vim Lista de listas de ventanas
-    @param vpred Vector de predicciones para cada ventana
-    @return Devuelve una predicción para cada imagen y no para cada ventana
-    '''
-    ret = []
-    pos_vpred=0
-    # Para cada lista de ventanas
-    for i in range(len(vim)):
-        encontradoUnaPersona = False
-        # Para cada ventana en la lista de ventanas
-        for j in range(len(vim[i])):
-            # Con que una sola de las etiquetas predichas para una ventana de una imagen
-            # sea un 1 (hay peaton) entonces decimos que la respuesta general para la imagen
-            # es 1, hay peatón en la misma
-            if vpred[pos_vpred] == 1:
-                encontradoUnaPersona = True
-            pos_vpred+=1
-        # Si hemos encontrado una persona añadimos un 1 y si no un 2
-        if encontradoUnaPersona:
-            ret.append(1)
-        else:
-            ret.append(2)
-    return ret

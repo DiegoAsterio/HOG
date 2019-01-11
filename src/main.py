@@ -20,14 +20,8 @@ svm = cv.ml.SVM_load("svm.txt")
 '''
 print("Cargando el test")
 
-imgs, _ = af.getImagesAndTags()
+pred_pos, pred_neg = af.getPredictions(svm)
 
-descr, tags = descriptorHOG.createTestData()
-predicciones = svm.predict(descr)[1]
-predicciones = [pred[0] for pred in predicciones]
-chunkedPred = descriptorHOG.chunkPredictions(imgs, predicciones)
-
-del descr
 del svm
 
 print("\n\n##################################################")
@@ -35,48 +29,17 @@ print("Predicción: ")
 print(predicciones)
 print("##################################################\n\n")
 
+pos_score = 0
+neg_score = 0
 
+for ppred in pred_pos:
+    pos_score+=ppred
 
-npos=0
-nneg=0
-total_neg = 0
-total_pos = 0
+for npred in pred_neg:
+    neg_score+=npred
 
-for t in tags:
-    if t==1:
-        total_pos+=1
-    elif t==2:
-        total_neg+=1
-
-img_pos_correctas = []
-img_pos_incorrectas = []
-# Calculamos el número de aciertos
-for i in range(len(chunkedPred)):
-    if tags[i]==chunkedPred[i]:
-        if chunkedPred[i]==1:
-            npos+=1
-            #img_pos_correctas.append(np.uint8(imgs[i][0]))
-        elif chunkedPred[i]==2:
-            nneg+=1
-    #else:
-        #if chunkedPred[i]==2:
-            #img_pos_incorrectas.append(np.uint8(imgs[i][0]))
 print("\n\n##################################################")
-print("Positivos: " + str(npos) + "/" + str(total_pos) + "===>" + str(100*npos/total_pos) + "%")
-print("Negativos: " + str(nneg) + "/" + str(total_neg) + "===>" + str(100*nneg/total_neg) + "%")
-print("Porcentaje de acierto total: " + str(100*(npos+nneg)/(total_pos+total_neg)))
+print("Positivos: " + str(pos_score) + "/" + str(len(pred_pos)) + "===>" + str(100*pos_score/len(pred_pos)) + "%")
+print("Negativos: " + str(neg_score) + "/" + str(len(pred_neg)) + "===>" + str(100*neg_score/len(pred_neg)) + "%")
+print("Porcentaje de acierto total: " + str(100*(pos_score+neg_score)/(len(pred_pos)+len(pred_neg))))
 print("##################################################\n\n")
-
-'''
-print("Pintando las imagenes positivas acertadas: ")
-if len(img_pos_correctas)>50:
-    af.pintaMI(random.sample(img_pos_correctas,50))
-else:
-    af.pintaMI(img_pos_correctas)
-
-print("Pintando las imagenes positivas falladas: ")
-if len(img_pos_incorrectas)>50:
-    af.pintaMI(random.sample(img_pos_incorrectas,50))
-else:
-    af.pintaMI(img_pos_incorrectas)
-'''

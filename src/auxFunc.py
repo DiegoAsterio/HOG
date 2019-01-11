@@ -76,26 +76,30 @@ def obtainNegativeSamples(neg_samples_dir=PATH_TO_INRIA+"/Train/neg/",dir_to_sav
             crop = img[y_min:y_max, x_min:x_max]
             cv.imwrite(dir_to_save+img_name_sp+"_c_"+str(i)+"."+format,crop)
 
-def obtainNegatives(neg_samples_dir=PATH_TO_INRIA+"/Train/neg/"):
+def obtainNegatives(svm,neg_samples_dir=PATH_TO_INRIA+"/Train/neg/", num_windows=10):
     '''
     @brief Función que dado un directorio con imágenes y un directorio para guardarlas
     obtiene 10 ventanas aleatorias de la misma y las guarda en el directorio correspondiente
     @param neg_samples_dir Directorio que contiene las imágenes
     @param dir_to_save Directorio donde queremos guardar los resultados
     '''
-    ret = []
+    pred = []
     list_images = os.listdir(neg_samples_dir)
     for img_name in list_images:
         img = cv.imread(neg_samples_dir + img_name,-1)
         img_name_sp = img_name.split(".")[0]
         format = img_name.split(".")[1]
         windows = []
-        for i in range(10):
+        for i in range(num_windows):
             x_min,y_min,x_max,y_max = obtainCropLimits(img.shape[0],img.shape[1])
             crop = img[y_min:y_max, x_min:x_max]
             windows.append(crop)
-        ret.append(windows)
-    return ret
+        pred.append(windows)
+        descr = af.obtainDescriptors(windows)
+        pred_windows = svm.predict(descr)[1]
+        pred_windows = [pred[0] for pred in pred_windows]
+        pred.append(pred_windows)
+    return pred
 
 def obtainHardNegativeExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_negative_examples/"):
     negatives = obtainNegativesRaw()
@@ -432,7 +436,7 @@ def getPedestrianBoxes(img_name,path_to_annotations):
             boxes.append([xmin,ymin,xmax,ymax])
     return boxes
 
-def getWindowsPos(imgs,boxes):
+def getPredPos(imgs,boxes,svm):
     '''
     @brief Función que dado un vector de imágenes positivas (con peatones en ellas)
     y una lista de cajas que delimitan la posición de los peatones obtiene ventanas
@@ -442,21 +446,21 @@ def getWindowsPos(imgs,boxes):
     @return Devuelve una lista de listas en las que cada posición tiene una lista
     para la imagen correspondiente de ventanas de 128x64
     '''
-    windows = []
+    boxes_pred = []
     for i in range(len(imgs)):
-        lwindow= calculateEveryWindow(imgs[i],boxes[i])
-        windows.append(lwindow)
-    return windows
+        box_pred= getPredPosImg(svm,imgs[i],boxes[i])
+        boxes_pred.append(box_pred)
+    return boxes_pred
 
-def getWindowsNeg(imgs):
+def getPredNeg(svm,imgs):
     '''
-    @brief Función que obtiene las ventanas de las imágenes negativas (no tienen peatones)
+    @brief Función que obtiene las predicciones de las imágenes negativas (no tienen peatones)
     @param imgs Lista de imágenes
     @return Devuelve una lista de listas en la que en cada posición tiene una lista
     de ventanas para la imagen correspondiente
     '''
-    windows = obtainNegatives(neg_samples_dir=PATH_TO_INRIA+"/Test/neg/")
-    return windows
+    pred = obtainNegatives(svm,neg_samples_dir=PATH_TO_INRIA+"/Test/neg/")
+    return pred
 
 
 def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
@@ -525,7 +529,7 @@ def calculateEveryWindow(img, boxes, stepY=20, stepX=20):
         reduce*=2
     return windows
 
-def getImagesAndTags():
+def getPredictions(svm):
     '''
     @brief Función que lee las imágenes positivas y negativas, obtiene sus ventanas
     y etiquetas correspondientes y las devuelve
@@ -553,29 +557,25 @@ def getImagesAndTags():
         # Añadimos las imagenes negativas
         neg_imgs.append(im)
     del neg_imgs_names
-    # Obtenemos las ventanas de las imagenes positivas
-    pos_windows = getWindowsPos(pos_imgs,pos_boxes)
-    # Eliminamos las imagenes que no tienen ventanas
-    pos_windows_notEmpty = []
-    for windows in pos_windows:
-        if len(windows)>0:
-            pos_windows_notEmpty.append(windows)
-    # Calculamos las etiquetas en función del número de imagenes con ventanas
-    tags_pos_windows = [1 for i in range(len(pos_windows_notEmpty))]
-    del pos_imgs
-    del pos_boxes
-    del pos_windows
-    # Calculamos las ventanas de las imagenes negativas
-    neg_windows = getWindowsNeg(neg_imgs)
-    # Eliminamos las imagenes que no tienen ventanas
-    neg_windows_notEmpty = []
-    for windows in neg_windows:
-        if len(windows)>0:
-            neg_windows_notEmpty.append(windows)
 
-    # Calculamos las etiquetas en función del número de imagenes con ventanas
-    tags_neg_windows = [2 for i in range(len(neg_windows_notEmpty))]
-    del neg_imgs
-    del neg_windows
-    # Devolvemos las imagenes y sus etiquetas
-    return pos_windows_notEmpty + neg_windows_notEmpty, tags_pos_windows + tags_neg_windows
+
+    # Obtenemos las respuestas de las imagenes positivas
+    box_pred = getPredPos(pos_imgs,pos_boxes,svm)
+    pred_pos = []
+    for predictions in box_pred:
+        tot = 0
+        for pred in predictions:
+            if pred:
+                tot+=1
+        pred_pos.append(tot)
+    # Calculamos las respuestas de las imagenes negativas
+    pred_neg_windows = getPredNeg(neg_imgs,svm)
+    pred_neg = []
+    for predictions in pred_neg_windows:
+        tot = 0
+        for pred in predictions:
+            if pred:
+                tot+=1
+        pred_neg.append(tot)
+
+    return pred_pos, pred_neg
