@@ -5,7 +5,7 @@ import pdb
 import random
 import numpy as np
 
-
+'''
 print("Obteniendo los datos de entrenamiento")
 # Obtenemos los datos de entrenamiento
 td = descriptorHOG.obtainHardTrainData()
@@ -17,7 +17,7 @@ del td
 '''
 print("Cargando la SVM de fichero")
 svm = cv.ml.SVM_load("svm.txt")
-'''
+
 print("Cargando el test")
 
 pred_pos, pred_neg = af.getPredictions(svm)
@@ -25,8 +25,10 @@ pred_pos, pred_neg = af.getPredictions(svm)
 del svm
 
 print("\n\n##################################################")
-print("Predicción: ")
-print(predicciones)
+print("Predicciones para las imagenes positivas: ")
+print(pred_pos)
+print("Predicciones para las imagenes negativas: ")
+print(pred_neg)
 print("##################################################\n\n")
 
 pos_score = 0
