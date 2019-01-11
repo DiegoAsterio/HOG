@@ -514,10 +514,11 @@ def getPredPosImg(svm, img, boxes, stepY=64, stepX=32):
                 coord.append((indiceY, indiceX))
                 indiceX = indiceX + stepX
             indiceY = indiceY + stepY
-        descr = descriptorHOG.obtainDescriptors(windows,True)
-        prediction = list(map(lambda x:x[0],svm.predict(descr)[1]))
-        heatMap = buildHeatMap((y,x),prediction,coord)
-        ret |= checkOccurrences(heatMap, boxes, scale)
+        if len(windows)>1:
+            descr = descriptorHOG.obtainDescriptors(windows,True)
+            prediction = list(map(lambda x:x[0],svm.predict(descr)[1]))
+            heatMap = buildHeatMap((y,x),prediction,coord)
+            ret |= checkOccurrences(heatMap, boxes, scale)
         # Escalamos para obtener las coordenadas adecuadas en cada nivel de la pirámide Gaussiana
         scale*=2
     return ret
