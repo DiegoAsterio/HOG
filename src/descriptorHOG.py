@@ -312,11 +312,14 @@ def obtainHardTrainData(perc=0.5):
     resp = tags_pos + tags_hard_positive + tags_neg + tags_hard_negative
     resp = np.array(resp).astype(np.int)
     # Obtenemos los descriptores, uno por imagen
-    img_descr = obtainDescriptors(img_pos + hard_positive_examples + img_neg + hard_negative_examples)
-    del img_pos
-    del img_neg
-    del hard_negative_examples
-    del hard_positive_examples
+    img_descr = obtainDescriptors(img_pos)
+    img_pos = None
+    img_descr = np.concatenate((img_descr,obtainDescriptors(hard_positive_examples)))
+    hard_positive_examples = None
+    img_descr = np.concatenate((img_descr,obtainDescriptors(img_neg)))
+    img_neg = None
+    img_descr = np.concatenate((img_descr,obtainDescriptors(hard_negative_examples)))
+    hard_negative_examples = None
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr, cv.ml.ROW_SAMPLE, resp)
 
