@@ -516,7 +516,7 @@ def getPredPosImg(svm, img, boxes, stepY=20, stepX=20):
                 indiceX = indiceX + stepX
             indiceY = indiceY + stepY
         descr = descriptorHOG.obtainDescriptors(windows)
-        prediction = list(map(lambda(x:x[0]),svm.predict(descr)[1]))
+        prediction = list(map(lambda x:x[0],svm.predict(descr)[1]))
         heatMap = buildHeatMap((y,x),prediction,coord)
         ret |= checkOccurrences(heatMap, boxes, scale)
         # Escalamos para obtener las coordenadas adecuadas en cada nivel de la pirámide Gaussiana
@@ -572,10 +572,10 @@ def createBoxes(regions,scale):
     return boxes
 
 def getCenter(region):
-    xmin = min(list(map(lambda(x:x[0]),region)))
-    ymin = min(list(map(lambda(x:x[1]),region)))
-    xmax = max(list(map(lambda(x:x[0]),region)))
-    ymax = max(list(map(lambda(x:x[1]),region)))
+    xmin = min(list(map(lambda x:x[0],region)))
+    ymin = min(list(map(lambda x:x[1],region)))
+    xmax = max(list(map(lambda x:x[0],region)))
+    ymax = max(list(map(lambda x:x[1],region)))
     x = int((xmin + xmax)/2)
     y = int((ymin + ymax)/2)
     return x, y
