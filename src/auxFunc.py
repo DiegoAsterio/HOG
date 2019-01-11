@@ -484,7 +484,7 @@ def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
     return areaParcial/areaTotal >= 0.5
 
 # Originalmente stepY=64, stepX=32
-def getPredPosImg(svm, img, boxes, stepY=20, stepX=20):
+def getPredPosImg(svm, img, boxes, stepY=64, stepX=32):
     '''
     @brief Función que dada una imagen y la delimitación de sus peatones obtiene
     todas las ventanas que al menos solapan un 50% con los rectángulos de los peatones.
@@ -551,6 +551,7 @@ def checkOccurrences(heatMap, boxes, scale):
     umbral = 3
     m = cutBeneathRate(umbral,heatMap)
     indexes = differentFromZero(m)
+    regions = []
     while len(indexes) != 0:
         region = DFSiterative(indexes[0],heatMap)
         indexes = substractRegion(region,indexes)
@@ -566,7 +567,7 @@ def checkOccurrences(heatMap, boxes, scale):
 
 def createBoxes(regions,scale):
     boxes = []
-    for region in region:
+    for region in regions:
         x, y = getCenter(region)
         boxes.append((x-32//scale, y-64//scale, x+32//scale, y+64//scale))
     return boxes
