@@ -84,6 +84,33 @@
 
 \subsection{Descriptores HOG}
 
+El problema mencionado anteriormente se ha enfrentado desde
+distintos puntos de vista lo que ha dado lugar a diversos
+descriptores. Nuestra implementacion se basa en el paper de
+Navneet Dalal y Bill Triggs en el que desarrollan un descriptor
+basado en el gradiente de una imagen llamado descriptor HOG.
+El metodo se basa en calcular los gradientes de una imagen y a
+continuacion construir histogramas locales basado en la
+orientacion de dichos gradientes.
+
+La idea basica sobre la que se desarrolla la tecnica es que las
+caracteristicas de forma y apariencia de un objeto de forma local
+se pueden resumir gracias a la distribucion de la orientacion de
+los gradientes de la imagen.
+
+A continuacion se describe la implementacion de la tecnica a
+grandes rasgos. En primer lugar la ventana de la imagen sobre la
+que se va a construir el vector de caracteristicas se divide en
+celdas. Estas celdas son pequenas regiones de la imagen. En cada
+una de estas celdas se calcula el histograma de la direccion de
+los gradientes que en ella se encuentran. Esto define la re
+A continuacion estas
+celdas se agrupan en bloques para que sea posible normalizarlas.
+
+
+diEl descriptor HOG es un vector de caracteristicas 
+La construccion del descriptor HOG se apoya fundamentalmente en el gradiente de la imagen.
+
 \subsection{Fases de la resolución}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

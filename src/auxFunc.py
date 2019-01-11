@@ -535,7 +535,7 @@ def getPredictions(svm):
     y etiquetas correspondientes y las devuelve
     @return Devuelve dos valores, el primero es la lista de listas de ventanas de
     cada imagen y el segundo es la lista de etiquetas correspondientes para cada imagen
-    (no para cada ventana)
+    (no para cada ventana)b
     '''
     pos_imgs = []
     pos_boxes = []
