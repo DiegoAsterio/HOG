@@ -659,7 +659,7 @@ def getPredictions(svm):
     for predictions in pred_neg_windows:
         tot = 0
         for pred in predictions:
-            if pred==1:
+            if pred==2:
                 tot+=1
         pred_neg.append(tot/len(predictions))
 
