@@ -652,15 +652,15 @@ def getPredictions(svm):
         for pred in predictions:
             if pred:
                 tot+=1
-        pred_pos.append(tot)
+        pred_pos.append(tot/len(predictions))
     # Calculamos las respuestas de las imagenes negativas
     pred_neg_windows = getPredNeg(neg_imgs,svm)
     pred_neg = []
     for predictions in pred_neg_windows:
         tot = 0
         for pred in predictions:
-            if pred:
+            if pred==1:
                 tot+=1
-        pred_neg.append(tot)
+        pred_neg.append(tot/len(predictions))
 
     return pred_pos, pred_neg
