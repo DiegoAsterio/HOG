@@ -197,14 +197,13 @@ def testSVM(svm, testData):
 def obtainDescriptors(imgs, silent=False, ncores=4):
     p = Pool(ncores)
     vims = map(lambda x:list(x),list(filter(lambda x : len(x)>0, list(np.array_split(imgs,ncores)))))
-    f = lambda x : obtainDescriptorsSubImg(x,silent=True)
-    list_descr = p.map(f, vims)
+    list_descr = p.map(obtainDescriptorsSubImg, vims)
     ret = list_descr[0]
     for descr in list_descr:
         ret = np.vstack([ret,descr])
     return ret
 
-def obtainDescriptorsSubImg(imgs,silent=False):
+def obtainDescriptorsSubImg(imgs,silent=True):
     '''
     @brief Función que dada un vector de imágenes obtiene los descriptores asociados
     a la misma y hace la unión. Las imágenes tienen que ser parches de 64x128
