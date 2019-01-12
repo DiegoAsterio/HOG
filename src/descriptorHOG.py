@@ -3,6 +3,7 @@ import cv2 as cv
 import auxFunc as af
 import pdb
 import random
+from multiprocessing import Pool
 
 ################################################################################
 ##                        1: Normalización Gamma                              ##
@@ -193,13 +194,13 @@ def testSVM(svm, testData):
     retval, results = svm.predict(testData)
     return results
 
-def obtainDescriptors(imgs, silent=False):
-    p = Pool(8)
-    vims = map(lambda x:list(x),list(filter(lambda x : len(x)>0, list(np.array_split(imgs,8)))))
+def obtainDescriptors(imgs, silent=False, ncores=4):
+    p = Pool(ncores)
+    vims = map(lambda x:list(x),list(filter(lambda x : len(x)>0, list(np.array_split(imgs,ncores)))))
     list_descr = p.map(obtainDescriptorsSubImg, vims)
     ret = list_descr[0]
     for descr in list_descr:
-        ret = np.vstack([ret,descr])        
+        ret = np.vstack([ret,descr])
     return ret
 
 def obtainDescriptorsSubImg(imgs,silent=False):

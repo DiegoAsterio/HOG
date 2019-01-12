@@ -515,7 +515,7 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
                 indiceX = indiceX + stepX//scale
             indiceY = indiceY + stepY//scale
         if len(windows)>1:
-            descr = descriptorHOG.obtainDescriptors(windows,True)
+            descr = descriptorHOG.obtainDescriptors(windows,silent=True)
             prediction = list(map(lambda x:x[0],svm.predict(descr)[1]))
             heatMap = buildHeatMap((y,x),prediction,coord)
             ret |= checkOccurrences(heatMap, boxes, scale)
