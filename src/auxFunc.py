@@ -483,7 +483,7 @@ def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
     return areaParcial/areaTotal >= 0.5
 
 # Originalmente stepY=64, stepX=32
-def getPredPosImg(svm, img, boxes, stepY=64, stepX=32):
+def getPredPosImg(svm, img, boxes, stepY=32, stepX=16):
     '''
     @brief Función que dada una imagen y la delimitación de sus peatones obtiene
     todas las ventanas que al menos solapan un 50% con los rectángulos de los peatones.
@@ -526,7 +526,7 @@ def getPredPosImg(svm, img, boxes, stepY=64, stepX=32):
 def buildHeatMap(size, prediction, coord):
     HeatMap = np.zeros(size)
     for i in range(len(prediction)):
-        if prediction == 1:
+        if prediction[i] == 1:
             y, x = coord[i]
             HeatMap[y:y+128,x:x+64] += 1
     return HeatMap
@@ -548,7 +548,7 @@ def cutBeneathRate(rate, heatMap):
     return heatMap
 
 def checkOccurrences(heatMap, boxes, scale):
-    umbral = 3
+    umbral = 2
     m = cutBeneathRate(umbral,heatMap)
     indexes = differentFromZero(m)
     regions = []
@@ -672,7 +672,7 @@ def getPredictions(svm):
 
     # Obtenemos las respuestas de las imagenes positivas
     print("Obteniendo las predicciones de las imagenes positivas")
-    box_pred = getPredPos(pos_imgs,pos_boxes,svm)
+    box_pred = getPredPos(pos_imgs[:5],pos_boxes[:5],svm)
     pred_pos = []
     for predictions in box_pred:
         tot = 0
@@ -682,7 +682,7 @@ def getPredictions(svm):
         pred_pos.append(tot/len(predictions))
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
-    pred_neg_windows = getPredNeg(neg_imgs,svm)
+    pred_neg_windows = getPredNeg(neg_imgs[:5],svm)
     pred_neg = []
     for predictions in pred_neg_windows:
         tot = 0
