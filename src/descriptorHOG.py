@@ -194,14 +194,17 @@ def testSVM(svm, testData):
     retval, results = svm.predict(testData)
     return results
 
-def obtainDescriptors(imgs, silent=False, ncores=8):
-    p = Pool(ncores)
-    vims = map(lambda x:list(x),list(filter(lambda x : len(x)>0, list(np.array_split(imgs,ncores)))))
-    list_descr = p.map(obtainDescriptorsSubImg, vims)
-    ret = list_descr[0]
-    for descr in list_descr:
-        ret = np.vstack([ret,descr])
-    return ret
+def obtainDescriptors(imgs, silent=True, ncores=8):
+    if len(imgs)<ncores*3:
+        return obtainDescriptors(imgs,silent)
+    else:
+        p = Pool(ncores)
+        vims = [list(v) for v in np.array_split(imgs,ncores)]
+        list_descr = p.map(obtainDescriptorsSubImg, vims)
+        ret = list_descr[0]
+        for descr in list_descr:
+            ret = np.concatenate((ret,descr))
+        return ret
 
 def obtainDescriptorsSubImg(imgs,silent=True):
     '''
