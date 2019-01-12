@@ -197,7 +197,7 @@ def testSVM(svm, testData):
 def obtainDescriptors(imgs, silent=False, ncores=4):
     p = Pool(ncores)
     vims = map(lambda x:list(x),list(filter(lambda x : len(x)>0, list(np.array_split(imgs,ncores)))))
-    list_descr = p.map(obtainDescriptorsSubImg, vims)
+    list_descr = p.map(lambda x : obtainDescriptorsSubImg(x,True), vims)
     ret = list_descr[0]
     for descr in list_descr:
         ret = np.vstack([ret,descr])
