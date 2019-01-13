@@ -202,8 +202,9 @@ def obtainDescriptors(imgs, silent=True, ncores=8):
         vims = [list(v) for v in np.array_split(imgs,ncores)]
         list_descr = p.map(obtainDescriptorsSubImg, vims)
         ret = list_descr[0]
-        for descr in list_descr:
+        for descr in list_descr[1:]:
             ret = np.concatenate((ret,descr))
+        pdb.set_trace()
         return ret
 
 def obtainDescriptorsSubImg(imgs,silent=True):
