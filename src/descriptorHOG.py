@@ -196,7 +196,7 @@ def testSVM(svm, testData):
 
 def obtainDescriptors(imgs, silent=True, ncores=8):
     if len(imgs)<ncores*3:
-        return obtainDescriptors(imgs,silent)
+        return obtainDescriptorsSubImg(imgs,silent)
     else:
         p = Pool(ncores)
         vims = [list(v) for v in np.array_split(imgs,ncores)]
