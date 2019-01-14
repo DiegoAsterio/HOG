@@ -80,6 +80,24 @@
 
 \section{Descripción del problema y enfoque de la resolución}
 
+En la resolución de este trabajo nos hemos planteado el siguiente problema a resolver, dada una imagen de una persona andando por la calle (un peatón), ¿cómo podemos reconocer que es un peatón?
+
+Esta misma cuestión fue planteada por Navneet Dalal y Bill Triggs en su paper ``Histogram of Oriented Gradients for Human Detection'' en el que explican el desarrollo de unos descriptores que aplicados a su dataset de personas obtienen unos resultados muy buenos en la detección de las mismas. 
+
+Estos descriptores son los descriptores HOG o descriptores de histogramas basados en gradientes. Como veremos a lo largo del trabajo se han empleado distintas variaciones a la hora de hallar los descriptores por Dalal y Triggs, quedándonos nosotros con las elecciones que han resultado más fructíferas para ellos en su análisis. 
+
+Para comenzar hay que saber que la detección de personas es un problema difícil de abordar y que actualmente resulta muy interesante en aplicaciones por ejemplo en coches, de forma que si detecta un peatón andando por delante del vehículo este entienda que tiene que detenerse. 
+
+Las herramientas usadas en este proyecto han sido:
+\begin{itemize}
+	\item Python para la implementación.
+	\item OpenCV y NumPy para las operaciones de los algoritmos.
+	\item El módulo de SVM incluído en OpenCV para poder predecir la existencia o no de un humano en una imagen en base a los descriptores calculados.
+	\item El dataset dado por los investigadores empleado en la elaboración de su artículo.
+\end{itemize}
+
+A continuación hacemos una descripción un poco más elaborada del problema propuesto.
+
 \subsection{Problema a resolver}
 
 \subsection{Descriptores HOG}
