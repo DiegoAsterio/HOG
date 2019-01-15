@@ -13,6 +13,7 @@ print("Entrenando la SVM")
 # Entrenamos la SVM
 svm = descriptorHOG.trainSVM(td)
 svm.save("svm.txt")
+exit()
 del td
 '''
 print("Cargando la SVM de fichero")
