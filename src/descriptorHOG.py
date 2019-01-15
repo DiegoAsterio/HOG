@@ -306,7 +306,7 @@ def obtainTrainData():
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr,cv.ml.ROW_SAMPLE,resp.astype(np.int))
 
-def obtainHardTrainData(perc=0.5):
+def obtainHardTrainData():
     '''
     @brief Función que obtiene todos los datos de entrenamiento
     cargando las imágenes correspondientes + ejemplos dificiles
@@ -316,18 +316,32 @@ def obtainHardTrainData(perc=0.5):
     # Cargamos las imágenes de entrenamiento
     img_pos,img_neg = af.loadTrainImgs()
     hard_negative_examples = af.loadHardNegativeExamples()
+    hard_positive_examples = af.loadHardPositiveExamples(3000)
     # Generamos las respuestas 1 si es una persona, 2 si no lo es
     tags_pos = [1 for i in range(len(img_pos))]
     tags_neg = [2 for i in range(len(img_neg))]
     tags_hard_negative = [2 for i in range(len(hard_negative_examples))]
-    resp = tags_pos + tags_neg + tags_hard_negative
+    tags_hard_positive = [1 for i in range(len(hard_positive_examples))]
+    resp = tags_pos + tags_hard_positive + tags_neg + tags_hard_negative
     resp = np.array(resp).astype(np.int)
     # Obtenemos los descriptores, uno por imagen
+    print("Calculando los descriptores de las imagenes positivas")
     img_descr = obtainDescriptors(img_pos)
     img_pos = None
-    img_descr = np.concatenate((img_descr,obtainDescriptors(img_neg)))
+    del img_pos
+    print("Calculando los descriptores de las imagenes positivas dificiles")
+    img_descr = np.concatenate((img_descr,obtainDescriptors(hard_positive_examples)))
+    hard_positive_examples = None
+    del hard_positive_examples
+    print("Calculando los descriptores de las imagenes negativas")
+    img_descr = np.concatenate((img_descr,obtainDescriptors(img_neg[:int(len(img_neg)/2)])))
+    img_descr = np.concatenate((img_descr,obtainDescriptors(img_neg[int(len(img_neg)/2):])))
     img_neg = None
-    img_descr = np.concatenate((img_descr,obtainDescriptors(hard_negative_examples)))
+    del img_neg
+    print("Calculando los descriptores de las imagenes negativas dificiles")
+    img_descr = np.concatenate((img_descr,obtainDescriptors(hard_negative_examples[:int(len(hard_negative_examples)/2)])))
+    img_descr = np.concatenate((img_descr,obtainDescriptors(hard_negative_examples[int(len(hard_negative_examples)/2):])))
     hard_negative_examples = None
+    del hard_negative_examples
     # Creamos los datos de entrenamiento y los devolvemos
     return cv.ml.TrainData_create(img_descr, cv.ml.ROW_SAMPLE, resp)
