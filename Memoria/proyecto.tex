@@ -30,6 +30,7 @@
 %\setlength\parindent{0pt}
 
 \setlength\parindent{0pt}
+\setlength{\parskip}{10px}
 
 
 % Carpeta con las imágenes
@@ -138,6 +139,32 @@ diEl descriptor HOG es un vector de caracteristicas
 La construccion del descriptor HOG se apoya fundamentalmente en el gradiente de la imagen.
 
 \subsection{Fases de la resolución}
+
+
+\subsubsection{Procedimiento para entrenar el modelo SVM}
+
+
+\subsubsection{Procedimiento para la detección de un peatón en una imagen de test}
+
+El el paper no se discute en ningún momento el método de test utilizado por los investigadores por lo que, para que sea comparable con otras técnicas actuales, hemos empleado un método de test utilizado actualmente para medir el acierto de la detección.
+
+En primer lugar se nos introduce una imagen de test de la que tenemos anotaciones en caso de ser positiva que nos indican el rectángulo de la imagen en el que tenemos un peatón. De esta forma una vez dada la región que hemos estimado para cada peatón podemos comprobar si se acerca a las regiones provistas por el fichero de anotaciones. 
+
+En primer lugar tomamos los tres primeros niveles de la pirámide Gaussiana para la imagen original, esto sería una lista con la imagen original y los dos niveles siguientes de la pirámide (incluimos a la imagen original como el primer nivel de la pirámide Gaussiana). 
+
+Para cada uno de estos niveles vamos a ir pasando una ventana deslizante de 128x64 píxeles y vamos a ir guardando estos parches. Tras la obtención de los parches calculamos sus descriptores y los pasamos a la SVM para que prediga si hay o no un peatón en cada parche. De esta forma finalmente obtendremos ventanas en las que sí pensamos hay un peatón y ventanas en las que pensamos que no hay un peatón.
+
+Tomamos una matriz de ceros del mismo tamaño que el nivel de la pirámide Gaussiana que estamos evaluando y en cada posición sumamos 1 cada vez que obtengamos que dicho píxel está en una región en la que hemos predicho que hay un peatón. De esta forma terminamos con una matriz que tiene 0 en las posiciones en las que nunca se ha predicho que hay un peatón y números mayores que 0 indicando cuántas veces dicho píxel ha estado en una ventana con un peatón. Esta estructura es conocida como mapa de calor. Tras la obtención de esta matriz truncamos los valores menores que un umbral a 0 para quedarnos únicamente con regiones significativas, es decir, si tomásemos como umbral 2 entonces todos los píxeles con valor menor estricto que 2 tendrían un 0 en el mapa de calor. 
+
+Con esta estructura ya realizada podemos estudiar las regiones conexas de la misma, es decir, las regiones en las que tenemos números mayores que 0 adyacentes entre sí. De esta forma obtendremos regiones disjuntas del mapa de calor. Sólo resta buscar el rectángulo más pequeño que engloba dicha región y ya tendríamos nuestra predicción de la región de la imagen en la que tenemos peatones. 
+
+Por último se comprueba que las regiones encontradas solapen al menos en un 50\% con las regiones aportadas por los ficheros de anotaciones y devolvemos para cada imagen $\frac{n\acute{u}mero \ de \ peatones \ acertados}{n\acute{u}mero \ de \ peatones \ totales}$. De esta forma tenemos una medida entre 0 y 1 que nos dice cuánto hemos acertado en cada imagen. Si sumamos todos estos números tendríamos una medida global del acierto, de forma que la puntuación máxima que podríamos obtener sería el número de imágenes. 
+
+De igual modo para hacer una predicción y medida equivalente en las imágenes negativas, para cada imagen de test negativa tomamos 10 ventanas de tamaño 128x64 de forma aleatoria y devolvemos el número de ventanas acertadas partido por el número de ventanas totales, en este caso 10. De esta forma obtenemos que las medidas de las imágenes negativas y positivas acertadas serían comparables entre sí. 
+
+Al realizar el análisis de los peatones en cada uno de los niveles de la pirámide Gaussiana obtenemos una ventaja, y es que los posibles peatones que haya en la misma serán de menor tamaño y por tanto será más probable que el peatón nos entre por completo en una ventana al ir avanzando en los niveles de la pirámide con lo que el parche que obtengamos será más parecido a los pasados para entrenamiento de la SVM. 
+
+Así mismo hemos realizado un test ortodoxo del modelo tomando imágenes ya recortadas del test de tamaño 128x64 con personas y sin personas de forma que es capaz de decirnos si hay o no personas en esa imagen (sólo hay una persona por recorte). Este test nos proporciona también una medida del método que subyace a lo realizado en el proceso anterior. Podríamos decir que este proceso de test de los recortes realizados por nosotros a mano empleando los ficheros de anotaciones es la parte del reconocimiento de los parches empleada en el método anterior al obtenerlos con la ventana deslizante. En la siguiente sección detallaremos más en profundidad los resultados obtenidos y los comentaremos.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                           Valoración de los resultados                           %%
