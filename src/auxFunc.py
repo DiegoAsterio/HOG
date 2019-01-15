@@ -5,8 +5,12 @@ import os
 import re
 import random
 import descriptorHOG
+from profilehooks import profile
+from numba import jit, autojit
 
 PATH_TO_INRIA = "../INRIAPerson"
+
+GLOBAL_COUNT=0
 
 ################################################################################
 ##                       Funciones de dibujado                                ##
@@ -344,6 +348,23 @@ def loadHardNegativeExamples():
         vim.append(im)
     return vim
 
+def loadHardPositiveExamples(nImgs=-1):
+    '''
+    @brief Funcion que devuelve las imagenes que son ejemplos
+    dificiles
+    @return Lista que contiene imagenes
+    '''
+    vim = []
+    hard_examples_names = os.listdir(PATH_TO_INRIA+"/hard_positive_examples")
+    if nImgs>0:
+        print("Tomando solo " + str(nImgs) + " imagenes dificiles positivas para entrenar")
+        hard_examples_names = random.sample(hard_examples_names,nImgs)
+    for pimg in hard_examples_names:
+        im = cv.imread(PATH_TO_INRIA+"/hard_positive_examples/"+pimg,-1)
+        im = np.float32(im)
+        vim.append(im)
+    return vim
+
 def loadTestImgs():
     '''
     @brief Función que devuelve las imágenes de test como dos listas
@@ -483,6 +504,7 @@ def checkArea(x1,y1,x2,y2,u1,v1,u2,v2):
     return areaParcial/areaTotal >= 0.5
 
 # Originalmente stepY=64, stepX=32
+#def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
 def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
     '''
     @brief Función que dada una imagen y la delimitación de sus peatones obtiene
@@ -496,12 +518,15 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
     en el eje Y de la imagen
     @return Devuelve una lista de subimagenes de 128x64 para la imagen pasada
     '''
+    imgs_con_boxes = []
+
     ret = np.zeros(len(boxes)).astype(np.bool)
     # Calculamos la pirámide gaussiana, la primera imagen de la misma es la original
     pyr = gaussianPyramid(img)
     scale=1
     # Para cada nivel
     for level in pyr:
+        print("Escala:" + str(scale))
         windows=[]
         coord = []
         y,x,z = level.shape
@@ -515,14 +540,37 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
                 indiceX = indiceX + stepX//scale
             indiceY = indiceY + stepY//scale
         if len(windows)>1:
+            print("Obteniendo descriptores")
             descr = descriptorHOG.obtainDescriptors(windows,silent=True)
-            prediction = list(map(lambda x:x[0],svm.predict(descr)[1]))
+            print("Obteniendo predicciones")
+            prediction = [pred[0] for pred in svm.predict(descr)[1]]
+            print("Obteniendo el mapa de calor")
             heatMap = buildHeatMap((y,x),prediction,coord)
-            ret |= checkOccurrences(heatMap, boxes, scale)
+            print("Obteniendo las ocurrencias")
+            answer, boxes_nuestras = checkOccurrences(heatMap, boxes, scale)
+            ret |= answer
+
+            img_rectangulos=np.uint8(level)
+            if len(boxes_nuestras)>0:
+                cv.rectangle(img_rectangulos, (boxes_nuestras[0][0],boxes_nuestras[0][3]), (boxes_nuestras[0][2], boxes_nuestras[0][1]), (0,255,0), 3)
+                for xmin,ymin,xmax,ymax in boxes_nuestras[1:]:
+                    cv.rectangle(img_rectangulos, (xmin,ymax), (xmax, ymin), (0,255,0), 3)
+                imgs_con_boxes.append(img_rectangulos)
+
         # Escalamos para obtener las coordenadas adecuadas en cada nivel de la pirámide Gaussiana
         scale*=2
+
+    if len(imgs_con_boxes)>0:
+        #pintaMI(imgs_con_boxes)
+        for img_box in imgs_con_boxes:
+            cv.imwrite("./cuadrados/"+str(GLOBAL_COUNT)+".jpg",img_box)
+            GLOBAL_COUNT+=1
+    else:
+        print("No hay ninguna imagen con cajas")
+
     return ret
 
+@autojit
 def buildHeatMap(size, prediction, coord):
     HeatMap = np.zeros(size)
     for i in range(len(prediction)):
@@ -531,29 +579,25 @@ def buildHeatMap(size, prediction, coord):
             HeatMap[y:y+128,x:x+64] += 1
     return HeatMap
 
+@autojit
 def differentFromZero(heatMap):
-    indexes = []
-    y, x = heatMap.shape
-    for i in range(y):
-        for j in range(x):
-            indexes.append((i,j))
+    x,y = np.nonzero(heatMap)
+    indexes = list(zip(x,y))
     return indexes
 
+@autojit
 def cutBeneathRate(rate, heatMap):
-    y, x = heatMap.shape
-    for i in range(y):
-        for j in range(x):
-            if heatMap[i,j] < rate:
-                heatMap[i,j] = 0
+    heatMap[heatMap<rate]=0
     return heatMap
 
+@autojit
 def checkOccurrences(heatMap, boxes, scale):
-    umbral = 2
+    umbral = 1      # Es como si no hubiese umbral (<1 es cero)
     m = cutBeneathRate(umbral,heatMap)
     indexes = differentFromZero(m)
     regions = []
     while len(indexes) != 0:
-        region = DFSiterative(indexes[0],heatMap)
+        region = getRegion(indexes[0],heatMap)
         indexes = substractRegion(region,indexes)
         regions.append(region)
     ourBoxes = createBoxes(regions,scale,heatMap)
@@ -563,8 +607,9 @@ def checkOccurrences(heatMap, boxes, scale):
             x1, y1, x2, y2 = boxes[i]
             if checkArea(x1//scale, y1//scale, x2//scale, y2//scale, xmin, ymin, xmax, ymax):
                 answer[i] = True
-    return answer
+    return answer, ourBoxes
 
+@autojit
 def createBoxes(regions,scale,G):
     boxes = []
     for region in regions:
@@ -573,6 +618,7 @@ def createBoxes(regions,scale,G):
         boxes.append((x-32//scale, y-64//scale, x+32//scale, y+64//scale))
     return boxes
 
+@autojit
 def getElemsMax(G,region):
     maxim = -1
     for i,j in region:
@@ -593,17 +639,35 @@ def getCenter(region):
     y = int((ymin + ymax)/2)
     return x, y
 
+@autojit
+def getRegion(index, G):
+    x,y = np.nonzero(G)
+    indices = list(zip(x,y))
+    region = [index]
+    non_tested = [index]
+    while non_tested:
+        ind_reg = non_tested.pop()
+        for ind in indices:
+            if checkAdjacent(ind_reg,ind):
+                region.append(ind)
+                non_tested.append(ind)
+                indices.remove(ind)
+    return list(set(region))
+
+@autojit
+def checkAdjacent(i1,i2):
+    return ((i1[0]==i2[0]+1 or i1[0]==i2[0]-1) and i1[1]==i2[1]) or ((i1[1]==i2[1]+1 or i1[1]==i2[1]-1) and i1[0]==i2[0])
+
 def DFSiterative(elem, G):
     discovered = []
     S = []
     S.append(elem)
     while S:
         vert = S.pop()
-        if vert not in discovered:
+        if not vert in discovered:
             discovered.append(vert)
             adjacent = getAdjacents(vert,G)
-            for w in adjacent:
-                S.append(w)
+            S = S+adjacent
     return discovered
 
 def getAdjacents(vert, G):
@@ -613,13 +677,13 @@ def getAdjacents(vert, G):
     i3 = (vert[0]-1,vert[1])
     i4 = (vert[0],vert[1]-1)
     if checkInGNPos(i1,G):
-        adjacents.append(vert)
+        adjacents.append(i1)
     if checkInGNPos(i2,G):
-        adjacents.append(vert)
+        adjacents.append(i2)
     if checkInGNPos(i3,G):
-        adjacents.append(vert)
+        adjacents.append(i3)
     if checkInGNPos(i4,G):
-        adjacents.append(vert)
+        adjacents.append(i4)
     return adjacents
 
 def checkInGNPos(index, graph):
@@ -635,6 +699,7 @@ def checkInGNPos(index, graph):
     else:
         return False
 
+@autojit
 def substractRegion(subset, theset):
     for e in subset:
         theset.remove(e)
