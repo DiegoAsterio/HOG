@@ -130,19 +130,33 @@ grandes rasgos. En primer lugar la ventana de la imagen sobre la
 que se va a construir el vector de caracteristicas se divide en
 celdas. Estas celdas son pequenas regiones de la imagen. En cada
 una de estas celdas se calcula el histograma de la direccion de
-los gradientes que en ella se encuentran. Esto define la re
-A continuacion estas
-celdas se agrupan en bloques para que sea posible normalizarlas.
-
-
-diEl descriptor HOG es un vector de caracteristicas 
-La construccion del descriptor HOG se apoya fundamentalmente en el gradiente de la imagen.
+los gradientes que en ella se encuentran. Por ultimo estas
+celdas se agrupan en bloques para que sea posible normalizar los
+histogramas. Finalmente, el vector de caracteristicas lo conforman
+los histogramas normalizados concatenados uno detras de otro.
 
 \subsection{Fases de la resolución}
 
 
 \subsubsection{Procedimiento para entrenar el modelo SVM}
 
+Las palabras del Test se han generado a partir de las imagenes de
+la base de datos INRIA. Esta es la base de datos con la que se
+obtuvieron por primera vez los resultados del descriptor HOG.
+
+En primer lugar se han procesado las imagenes del test etiquetadas
+como positivas. Cada peaton en la imagen se ha recortado y
+redimensionado al tamano de la ventana, es decir $64\times 128$.
+En segundo lugar se han procesado las imagnes negativas. Para
+obtener recortes de las imagenes negativas se ha recorrido el
+directorio de las imagenes negativas y por cada imagen se han
+obtenido $10$ recortes del tamano considerado que se han etiquetado
+como negativas. A partir de todos esos recortes se han generado los
+descriptores HOG asociados con los que se ha entrenado la SVM.
+
+Hemos utilizado la implementacion de openCV de SVM. La SVM es
+lineal y tiene el mismo coeficiente C que en el paper de referencia
+es decir $C = 0.01$. 
 
 \subsubsection{Procedimiento para la detección de un peatón en una imagen de test}
 
