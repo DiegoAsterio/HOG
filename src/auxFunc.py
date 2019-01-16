@@ -543,10 +543,6 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
                 coord.append((indiceY, indiceX))
                 indiceX = indiceX + stepX//scale
             indiceY = indiceY + stepY//scale
-        if scale==4:
-            # Lo meto dos veces por si windows esta vacia
-            windows.append(cv.resize(level,(128,64)))
-            windows.append(cv.resize(level,(128,64)))
         if len(windows)>1:
             print("Obteniendo descriptores")
             print("Número de ventanas: " + str(len(windows)))
