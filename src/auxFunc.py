@@ -541,10 +541,14 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
                 coord.append((indiceY, indiceX))
                 indiceX = indiceX + stepX//scale
             indiceY = indiceY + stepY//scale
+        if scale==4:
+            # Lo meto dos veces por si windows esta vacia
+            windows.append(cv.resize(level,(128,64)))
+            windows.append(cv.resize(level,(128,64)))
         if len(windows)>1:
             print("Obteniendo descriptores")
             print("Número de ventanas: " + str(len(windows)))
-            if len(windows)>5000:
+            if len(windows)>4000:
                 descr = descriptorHOG.obtainDescriptors(windows[:int(len(windows)/2)],silent=True)
                 descr = np.concatenate((descr, descriptorHOG.obtainDescriptors(windows[int(len(windows)/2):],silent=True)))
             else:
@@ -753,12 +757,12 @@ def getPredictions(svm):
     print("Obteniendo las predicciones de las imagenes positivas")
     box_pred = getPredPos(pos_imgs[:50],pos_boxes[:50],svm)
     pred_pos = []
-    for predictions in box_pred:
+    for i in range(len(box_pred)):
         tot = 0
-        for pred in predictions:
+        for pred in box_pred[i]:
             if pred:
                 tot+=1
-        pred_pos.append(tot/len(predictions))
+        pred_pos.append(tot/len(pos_boxes[i]))
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
     pred_neg_windows = getPredNeg(neg_imgs[:50],svm)
