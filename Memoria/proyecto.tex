@@ -14,8 +14,7 @@
 \usepackage{accents}
 \usepackage{flushend}
 \usepackage{tikz}
-\usepackage[LGR,T1]{fontenc}
-\newcommand{\textgreek}[1]{\begingroup\fontencoding{LGR}\selectfont#1\endgroup}
+
 \usetikzlibrary{arrows,automata}
 \usepackage{multicol}
 \setlength{\columnsep}{1cm}
@@ -93,7 +92,7 @@ Las herramientas usadas en este proyecto han sido:
 \begin{itemize}
 	\item Python para la implementación.
 	\item OpenCV y NumPy para las operaciones de los algoritmos.
-	\item El módulo de SVM incluído en OpenCV para poder predecir la existencia o no de un humano en una imagen en base a los descriptores calculados.
+	\item El módulo de SVM incluido en OpenCV para poder predecir la existencia o no de un humano en una imagen en base a los descriptores calculados.
 	\item El dataset dado por los investigadores empleado en la elaboración de su artículo.
 \end{itemize}
 
@@ -113,50 +112,120 @@ La segunda fase es la de test que comparte dificultad e importancia con la prime
 
 El problema mencionado anteriormente se ha enfrentado desde
 distintos puntos de vista lo que ha dado lugar a diversos
-descriptores. Nuestra implementacion se basa en el paper de
+descriptores. Nuestra implementación se basa en el paper de
 Navneet Dalal y Bill Triggs en el que desarrollan un descriptor
 basado en el gradiente de una imagen llamado descriptor HOG.
 El metodo se basa en calcular los gradientes de una imagen y a
-continuacion construir histogramas locales basado en la
-orientacion de dichos gradientes.
+continuación construir histogramas locales basado en la
+orientación de dichos gradientes.
 
-La idea basica sobre la que se desarrolla la tecnica es que las
-caracteristicas de forma y apariencia de un objeto de forma local
-se pueden resumir gracias a la distribucion de la orientacion de
+La idea básica sobre la que se desarrolla la técnica es que las
+características de forma y apariencia de un objeto de forma local
+se pueden resumir gracias a la distribución de la orientación de
 los gradientes de la imagen.
 
-A continuacion se describe la implementacion de la tecnica a
-grandes rasgos. En primer lugar la ventana de la imagen sobre la
-que se va a construir el vector de caracteristicas se divide en
-celdas. Estas celdas son pequenas regiones de la imagen. En cada
-una de estas celdas se calcula el histograma de la direccion de
+A continuación se describe la implementación de la técnica a
+grandes rasgos. En primer lugar cada imagen se procesa con una
+normalización Gamma tras un suavizado se calculan los gradientes
+de la imagen. A esto le sigue que la ventana de la imagen sobre la
+que se va a construir el vector de características se divide en
+celdas. Estas celdas son pequeñas regiones de la imagen. En cada
+una de estas celdas se calcula el histograma de la dirección de
 los gradientes que en ella se encuentran. Por ultimo estas
 celdas se agrupan en bloques para que sea posible normalizar los
-histogramas. Finalmente, el vector de caracteristicas lo conforman
-los histogramas normalizados concatenados uno detras de otro.
+histogramas. Finalmente, el vector de características lo conforman
+los histogramas normalizados concatenados uno detrás de otro.
+
+Conviene detallar cada uno de los pasos que se han seguido en el
+proceso de construcción del descriptor.
+
+\subsubsection{Normalización Gamma}
+
+La fase de normalización consiste en corregir los valores de la
+imagen gracias a una transformación del tipo
+\[
+  v_{\text{out}} = \alpha \cdot v_{\text{in}}^\beta
+\]
+esta transformación se aplica a cada píxel de la imagen.
+
+\subsubsection{Computo del gradiente}
+
+Previo al computo del gradiente se puede realizar un suavizado de
+la imagen convolucionando una mascara Gaussiana. Sin embargo, los mejores resultados se alcanzan sin ese suavizado.  A continuación
+se calculan las derivadas direccionales $\frac{df}{dx}$ y
+$\frac{df}{dy}$ convolucionando el kernel uno dimensional
+\[
+  \begin{bmatrix}-1 & 0 & 1\end{bmatrix}
+\]
+por filas y columnas respectivamente.
+
+\subsubsection{Generación de los histogramas}
+
+Para generar los histogramas hace falta establecer el tamaño de las
+celdas en nuestro caso son celdas $6\times 6$ píxeles. A
+continuación en cada píxel de la celda se considera el gradiente de
+la imagen en ese píxel. Se calcula el ángulo que forma con el eje
+OX y la magnitud del gradiente. Si el ángulo $\alpha$ es mayor que
+$180$ entonces se toma el ángulo $\alpha - 180$.
+
+Para cada píxel de la celda el gradiente de la imagen en ese píxel
+va a realizar un voto que se acumulara en el histograma de la celda
+. El voto que realiza cada gradiente es una función del gradiente
+en nuestro caso se trata del propio gradiente. Para determinar
+sobre cuales de las columnas del histograma se acumula el voto se
+utiliza el ángulo del gradiente. Cada columna del histograma se
+identifica con un ángulo entre 0 y 180 hay tantos ángulos como
+columnas tenga el histograma (en nuestro caso 9) y están a la misma
+distancia unos de otros. Para acumular el voto sobre las columnas
+del histograma se realiza una interpolación bolinea entre los dos
+ángulos mas cercanos al ángulo del gradiente.
+
+\subsubsection{Normalización de los bloques}
+
+A continuación las celdas se agrupan en bloques de tamaño
+$3\times 3$ celdas. Los histogramas de las células se concatenan
+juntos y el vector resultante se normaliza utilizando la norma
+euclídea.
 
 \subsection{Fases de la resolución}
 
 
 \subsubsection{Procedimiento para entrenar el modelo SVM}
 
-Las palabras del Test se han generado a partir de las imagenes de
+Las palabras del Test se han generado a partir de las imágenes de
 la base de datos INRIA. Esta es la base de datos con la que se
 obtuvieron por primera vez los resultados del descriptor HOG.
 
-En primer lugar se han procesado las imagenes del test etiquetadas
-como positivas. Cada peaton en la imagen se ha recortado y
-redimensionado al tamano de la ventana, es decir $64\times 128$.
-En segundo lugar se han procesado las imagnes negativas. Para
-obtener recortes de las imagenes negativas se ha recorrido el
-directorio de las imagenes negativas y por cada imagen se han
-obtenido $10$ recortes del tamano considerado que se han etiquetado
-como negativas. A partir de todos esos recortes se han generado los
-descriptores HOG asociados con los que se ha entrenado la SVM.
+En primer lugar se han procesado las imágenes del test etiquetadas
+como positivas. Para ello nos hemos servido del archivo de anotaciones
+que tiene cada imagen positiva del test. Cada imagen etiquetada como
+positiva tiene un archivo con anotaciones en las que se almacenan
+las coordenadas de cada peatón dentro de la imagen. A partir de esa
+información cada peatón de la imagen se ha recortado y redimensionado
+al tamaño de la ventana, es decir $64\times 128$.
 
-Hemos utilizado la implementacion de openCV de SVM. La SVM es
+En segundo lugar se han procesado las imágenes negativas. Para
+obtener recortes de las imágenes negativas se ha recorrido el
+directorio de las imágenes negativas y por cada imagen se han
+obtenido $10$ recortes del tamaño considerado que se han etiquetado
+como negativas. Los $10$ recortes se han elegido de forma aleatoria
+dentro de las imágenes. A partir de todos esos recortes se han generado
+los descriptores HOG asociados con los que se ha entrenado la SVM.
+
+Hemos utilizado la implementación de openCV de SVM. La SVM es
 lineal y tiene el mismo coeficiente C que en el paper de referencia
 es decir $C = 0.01$. 
+
+Después de obtener un predictor preliminar se ha buscado dentro de las
+imágenes negativas recortes de la ventana deslizante que hagan falsos
+positivos. Estos se han almacenado en un directorio llamado falsos\_positivos
+una vez determinados esos falsos positivos se ha reentrenado la SVM.
+
+En total el numero de imágenes de ventanas positivas que se han
+conseguido es 1280. Para las imágenes negativas hay 10 ventanas por
+cada imagen de modo que en total son 12180. A todo eso además se le añade
+un numero considerable de falsos positivos para mejorar los resultados
+de la predicción.
 
 \subsubsection{Procedimiento para la detección de un peatón en una imagen de test}
 
