@@ -619,7 +619,11 @@ def checkOccurrences(heatMap, boxes, scale):
     for xmin, ymin, xmax, ymax in ourBoxes:
         for i in range(len(boxes)):
             x1, y1, x2, y2 = boxes[i]
-            if checkArea(x1//scale, y1//scale, x2//scale, y2//scale, xmin, ymin, xmax, ymax):
+            xmin_interseccion = xmin if xmin>(x1//scale) else (x1//scale)
+            ymin_interseccion = ymin if ymin>(y2//scale) else (y2//scale)
+            xmax_interseccion = xmax if xmax<(x2//scale) else (x2//scale)
+            ymax_interseccion = ymax if ymax<(y2//scale) else (y2//scale)
+            if checkArea(x1//scale, y1//scale, x2//scale, y2//scale, xmin_interseccion, ymin_interseccion, xmax_interseccion, ymax_interseccion):
                 answer[i] = True
     return answer, ourBoxes
 
@@ -758,10 +762,9 @@ def getPredictions(svm):
 
     # Obtenemos las respuestas de las imagenes positivas
     print("Obteniendo las predicciones de las imagenes positivas")
-    box_pred = getPredPos(pos_imgs[:2],pos_boxes[:2],svm)
+    box_pred = getPredPos(pos_imgs,pos_boxes,svm)
     pred_pos = []
     for i in range(len(box_pred)):
-        pdb.set_trace()
         tot = 0
         for pred in box_pred[i]:
             if pred:
@@ -769,7 +772,7 @@ def getPredictions(svm):
         pred_pos.append(tot/len(pos_boxes[i]))
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
-    pred_neg_windows = getPredNeg(neg_imgs[:2],svm)
+    pred_neg_windows = getPredNeg(neg_imgs,svm)
     pred_neg = []
     for predictions in pred_neg_windows:
         tot = 0
