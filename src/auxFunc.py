@@ -16,11 +16,7 @@ GLOBAL_COUNT=0
 ##                       Funciones de dibujado                                ##
 ################################################################################
 
-def pintaMI(vim):
-    '''
-    @brief Función que dada una lista de imágenes las pinta en una misma ventana.
-    @param vim Lista de imágenes que queremos pintar
-    '''
+def concatenaImagenes(vim):
     imagenes = []
     max_h = 0
     max_w = 0
@@ -35,8 +31,15 @@ def pintaMI(vim):
         else:
             imagenes.append(cv.copyMakeBorder(im,top=0,bottom=max_h-im.shape[0],left=0,right=0,borderType= cv.BORDER_CONSTANT, value=[0,0,0]))
     concatenada = cv.hconcat(imagenes)
+    return concatenada
+
+def pintaMI(vim):
+    '''
+    @brief Función que dada una lista de imágenes las pinta en una misma ventana.
+    @param vim Lista de imágenes que queremos pintar
+    '''
     cv.namedWindow('Imagenes', cv.WINDOW_NORMAL)
-    cv.imshow("Imagenes",concatenada)
+    cv.imshow("Imagenes",concatenaImagenes(vim))
     cv.waitKey(0)
     cv.destroyAllWindows()
 
@@ -518,7 +521,6 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
     en el eje Y de la imagen
     @return Devuelve una lista de subimagenes de 128x64 para la imagen pasada
     '''
-    global GLOBAL_COUNT
 
     imgs_con_boxes = []
 
@@ -572,10 +574,11 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
         scale*=2
 
     if len(imgs_con_boxes)>0:
-        #pintaMI(imgs_con_boxes)
-        for img_box in imgs_con_boxes:
-            cv.imwrite("./cuadrados/"+str(GLOBAL_COUNT)+".jpg",img_box)
-            GLOBAL_COUNT+=1
+        global GLOBAL_COUNT
+        concatenada = concatenaImagenes(imgs_con_boxes)
+        cv.imwrite("./cuadrados/"+str(GLOBAL_COUNT)+".jpg",concatenada)
+        GLOBAL_COUNT+=1
+
     else:
         print("No hay ninguna imagen con cajas")
 
