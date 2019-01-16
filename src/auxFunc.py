@@ -518,6 +518,8 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
     en el eje Y de la imagen
     @return Devuelve una lista de subimagenes de 128x64 para la imagen pasada
     '''
+    global GLOBAL_COUNT
+
     imgs_con_boxes = []
 
     ret = np.zeros(len(boxes)).astype(np.bool)
@@ -592,12 +594,12 @@ def cutBeneathRate(rate, heatMap):
 
 @autojit
 def checkOccurrences(heatMap, boxes, scale):
-    umbral = 1      # Es como si no hubiese umbral (<1 es cero)
+    umbral = 2      # Es como si no hubiese umbral (<1 es cero)
     m = cutBeneathRate(umbral,heatMap)
     indexes = differentFromZero(m)
     regions = []
     while len(indexes) != 0:
-        region = getRegion(indexes[0],heatMap)
+        region = getRegion(indexes[0],heatMap,indexes)
         indexes = substractRegion(region,indexes)
         regions.append(region)
     ourBoxes = createBoxes(regions,scale,heatMap)
@@ -612,11 +614,21 @@ def checkOccurrences(heatMap, boxes, scale):
 @autojit
 def createBoxes(regions,scale,G):
     boxes = []
+    y_boundary,x_boundary = G.shape
     for region in regions:
         subRegion = getElemsMax(G,region)
         x, y = getCenter(subRegion)
-        boxes.append((x-32//scale, y-64//scale, x+32//scale, y+64//scale))
+        #boxes.append((x-32//scale, y-64//scale, x+32//scale, y+64//scale))
+        boxes.append(obtainBox(x,y,y_boundary, x_boundary))
     return boxes
+
+@autojit
+def obtainBox(x,y,x_boundary,y_boundary):
+    xmin = 0 if x-32<0 else x-32
+    ymin = 0 if y-64<0 else y-64
+    xmax = x_boundary-1 if x+32>=x_boundary else x+32
+    ymax = y_boundary-1 if y+64>=y_boundary else y+64
+    return (xmin,ymin,xmax,ymax)
 
 @autojit
 def getElemsMax(G,region):
@@ -640,9 +652,8 @@ def getCenter(region):
     return x, y
 
 @autojit
-def getRegion(index, G):
-    x,y = np.nonzero(G)
-    indices = list(zip(x,y))
+def getRegion(index, G,indexes):
+    indices = indexes.copy()
     region = [index]
     non_tested = [index]
     while non_tested:
@@ -701,9 +712,7 @@ def checkInGNPos(index, graph):
 
 @autojit
 def substractRegion(subset, theset):
-    for e in subset:
-        theset.remove(e)
-    return theset
+    return list(set(theset).difference(set(subset)))
 
 def getPredictions(svm):
     '''
@@ -737,7 +746,7 @@ def getPredictions(svm):
 
     # Obtenemos las respuestas de las imagenes positivas
     print("Obteniendo las predicciones de las imagenes positivas")
-    box_pred = getPredPos(pos_imgs,pos_boxes,svm)
+    box_pred = getPredPos(pos_imgs[:50],pos_boxes[:50],svm)
     pred_pos = []
     for predictions in box_pred:
         tot = 0
@@ -747,7 +756,7 @@ def getPredictions(svm):
         pred_pos.append(tot/len(predictions))
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
-    pred_neg_windows = getPredNeg(neg_imgs,svm)
+    pred_neg_windows = getPredNeg(neg_imgs[:50],svm)
     pred_neg = []
     for predictions in pred_neg_windows:
         tot = 0
