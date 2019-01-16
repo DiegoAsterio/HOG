@@ -543,7 +543,12 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
             indiceY = indiceY + stepY//scale
         if len(windows)>1:
             print("Obteniendo descriptores")
-            descr = descriptorHOG.obtainDescriptors(windows,silent=True)
+            print("Número de ventanas: " + str(len(windows)))
+            if len(windows)>5000:
+                descr = descriptorHOG.obtainDescriptors(windows[:int(len(windows)/2)],silent=True)
+                descr = np.concatenate((descr, descriptorHOG.obtainDescriptors(windows[int(len(windows)/2):],silent=True)))
+            else:
+                descr = descriptorHOG.obtainDescriptors(windows,silent=True)
             print("Obteniendo predicciones")
             prediction = [pred[0] for pred in svm.predict(descr)[1]]
             print("Obteniendo el mapa de calor")
@@ -594,7 +599,7 @@ def cutBeneathRate(rate, heatMap):
 
 @autojit
 def checkOccurrences(heatMap, boxes, scale):
-    umbral = 2      # Es como si no hubiese umbral (<1 es cero)
+    umbral = 1      # Es como si no hubiese umbral (<1 es cero)
     m = cutBeneathRate(umbral,heatMap)
     indexes = differentFromZero(m)
     regions = []
