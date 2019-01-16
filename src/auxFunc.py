@@ -564,6 +564,10 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
                 cv.rectangle(img_rectangulos, (boxes_nuestras[0][0],boxes_nuestras[0][3]), (boxes_nuestras[0][2], boxes_nuestras[0][1]), (0,255,0), 3)
                 for xmin,ymin,xmax,ymax in boxes_nuestras[1:]:
                     cv.rectangle(img_rectangulos, (xmin,ymax), (xmax, ymin), (0,255,0), 3)
+                # Añade los rectángulos de las anotaciones
+                cv.rectangle(img_rectangulos, (boxes[0][0]//scale,boxes[0][3]//scale), (boxes[0][2]//scale, boxes[0][1]//scale), (0,0,255), 3)
+                for xmin,ymin,xmax,ymax in boxes[1:]:
+                    cv.rectangle(img_rectangulos, (xmin//scale,ymax//scale), (xmax//scale, ymin//scale), (0,0,255), 3)
                 imgs_con_boxes.append(img_rectangulos)
 
         # Escalamos para obtener las coordenadas adecuadas en cada nivel de la pirámide Gaussiana
@@ -754,9 +758,10 @@ def getPredictions(svm):
 
     # Obtenemos las respuestas de las imagenes positivas
     print("Obteniendo las predicciones de las imagenes positivas")
-    box_pred = getPredPos(pos_imgs[:50],pos_boxes[:50],svm)
+    box_pred = getPredPos(pos_imgs[:2],pos_boxes[:2],svm)
     pred_pos = []
     for i in range(len(box_pred)):
+        pdb.set_trace()
         tot = 0
         for pred in box_pred[i]:
             if pred:
@@ -764,7 +769,7 @@ def getPredictions(svm):
         pred_pos.append(tot/len(pos_boxes[i]))
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
-    pred_neg_windows = getPredNeg(neg_imgs[:50],svm)
+    pred_neg_windows = getPredNeg(neg_imgs[:2],svm)
     pred_neg = []
     for predictions in pred_neg_windows:
         tot = 0
