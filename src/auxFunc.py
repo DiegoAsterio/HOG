@@ -610,7 +610,7 @@ def cutBeneathRate(rate, heatMap):
 
 def debugRegion(region,heatMap):
     for i,j in region:
-        if heatMap[i,j] != 0:
+        if heatMap[i,j] == 0:
             print("esta fallando esto basto!")
 
 def checkOccurrences(heatMap, boxes, scale):
