@@ -226,7 +226,7 @@ que tiene cada imagen positiva del test. Cada imagen etiquetada como
 positiva tiene asociado un archivo con anotaciones en las que se almacenan
 las coordenadas de cada peatón dentro de la imagen. A partir de esa
 información cada peatón de la imagen se ha recortado y redimensionado
-al tamaño de la ventana, es decir $64\times 128$.
+al tamaño de la ventana, es decir $64\times 128$. A este conjunto de imágenes positivas se le han añadido sus reflejadas con respecto al borde derecho de la imagen, de forma que continuamos teniendo peatones con la cabeza en la parte superior y los pies en la inferior, obteniendo el doble de ejemplos positivos a partir de los recortes.
 
 En segundo lugar se han procesado las imágenes negativas. Para
 obtener recortes de las imágenes negativas se ha recorrido el
@@ -246,7 +246,7 @@ positivos. Estos se han almacenado en un directorio llamado falsos\_positivos
 una vez determinados esos falsos positivos se ha reentrenado la SVM.
 
 En total el numero de imágenes de ventanas positivas que se han
-conseguido es $1280$. Para las imágenes negativas hay $10$ ventanas por
+conseguido es $1237$ más sus imágenes reflejadas con respecto al borde derecho.. Para las imágenes negativas hay $10$ ventanas por
 cada imagen de modo que en total son $12180$. A todo eso además se le añade
 un numero considerable de falsos positivos para mejorar los resultados
 de la predicción.
