@@ -694,7 +694,12 @@ def getRegion(index, indexes):
 
 @autojit
 def checkAdjacent(i1,i2):
-    return ((i1[0]==i2[0]+1 or i1[0]==i2[0]-1) and i1[1]==i2[1]) or ((i1[1]==i2[1]+1 or i1[1]==i2[1]-1) and i1[0]==i2[0])
+    ret = False # en ppo. no son adyacentes
+    ret = (i1[0] + 1 == i2[0]) and (i1[1] == i2[1]) or ret # comprueba si i1 + (1,0) == i2
+    ret = (i1[0] - 1 == i2[0]) and (i1[1] == i2[1]) or ret # comprueba si i1 - (1,0) == i2
+    ret = (i1[0] == i2[0]) and (i1[1] + 1 == i2[1]) or ret # comprueba si i1 + (0,1) == i2
+    ret = (i1[0] == i2[0]) and (i1[1] - 1 == i2[1]) or ret # comprueba si i1 - (0,1) == i2
+    return ret
 
 @autojit
 def substractRegion(subset, theset):
