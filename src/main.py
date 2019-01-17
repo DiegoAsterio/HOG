@@ -17,7 +17,7 @@ exit()
 del td
 '''
 print("Cargando la SVM de fichero")
-svm = cv.ml.SVM_load("svm.txt")
+svm = cv.ml.SVM_load("svm_sin_hardpositives.txt")
 
 print("Cargando el test")
 
