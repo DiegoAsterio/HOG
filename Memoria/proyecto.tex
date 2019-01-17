@@ -168,24 +168,48 @@ la imagen en ese píxel. Se calcula el ángulo que forma con el eje
 OX y la magnitud del gradiente. Si el ángulo $\alpha$ es mayor que
 $180$ entonces se toma el ángulo $\alpha - 180$.
 
-Para cada píxel de la celda el gradiente de la imagen en ese píxel
-va a realizar un voto que se acumulara en el histograma de la celda
-. El voto que realiza cada gradiente es una función del gradiente
-en nuestro caso se trata del propio gradiente. Para determinar
-sobre cuales de las columnas del histograma se acumula el voto se
-utiliza el ángulo del gradiente. Cada columna del histograma se
+El gradiente de la imagen en ese píxel va a realizar un voto que
+se acumulara en el histograma de la celda en la que se encuentre
+dicho gradiente. El voto que realiza cada gradiente coincide con
+la magnitud del propio gradiente. Para determinar sobre cuales
+de las columnas del histograma se acumula el voto se utiliza el
+ángulo $\theta$ del gradiente. Cada columna del histograma se
 identifica con un ángulo entre 0 y 180 hay tantos ángulos como
 columnas tenga el histograma (en nuestro caso 9) y están a la misma
-distancia unos de otros. Para acumular el voto sobre las columnas
-del histograma se realiza una interpolación bolinea entre los dos
-ángulos mas cercanos al ángulo del gradiente.
-
+distancia unos de otros. A continuacion se eligen los dos angulos
+$\theta_i,\theta_{i+1}$ de entre los nueve mencionados anteriormente
+de forma que $ \theta_i \le \theta < \theta_{i+1} $. A la columna
+$i$-esima se le vota con
+\[
+  (1-\frac{\theta-\theta_i}{\theta_{i+1} - \theta_i})\| \nabla f (x,y)\|_2
+\]
+y a la $i+1$-esima con 
+\[
+  (\frac{\theta-\theta_i}{\theta_{i+1} - \theta_i})\| \nabla f (x,y)\|_2
+\]
+  
 \subsubsection{Normalización de los bloques}
 
 A continuación las celdas se agrupan en bloques de tamaño
-$3\times 3$ celdas. Los histogramas de las células se concatenan
-juntos y el vector resultante se normaliza utilizando la norma
-euclídea.
+$3\times 3$ celdas. Los histogramas de las celdas se concatenan
+juntos y el vector resultante $v$ se normaliza utilizando la
+norma euclídea :
+\[
+  \frac{v}{\|v\|_2}
+\]
+En esta seccion es importante que los bloques se solapen, es
+decir habra bloques que compartan celdas. Para conseguir esto
+empezamos con el bloque formado por las $3\times 3$ primeras
+celdas una vez esta construido y normalizado se almacena el
+vector resultado y se siguen construyendo bloques. Cada bloque
+en construccion se rellena con la matriz formada por las
+$3\times 3$ celdas que estan un paso a la derecha. Cuando
+se agota la fila cambiamos de columna. De esta forma,
+recorremos toda la ventana.
+
+En ultimo lugar los vectores que se han formado siguiendo el
+procedimiento comentado arriba se concatenan. Este es el
+descriptor final.
 
 \subsection{Fases de la resolución}
 
@@ -197,9 +221,9 @@ la base de datos INRIA. Esta es la base de datos con la que se
 obtuvieron por primera vez los resultados del descriptor HOG.
 
 En primer lugar se han procesado las imágenes del test etiquetadas
-como positivas. Para ello nos hemos servido del archivo de anotaciones
+como positivas. Con ese fin hemos utilizado el archivo de anotaciones
 que tiene cada imagen positiva del test. Cada imagen etiquetada como
-positiva tiene un archivo con anotaciones en las que se almacenan
+positiva tiene asociado un archivo con anotaciones en las que se almacenan
 las coordenadas de cada peatón dentro de la imagen. A partir de esa
 información cada peatón de la imagen se ha recortado y redimensionado
 al tamaño de la ventana, es decir $64\times 128$.
