@@ -686,10 +686,9 @@ def getRegion(index, indexes):
     while non_tested:
         ind_reg = non_tested.pop()
         for ind in indices:
-            if checkAdjacent(ind_reg,ind):
+            if checkAdjacent(ind_reg,ind) and ind not in region:
                 region.append(ind)
                 non_tested.append(ind)
-                indices.remove(ind)
     return list(set(region))
 
 @autojit
