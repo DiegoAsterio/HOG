@@ -655,7 +655,7 @@ def obtainBox(x,y,x_boundary,y_boundary):
     ymin = 0 if y-64<0 else y-64
     xmax = x_boundary-1 if x+32>=x_boundary else x+32
     ymax = y_boundary-1 if y+64>=y_boundary else y+64
-    return (ymin, xmin, ymax, xmax)#return (xmin,ymin,xmax,ymax)
+    return (xmin, ymin, xmax, ymax)#return (xmin,ymin,xmax,ymax)
 
 @autojit
 def getElemsMax(G,region):
@@ -676,7 +676,7 @@ def getCenter(region):
     ymax = max(list(map(lambda x:x[1],region)))
     #x = int((xmin + xmax)/2)
     #y = int((ymin + ymax)/2)
-    return xmin,ymin,xmax,ymax
+    return ymin,xmin,ymax,xmax
 
 @autojit
 def getRegion(index, indexes):
@@ -735,7 +735,7 @@ def getPredictions(svm):
 
     # Obtenemos las respuestas de las imagenes positivas
     print("Obteniendo las predicciones de las imagenes positivas")
-    box_pred = getPredPos(pos_imgs[28:29],pos_boxes[28:29],svm)
+    box_pred = getPredPos(pos_imgs[:10],pos_boxes[:10],svm)
     pred_pos = []
     for i in range(len(box_pred)):
         tot = 0
@@ -745,7 +745,7 @@ def getPredictions(svm):
         pred_pos.append(tot/len(pos_boxes[i]))
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
-    pred_neg_windows = getPredNeg(neg_imgs[28:29],svm)
+    pred_neg_windows = getPredNeg(neg_imgs[:10],svm)
     pred_neg = []
     for predictions in pred_neg_windows:
         tot = 0
