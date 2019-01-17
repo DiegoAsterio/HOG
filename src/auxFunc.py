@@ -643,10 +643,10 @@ def createBoxes(regions,G):
     boxes = []
     y_boundary,x_boundary = G.shape
     for region in regions:
-        subRegion = getElemsMax(G,region)
-        x, y = getCenter(subRegion)
-        #boxes.append((x-32//scale, y-64//scale, x+32//scale, y+64//scale))
-        boxes.append(obtainBox(x,y,y_boundary, x_boundary))
+        #subRegion = getElemsMax(G,region)
+        x1,y1,x2,y2 = getCenter(region)
+        #boxes.append(obtainBox(x,y,y_boundary, x_boundary))
+        boxes.append((x1,y1,x2,y2))
     return boxes
 
 @autojit
@@ -674,9 +674,9 @@ def getCenter(region):
     ymin = min(list(map(lambda x:x[1],region)))
     xmax = max(list(map(lambda x:x[0],region)))
     ymax = max(list(map(lambda x:x[1],region)))
-    x = int((xmin + xmax)/2)
-    y = int((ymin + ymax)/2)
-    return x, y
+    #x = int((xmin + xmax)/2)
+    #y = int((ymin + ymax)/2)
+    return xmin,ymin,xmax,ymax
 
 @autojit
 def getRegion(index, indexes):
