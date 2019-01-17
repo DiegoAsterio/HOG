@@ -255,7 +255,11 @@ de la predicción.
 
 El el paper no se discute en ningún momento el método de test utilizado por los investigadores por lo que, para que sea comparable con otras técnicas actuales, hemos empleado un método de test utilizado actualmente para medir el acierto de la detección.
 
+<<<<<<< HEAD
 El dataset INRIA tambien incluye un fichero de anotaciones en el caso en el que la imagen es positiva. Como en la fase de entrenamiento las anotaciones indican el rectángulo de la imagen en el que aparece un peatón. De esta forma, una vez estimada la región en la que nuestro predictor encuentra un peatón se puede comprobar si coincide con las regiones provistas por el fichero de anotaciones.
+=======
+El dataset INRIA tambien incluye un fichero de anotaciones en el caso en el que la imagen es positiva. Como en la fase de entrenamiento las anotaciones indican el rectángulo de la imagen en el que aparece un peatón. De esta forma, una vez estimada la región en la que el predictor encuentra un peatón se puede comprobar si coincide con las regiones provistas por el fichero de anotaciones. 
+>>>>>>> 79f8c0ef1266ed328bbe0fe69fa89ef76ef96b06
 
 En primer lugar se toman los tres primeros niveles de la pirámide Gaussiana para la imagen original i.e. una lista con la imagen original y los dos niveles siguientes de la pirámide (se incluye a la imagen original como el primer nivel de la pirámide Gaussiana).
 
@@ -263,15 +267,18 @@ Cada uno de estos niveles se recorre con una ventana deslizante de $128\times 64
 
 Se toma en este momento, una matriz de ceros del mismo tamaño que el nivel de la pirámide Gaussiana que se esta evaluando y en cada posición se suma 1 cada vez que el predictor afirme que dicho píxel está en una región en la que aparece un peatón. Se termina con una matriz que tiene 0 en las posiciones en las que nunca se ha predicho que hay un peatón y números mayores que 0 indicando cuántas veces dicho píxel ha estado en una ventana con un peatón. Esta estructura es conocida como mapa de calor (Heat map). Una vez obtenida esta matriz se truncan los valores menores que un umbral a 0 para conservar únicamente las regiones mas significativas, es decir, tomando como umbral 2 entonces todos los píxeles con valor menor estricto que 2 tendrían un 0 en el mapa de calor.
 
-Con esta estructura ya realizada se pueden estudiar las regiones conexas de la misma, es decir, las regiones en las que existen números mayores que 0 que son adyacentes entre sí. De esta forma se obtienen regiones disjuntas del mapa de calor. Sólo queda en cada region encontrar el punto central y generar una ventana de tamano $128 \times 64$.
+Con esta estructura ya realizada se pueden estudiar las regiones conexas de la misma, es decir, las regiones en las que existen números mayores que 0 que son adyacentes entre sí. De esta forma se obtienen regiones disjuntas del mapa de calor. 
 
+<<<<<<< HEAD
 Por último se comprueba que las regiones encontradas solapen al menos en un 50\% con las regiones aportadas por los ficheros de anotaciones y devolvemos para cada imagen $\frac{n\acute{u}mero \ de \ peatones \ acertados}{n\acute{u}mero \ de \ peatones \ totales}$. De esta forma tenemos una medida entre 0 y 1 que nos dice cuánto hemos acertado en cada imagen. Si se suman todos estos números se alclanza una medida global del acierto, de forma que la puntuación máxima que podríamos obtener sería el número de imágenes.
+=======
+Por último se comprueba que las regiones encontradas solapen al menos en un 50\% con las regiones aportadas por los ficheros de anotaciones y devolvemos para cada imagen $\frac{n\acute{u}mero \ de \ peatones \ acertados}{n\acute{u}mero \ de \ peatones \ totales}$. De esta forma tenemos una medida entre 0 y 1 que nos dice cuánto hemos acertado en cada imagen. Si se suman todos estos números se alcanza una medida global del acierto, de forma que la puntuación máxima que podríamos obtener sería el número de imágenes. 
+>>>>>>> 79f8c0ef1266ed328bbe0fe69fa89ef76ef96b06
 
 De igual modo para hacer una predicción y medida equivalente en las imágenes negativas, para cada imagen de test negativa tomamos $10$ ventanas de tamaño $128\times 64$ de forma aleatoria y devolvemos el número de ventanas acertadas partido por el número de ventanas totales, en este caso 10. Las medidas de las imágenes negativas y positivas acertadas son comparables entre sí.
 
 Al realizar el análisis de los peatones en cada uno de los niveles de la pirámide Gaussiana obtenemos una ventaja, y es que los posibles peatones que haya en la misma serán de menor tamaño y por tanto será más probable que el peatón ocupe por completo una ventana al ir avanzando en los niveles de la pirámide con lo que el parche que obtengamos será más parecido a los pasados para entrenamiento de la SVM.
 
-Así mismo se ha realizado un test ortodoxo del modelo tomando imágenes ya recortadas del test de tamaño $128\times 64$ con personas y sin personas de forma que es capaz de decirnos si hay o no personas en esa imagen (sólo hay una persona por recorte). Este test proporciona también una medida del método que subyace a lo realizado en el proceso anterior. Se tiene que este proceso de test de los recortes realizados por nosotros a mano empleando los ficheros de anotaciones es la parte del reconocimiento de los parches empleada en el método anterior al obtenerlos con la ventana deslizante. En la siguiente sección detallaremos más en profundidad los resultados obtenidos y los comentaremos.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                           Valoración de los resultados                           %%
@@ -279,11 +286,32 @@ Así mismo se ha realizado un test ortodoxo del modelo tomando imágenes ya reco
 
 \section{Valoración de los resultados} 
 
+Una vez explicado el método para comprobar el acierto de la clasificación obtenida con la SVM, vamos a proceder a analizar los datos obtenidos. En primer lugar cabe destacar que el éxito de la detección en imágenes negativas no depende del método elegido, si no únicamente de la eficiencia de la SVM al clasificar ejemplos negativos. Esto es así puesto que no tenemos ninguna forma concreta para hallar las ventanas sobre las que queremos hallar la predicción al no tener ningún peatón en la misma.
+
+En el caso de la detección de las imágenes positivas tenemos que el porcentaje de acierto obtenido no sólo depende de lo buena que sea la SVM clasificando parches positivos y negativos, si no que también es fuertemente dependiente del método de test que hemos implementado.
+
+Cuando estamos analizando las imágenes positivas vamos tomando ventanas de la imagen para formar un mapa de calor como hemos mencionado anteriormente. Cabe destacar que es fundamental la aplicación de la técnica conocida como supresión de no máximos, la cual consiste en desechar los elementos del mapa de calor que tengan un valor menor que un umbral. Con esto lo que conseguimos es que se produzca un corte y los elementos menos relevantes del mapa sean descartados para darle prioridad a los que sí lo son. En nuestro caso hemos considerado como umbral de corte la mitad del valor máximo encontrado en el mapa de calor. 
+
+Para poder obtener la región sobre la que queremos comprobar su solapamiento con las cajas reales de los peatones tomamos el rectángulo mínimo que engloba cada región conexa. Veamos de forma gráfica esta idea con un ejemplo real:
+
+\begin{figure}
+	\includegraphics[scale=0.16]{./Imagenes/test01.jpg}
+	\caption{Ejemplo de una persona junto a una bicicleta}
+\end{figure}
+
+En este ejemplo podemos ver cada uno de los tres niveles de la pirámide Gaussiana en los que tenemos marcadas cajas de color rojo y verde. Las cajas de color rojo son las provistas por el fichero de anotaciones de dicha imagen y las cajas verdes se corresponden con las halladas mediante el mapa de calor correspondiente. Además, se puede observar que el mapa de calor correspondiente a cada nivel se sitúa a la derecha de su imagen asociada.
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               Propuestas de mejora                               %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
 \section{Trabajo futuro: propuestas de mejora}
+
+Despues del trabajo realizado podemos afirmar que nuestra implementacion tiene espacio para la mejora. El tiempo en el que se calculan los descriptores deberia ser mas razonable. La aplicacion inmediata de una solucion como esta puede ser la identificacion de peatones desde un coche. Teniendo en cuenta el tiempo que se tarda en identificar un peaton en una imagen (hay que recorrer los tres piramides de la piramide Gaussiana) no parece una opcion viable para la identificacion a tiempo real. Otro hecho que identificamos como un problema es que este metodo es sensible al tamano de los peatones de la imagen. Esto se debe principalmente a que el tamano de la ventana es fijo de modo que no se recoge la variabilidad del tamano de un peaton dentro de una imagen. En ultimo lugar pensamos que el metodo de busqueda que utilizamos que funciona por votos sobre el mapa de color plantea una desventaja clara cuando los peatones se encuentran en puntos muy cercanos de la imagen ya que las regiones de peatones distintos se solapan.
 
 \normalsize
 
