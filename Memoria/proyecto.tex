@@ -253,9 +253,9 @@ de la predicción.
 
 \subsubsection{Procedimiento para la detección de un peatón en una imagen de test}
 
-El el paper no se discute en ningún momento el método de test utilizado por los investigadores por lo que, para que sea comparable con otras técnicas actuales, hemos empleado un método de test utilizado actualmente para medir el acierto de la detección.
+El el paper de referencia no se discute en ningún momento el método de test utilizado por los investigadores por lo que, para que sea comparable con otras técnicas actuales, hemos empleado un método de test utilizado actualmente para medir el acierto de la detección.
 
-El dataset INRIA tambien incluye un fichero de anotaciones en el caso en el que la imagen es positiva. Como en la fase de entrenamiento las anotaciones indican el rectángulo de la imagen en el que aparece un peatón. De esta forma, una vez estimada la región en la que el predictor encuentra un peatón se puede comprobar si coincide con las regiones provistas por el fichero de anotaciones. 
+El dataset INRIA tambien incluye un fichero de anotaciones en el caso en el que la imagen de Test es positiva. Como en la fase de entrenamiento las anotaciones indican el rectángulo de la imagen en el que aparece un peatón. De esta forma, una vez estimada la región en la que el predictor encuentra un peatón se puede comprobar si coincide con las regiones provistas por el fichero de anotaciones. 
 
 En primer lugar se toman los tres primeros niveles de la pirámide Gaussiana para la imagen original i.e. una lista con la imagen original y los dos niveles siguientes de la pirámide (se incluye a la imagen original como el primer nivel de la pirámide Gaussiana). 
 
@@ -284,9 +284,16 @@ Al realizar el análisis de los peatones en cada uno de los niveles de la pirám
 
 
 
-\section{Trabajo futuro: propuestas de mejora}
+\subsection{Trabajo futuro: propuestas de mejora}
 
-Despues del trabajo realizado podemos afirmar que nuestra implementacion tiene espacio para la mejora. El tiempo en el que se calculan los descriptores deberia ser mas razonable. La aplicacion inmediata de una solucion como esta puede ser la identificacion de peatones desde un coche. Teniendo en cuenta el tiempo que se tarda en identificar un peaton en una imagen (hay que recorrer los tres piramides de la piramide Gaussiana) no parece una opcion viable para la identificacion a tiempo real. Otro hecho que identificamos como un problema es que este metodo es sensible al tamano de los peatones de la imagen. Esto se debe principalmente a que el tamano de la ventana es fijo de modo que no se recoge la variabilidad del tamano de un peaton dentro de una imagen. En ultimo lugar pensamos que el metodo de busqueda que utilizamos que funciona por votos sobre el mapa de color plantea una desventaja clara cuando los peatones se encuentran en puntos muy cercanos de la imagen ya que las regiones de peatones distintos se solapan.
+A pesar de que estamos contentos con el resultado obtenido. Despues del trabajo realizado podemos afirmar que nuestra implementacion tiene espacio para la mejora.
+
+En primer lugar pensamos que el tiempo en el que se calculan los descriptores deberia ser mas razonable. Esto lo pensamos porque la aplicacion inmediata de una solucion como esta puede ser la identificacion de peatones desde un coche en conduccion. Teniendo en cuenta el tiempo que se tarda en identificar un peaton en una imagen (hay que recorrer los tres piramides de la piramide Gaussiana) no parece una opcion viable para la identificacion a tiempo real.
+
+Otro hecho que identificamos como un problema es que este metodo es sensible al tamano de los peatones de la imagen. La forma que hemos tenido de paliar este hecho ha sido recorrer varios niveles de la piramide Gaussiana, a pesar de todo no esta asegurado que la ventana se adapte al tamano del peaton.
+
+En ultimo lugar pensamos que el metodo de busqueda que utilizamos plantea una desventaja clara. Al acumular votos sobre un mapa de calor de una imagen ocurre que cuando los peatones se encuentran en puntos muy cercanos de la imagen las regiones que aparecen en el mapa de calor se solapan. Esto dificulta nuestra capacidad de
+distinguir cada peaton como una entidad diferenciada.
 
 \normalsize
 
