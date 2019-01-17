@@ -1,9 +1,9 @@
-import auxFunc as asf
+import auxFunc as af
 import descriptorHOG
 import cv2 as cv
 
 print("Cargando la SVM de fichero")
-svm = cv.ml.SVM_load("svm.txt")
+svm = cv.ml.SVM_load("svm_sin_hardpositives.txt")
 
 print("Cargando el test")
 img_pos, img_neg = af.loadTestImgs()
@@ -24,7 +24,7 @@ for pred in pred_pos:
     if pred==1:
         pos_score+=1
 
-for pred in predictions_negative:
+for pred in pred_neg:
     if pred==2:
         neg_score+=1
 
