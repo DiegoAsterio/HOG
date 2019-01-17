@@ -737,11 +737,15 @@ def getPredictions(svm):
     print("Obteniendo las predicciones de las imagenes positivas")
     box_pred = getPredPos(pos_imgs[:10],pos_boxes[:10],svm)
     pred_pos = []
+    positivos_correctos = 0
+    positivos_totales = 0
     for i in range(len(box_pred)):
         tot = 0
         for pred in box_pred[i]:
             if pred:
+                peatones_totales_positivos+=1
                 tot+=1
+        positivos_totales+=len(pos_boxes[i])
         pred_pos.append(tot/len(pos_boxes[i]))
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
@@ -754,4 +758,4 @@ def getPredictions(svm):
                 tot+=1
         pred_neg.append(tot/len(predictions))
 
-    return pred_pos, pred_neg
+    return pred_pos, pred_neg, positivos_correctos, positivos_totales

@@ -21,7 +21,7 @@ svm = cv.ml.SVM_load("svm.txt")
 
 print("Cargando el test")
 
-pred_pos, pred_neg = af.getPredictions(svm)
+pred_pos, pred_neg, positivos_correctos, positivos_totales = af.getPredictions(svm)
 
 del svm
 
@@ -44,5 +44,6 @@ for npred in pred_neg:
 print("\n\n##################################################")
 print("Positivos: " + str(pos_score) + "/" + str(len(pred_pos)) + "===>" + str(100*pos_score/len(pred_pos)) + "%")
 print("Negativos: " + str(neg_score) + "/" + str(len(pred_neg)) + "===>" + str(100*neg_score/len(pred_neg)) + "%")
-print("Porcentaje de acierto total: " + str(100*(pos_score+neg_score)/(len(pred_pos)+len(pred_neg))))
+print("Porcentaje de acierto total con la media por imagen: " + str(100*(pos_score+neg_score)/(len(pred_pos)+len(pred_neg))) + "%")
+print("Peatones totales detectados: " + str(positivos_correctos) + "/" + str(positivos_totales) + "===>" + str(100*positivos_correctos/positivos_totales) + "%")
 print("##################################################\n\n")
