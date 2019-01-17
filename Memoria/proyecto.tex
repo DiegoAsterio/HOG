@@ -280,6 +280,8 @@ Al realizar el análisis de los peatones en cada uno de los niveles de la pirám
 
 \section{Valoración de los resultados}
 
+\subsection{Estudio empírico del método de test}
+
 Una vez explicado el método para comprobar el acierto de la clasificación obtenida con la SVM, vamos a proceder a analizar los datos obtenidos. En primer lugar cabe destacar que el éxito de la detección en imágenes negativas no depende del método elegido, si no únicamente de la eficiencia de la SVM al clasificar ejemplos negativos. Esto es así puesto que no tenemos ninguna forma concreta para hallar las ventanas sobre las que queremos hallar la predicción al no tener ningún peatón en la misma.
 
 En el caso de la detección de las imágenes positivas tenemos que el porcentaje de acierto obtenido no sólo depende de lo buena que sea la SVM clasificando parches positivos y negativos, si no que también es fuertemente dependiente del método de test que hemos implementado.
@@ -327,6 +329,16 @@ Veamos ahora un ejemplo aún más difícil con una alta concentración de person
 \end{figure}
 
 Esta imagen representa un salto en dificultad debido a la concentración de personas en la misma, en concreto tenemos 7 personas incluyendo a niños y personas de fondo. Como podemos observar el primer nivel de la pirámide no es útil debido al tamaño de las personas de la foto, por contra en el segundo nivel obtenemos unas ventanas muy favorables y si contamos las del segundo nivel y las del tercero entonces podemos comprobar que cubrimos casi todos los peatones de la imagen. Cabe destacar que no es simple la detección de todas estas personas. Representa un problema no sólo para el método si no también para los descriptores y la SVM puesto que los gradientes pueden variar enormemente si tenemos personas superpuestas entre sí.
+
+\subsection{Métricas y resultados}
+
+Para estudiar el funcionamiento del método de test hemos tomado varias métricas. Para las imágenes positivas hemos realizado en primer lugar una medición del acierto de peatones por imagen, de forma que obtenemos un número entre 0 y 1 que es $\frac{aciertos}{numero \ total \ de \ peatones}$ de forma que obtenemos un vector en el que en cada posición tenemos un número entre 0 y 1 con el acierto de peatones por imagen. De esta forma cuando obtenemos todos los resultados podemos sumarlos. La máxima puntuación que podríamos obtener en esta métrica es el número de imágenes. Esto nos deja la posibilidad de obtener un porcentaje de acierto medio por imagen. 
+
+Además de esta métrica hemos incorporado otra que contabiliza, de forma global, cuántos peatones hemos acertado respecto a cuántos hay en total. De esta forma obtenemos $\frac{peatones \ acertados}{numero \ total \ de \ peatones}$. De igual forma podemos obtener un porcentaje con esta medida.
+
+Para las imágenes negativas obtenemos una medida similar a la primera obtenida con las imágenes positivas. Esto es el número de ventanas acertadas por imagen partido por el número de ventanas por imagen. De esta forma obtenemos igualmente un valor entre 0 y 1 con lo que podemos hacer igual que con las imágenes positivas y obtener un porcentaje. 
+
+Con esto los resultados que hemos obtenido son:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               Propuestas de mejora                               %%
