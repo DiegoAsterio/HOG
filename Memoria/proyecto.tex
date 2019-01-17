@@ -82,11 +82,11 @@
 
 En la resolución de este trabajo nos hemos planteado el siguiente problema a resolver, dada una imagen de una persona andando por la calle (un peatón), ¿cómo podemos reconocer que es un peatón?
 
-Esta misma cuestión fue planteada por Navneet Dalal y Bill Triggs en su paper ``Histogram of Oriented Gradients for Human Detection'' en el que explican el desarrollo de unos descriptores que aplicados a su dataset de personas obtienen unos resultados muy buenos en la detección de las mismas. 
+Esta misma cuestión fue planteada por Navneet Dalal y Bill Triggs en su paper ``Histogram of Oriented Gradients for Human Detection'' en el que explican el desarrollo de unos descriptores que aplicados a su dataset de personas obtienen unos resultados muy buenos en la detección de las mismas.
 
-Estos descriptores son los descriptores HOG o descriptores de histogramas basados en gradientes. Como veremos a lo largo del trabajo se han empleado distintas variaciones a la hora de hallar los descriptores por Dalal y Triggs, quedándonos nosotros con las elecciones que han resultado más fructíferas para ellos en su análisis. 
+Estos descriptores son los descriptores HOG o descriptores de histogramas basados en gradientes. Como veremos a lo largo del trabajo se han empleado distintas variaciones a la hora de hallar los descriptores por Dalal y Triggs, quedándonos nosotros con las elecciones que han resultado más fructíferas para ellos en su análisis.
 
-Para comenzar hay que saber que la detección de personas es un problema difícil de abordar y que actualmente resulta muy interesante en aplicaciones por ejemplo en coches, de forma que si detecta un peatón andando por delante del vehículo este entienda que tiene que detenerse. 
+Para comenzar hay que saber que la detección de personas es un problema difícil de abordar y que actualmente resulta muy interesante en aplicaciones por ejemplo en coches, de forma que si detecta un peatón andando por delante del vehículo este entienda que tiene que detenerse.
 
 Las herramientas usadas en este proyecto han sido:
 \begin{itemize}
@@ -100,7 +100,7 @@ A continuación hacemos una descripción un poco más elaborada del problema pro
 
 \subsection{Problema a resolver}
 
-El problema consiste en, dada una imagen que contiene o no un peatón, debemos determinar si es que lo contiene y además una región aproximada en la que se encuentra el mismo. 
+El problema consiste en, dada una imagen que contiene o no un peatón, debemos determinar si es que lo contiene y además una región aproximada en la que se encuentra el mismo.
 
 Para la elaboración de la solución del problema hemos utilizado varios ingredientes entre los que tenemos la fase de creación de descriptores y entrenamiento de la SVM y la fase de test.
 
@@ -183,11 +183,11 @@ $i$-esima se le vota con
 \[
   (1-\frac{\theta-\theta_i}{\theta_{i+1} - \theta_i})\| \nabla f (x,y)\|_2
 \]
-y a la $i+1$-esima con 
+y a la $i+1$-esima con
 \[
   (\frac{\theta-\theta_i}{\theta_{i+1} - \theta_i})\| \nabla f (x,y)\|_2
 \]
-  
+
 \subsubsection{Normalización de los bloques}
 
 A continuación las celdas se agrupan en bloques de tamaño
@@ -238,7 +238,7 @@ los descriptores HOG asociados con los que se ha entrenado la SVM.
 
 Hemos utilizado la implementación de openCV de SVM. La SVM es
 lineal y tiene el mismo coeficiente C que en el paper de referencia
-es decir $C = 0.01$. 
+es decir $C = 0.01$.
 
 Después de obtener un predictor preliminar se ha buscado dentro de las
 imágenes negativas recortes de la ventana deslizante que hagan falsos
@@ -255,19 +255,22 @@ de la predicción.
 
 El el paper de referencia no se discute en ningún momento el método de test utilizado por los investigadores por lo que, para que sea comparable con otras técnicas actuales, hemos empleado un método de test utilizado actualmente para medir el acierto de la detección.
 
+
 El dataset INRIA tambien incluye un fichero de anotaciones en el caso en el que la imagen de Test es positiva. Como en la fase de entrenamiento las anotaciones indican el rectángulo de la imagen en el que aparece un peatón. De esta forma, una vez estimada la región en la que el predictor encuentra un peatón se puede comprobar si coincide con las regiones provistas por el fichero de anotaciones. 
 
-En primer lugar se toman los tres primeros niveles de la pirámide Gaussiana para la imagen original i.e. una lista con la imagen original y los dos niveles siguientes de la pirámide (se incluye a la imagen original como el primer nivel de la pirámide Gaussiana). 
+En primer lugar se toman los tres primeros niveles de la pirámide Gaussiana para la imagen original i.e. una lista con la imagen original y los dos niveles siguientes de la pirámide (se incluye a la imagen original como el primer nivel de la pirámide Gaussiana).
 
 Cada uno de estos niveles se recorre con una ventana deslizante de $128\times 64$ píxeles. Tras la obtención de todos los parches de un nivel de la piramide Gaussiana se calculan los descriptores asociados a estos parches. Estos descriptores son la entrada de la SVM que predice si hay o no un peatón en cada parche. Es entonces cuando se obtienen ventanas en las que se predice que haya un peatón y ventanas en las que se predice lo contrario.
 
-Se toma en este momento, una matriz de ceros del mismo tamaño que el nivel de la pirámide Gaussiana que se esta evaluando y en cada posición se suma 1 cada vez que el predictor afirme que dicho píxel está en una región en la que aparece un peatón. Se termina con una matriz que tiene 0 en las posiciones en las que nunca se ha predicho que hay un peatón y números mayores que 0 indicando cuántas veces dicho píxel ha estado en una ventana con un peatón. Esta estructura es conocida como mapa de calor (Heat map). Una vez obtenida esta matriz se truncan los valores menores que un umbral a 0 para conservar únicamente las regiones mas significativas, es decir, tomando como umbral 2 entonces todos los píxeles con valor menor estricto que 2 tendrían un 0 en el mapa de calor. 
+Se toma en este momento, una matriz de ceros del mismo tamaño que el nivel de la pirámide Gaussiana que se esta evaluando y en cada posición se suma 1 cada vez que el predictor afirme que dicho píxel está en una región en la que aparece un peatón. Se termina con una matriz que tiene 0 en las posiciones en las que nunca se ha predicho que hay un peatón y números mayores que 0 indicando cuántas veces dicho píxel ha estado en una ventana con un peatón. Esta estructura es conocida como mapa de calor (Heat map). Una vez obtenida esta matriz se truncan los valores menores que un umbral a 0 para conservar únicamente las regiones mas significativas, es decir, tomando como umbral 2 entonces todos los píxeles con valor menor estricto que 2 tendrían un 0 en el mapa de calor.
 
 Con esta estructura ya realizada se pueden estudiar las regiones conexas de la misma, es decir, las regiones en las que existen números mayores que 0 que son adyacentes entre sí. De esta forma se obtienen regiones disjuntas del mapa de calor. 
 
-Por último se comprueba que las regiones encontradas solapen al menos en un 50\% con las regiones aportadas por los ficheros de anotaciones y devolvemos para cada imagen $\frac{n\acute{u}mero \ de \ peatones \ acertados}{n\acute{u}mero \ de \ peatones \ totales}$. De esta forma tenemos una medida entre 0 y 1 que nos dice cuánto hemos acertado en cada imagen. Si se suman todos estos números se alcanza una medida global del acierto, de forma que la puntuación máxima que podríamos obtener sería el número de imágenes. 
 
-De igual modo para hacer una predicción y medida equivalente en las imágenes negativas, para cada imagen de test negativa tomamos $10$ ventanas de tamaño $128\times 64$ de forma aleatoria y devolvemos el número de ventanas acertadas partido por el número de ventanas totales, en este caso 10. Las medidas de las imágenes negativas y positivas acertadas son comparables entre sí. 
+
+Por último se comprueba que las regiones encontradas solapen al menos en un 50\% con las regiones aportadas por los ficheros de anotaciones y devolvemos para cada imagen $\frac{n\acute{u}mero \ de \ peatones \ acertados}{n\acute{u}mero \ de \ peatones \ totales}$. De esta forma tenemos una medida entre 0 y 1 que nos dice cuánto hemos acertado en cada imagen. Si se suman todos estos números se alclanza una medida global del acierto, de forma que la puntuación máxima que podríamos obtener sería el número de imágenes.
+
+De igual modo para hacer una predicción y medida equivalente en las imágenes negativas, para cada imagen de test negativa tomamos $10$ ventanas de tamaño $128\times 64$ de forma aleatoria y devolvemos el número de ventanas acertadas partido por el número de ventanas totales, en este caso 10. Las medidas de las imágenes negativas y positivas acertadas son comparables entre sí.
 
 Al realizar el análisis de los peatones en cada uno de los niveles de la pirámide Gaussiana obtenemos una ventaja, y es que los posibles peatones que haya en la misma serán de menor tamaño y por tanto será más probable que el peatón ocupe por completo una ventana al ir avanzando en los niveles de la pirámide con lo que el parche que obtengamos será más parecido a los pasados para entrenamiento de la SVM.
 
@@ -276,7 +279,7 @@ Al realizar el análisis de los peatones en cada uno de los niveles de la pirám
 %%                           Valoración de los resultados                           %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Valoración de los resultados}
+\section{Valoración de los resultados} 
 
 Una vez explicado el método para comprobar el acierto de la clasificación obtenida con la SVM, vamos a proceder a analizar los datos obtenidos. En primer lugar cabe destacar que el éxito de la detección en imágenes negativas no depende del método elegido, si no únicamente de la eficiencia de la SVM al clasificar ejemplos negativos. Esto es así puesto que no tenemos ninguna forma concreta para hallar las ventanas sobre las que queremos hallar la predicción al no tener ningún peatón en la misma.
 

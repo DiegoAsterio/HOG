@@ -743,7 +743,7 @@ def getPredictions(svm):
         tot = 0
         for pred in box_pred[i]:
             if pred:
-                peatones_totales_positivos+=1
+                positivos_correctos+=1
                 tot+=1
         positivos_totales+=len(pos_boxes[i])
         pred_pos.append(tot/len(pos_boxes[i]))
