@@ -1,6 +1,7 @@
 src/svm.txt
 src/svm_version_antigua.txt
 src/svm_sin_hardpositives.txt
+src/svm_con_hardpositives.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
