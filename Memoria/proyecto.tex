@@ -278,6 +278,23 @@ Al realizar el análisis de los peatones en cada uno de los niveles de la pirám
 
 \section{Valoración de los resultados}
 
+Una vez explicado el método para comprobar el acierto de la clasificación obtenida con la SVM, vamos a proceder a analizar los datos obtenidos. En primer lugar cabe destacar que el éxito de la detección en imágenes negativas no depende del método elegido, si no únicamente de la eficiencia de la SVM al clasificar ejemplos negativos. Esto es así puesto que no tenemos ninguna forma concreta para hallar las ventanas sobre las que queremos hallar la predicción al no tener ningún peatón en la misma.
+
+En el caso de la detección de las imágenes positivas tenemos que el porcentaje de acierto obtenido no sólo depende de lo buena que sea la SVM clasificando parches positivos y negativos, si no que también es fuertemente dependiente del método de test que hemos implementado.
+
+Cuando estamos analizando las imágenes positivas vamos tomando ventanas de la imagen para formar un mapa de calor como hemos mencionado anteriormente. Cabe destacar que es fundamental la aplicación de la técnica conocida como supresión de no máximos, la cual consiste en desechar los elementos del mapa de calor que tengan un valor menor que un umbral. Con esto lo que conseguimos es que se produzca un corte y los elementos menos relevantes del mapa sean descartados para darle prioridad a los que sí lo son. En nuestro caso hemos considerado como umbral de corte la mitad del valor máximo encontrado en el mapa de calor. 
+
+Para poder obtener la región sobre la que queremos comprobar su solapamiento con las cajas reales de los peatones tomamos el rectángulo mínimo que engloba cada región conexa. Veamos de forma gráfica esta idea con un ejemplo real:
+
+\begin{figure}
+	\includegraphics[scale=0.16]{./Imagenes/test01.jpg}
+	\caption{Ejemplo de una persona junto a una bicicleta}
+\end{figure}
+
+En este ejemplo podemos ver cada uno de los tres niveles de la pirámide Gaussiana en los que tenemos marcadas cajas de color rojo y verde. Las cajas de color rojo son las provistas por el fichero de anotaciones de dicha imagen y las cajas verdes se corresponden con las halladas mediante el mapa de calor correspondiente. Además, se puede observar que el mapa de calor correspondiente a cada nivel se sitúa a la derecha de su imagen asociada.
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               Propuestas de mejora                               %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
