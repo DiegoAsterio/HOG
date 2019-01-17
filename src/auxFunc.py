@@ -470,7 +470,6 @@ def getPredPos(imgs,boxes,svm):
     '''
     boxes_pred = []
     for i in range(len(imgs)):
-        print("Obteniendo predicción de la imagen " + str(i+1) + "/" + str(len(imgs)))
         box_pred= getPredPosImg(svm,imgs[i],boxes[i])
         boxes_pred.append(box_pred)
     return boxes_pred
@@ -530,7 +529,6 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
     scale=1
     # Para cada nivel
     for level in pyr:
-        print("Escala:" + str(scale))
         windows=[]
         coord = []
         y,x,z = level.shape
@@ -544,18 +542,13 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
                 indiceX = indiceX + stepX//scale
             indiceY = indiceY + stepY//scale
         if len(windows)>1:
-            print("Obteniendo descriptores")
-            print("Número de ventanas: " + str(len(windows)))
             if len(windows)>4000:
                 descr = descriptorHOG.obtainDescriptors(windows[:int(len(windows)/2)],silent=True)
                 descr = np.concatenate((descr, descriptorHOG.obtainDescriptors(windows[int(len(windows)/2):],silent=True)))
             else:
                 descr = descriptorHOG.obtainDescriptors(windows,silent=True)
-            print("Obteniendo predicciones")
             prediction = [pred[0] for pred in svm.predict(descr)[1]]
-            print("Obteniendo el mapa de calor")
             heatMap = buildHeatMap((y,x),prediction,coord)
-            print("Obteniendo las ocurrencias")
             answer, boxes_nuestras, heatMapRes = checkOccurrences(heatMap, boxes, scale)
             ret |= answer
 
@@ -582,9 +575,6 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
         cv.imwrite("./cuadrados/"+str(GLOBAL_COUNT)+".jpg",concatenada)
         GLOBAL_COUNT+=1
 
-    else:
-        print("No hay ninguna imagen con cajas")
-
     return ret
 
 @autojit
@@ -608,11 +598,6 @@ def cutBeneathRate(rate, heatMap):
     ret[ret<rate]=0
     return ret
 
-def debugRegion(region,heatMap):
-    for i,j in region:
-        if heatMap[i,j] == 0:
-            print("esta fallando esto basto!")
-
 def checkOccurrences(heatMap, boxes, scale):
     maximum_heat = max(list(heatMap.reshape(-1)))
     umbral = int(0.5*maximum_heat)
@@ -621,7 +606,6 @@ def checkOccurrences(heatMap, boxes, scale):
     regions = []
     while len(indexes) != 0:
         region = getRegion(indexes[0], indexes)
-        debugRegion(region, m)
         indexes = substractRegion(region,indexes)
         regions.append(region)
     ourBoxes = createBoxes(regions, m)
@@ -703,6 +687,37 @@ def checkAdjacent(i1,i2):
 def substractRegion(subset, theset):
     return list(set(theset).difference(set(subset)))
 
+def printStats(pred_pos, pred_neg, positivos_correctos, positivos_totales):
+    pos_score = 0
+    neg_score = 0
+
+    for ppred in pred_pos:
+        pos_score+=ppred
+
+    for npred in pred_neg:
+        neg_score+=npred
+
+    print("\n\n##################################################")
+    print("Positivos: " + str(pos_score) + "/" + str(len(pred_pos)) + "===>" + str(100*pos_score/len(pred_pos)) + "%")
+    if len(pred_neg)>0:
+        print("Negativos: " + str(neg_score) + "/" + str(len(pred_neg)) + "===>" + str(100*neg_score/len(pred_neg)) + "%")
+    print("Porcentaje de acierto total con la media por imagen: " + str(100*(pos_score+neg_score)/(len(pred_pos)+len(pred_neg))) + "%")
+    print("Peatones totales detectados: " + str(positivos_correctos) + "/" + str(positivos_totales) + "===>" + str(100*positivos_correctos/positivos_totales) + "%")
+    print("##################################################\n\n")
+
+def getSinglePrediction(svm, img, pos_box, positivos_correctos, positivos_totales):
+    box_pred = getPredPos([img],[pos_box],svm)
+    tot = 0
+    positivos_correctos_local = positivos_correctos
+    positivos_totales_local = positivos_totales
+    for pred in box_pred[0]:
+        if pred:
+            positivos_correctos_local+=1
+            tot+=1
+    positivos_totales_local+=len(pos_box)
+    prediction = tot/len(pos_box)
+    return prediction, positivos_correctos_local, positivos_totales_local
+
 def getPredictions(svm):
     '''
     @brief Función que lee las imágenes positivas y negativas, obtiene sus ventanas
@@ -735,18 +750,17 @@ def getPredictions(svm):
 
     # Obtenemos las respuestas de las imagenes positivas
     print("Obteniendo las predicciones de las imagenes positivas")
-    box_pred = getPredPos(pos_imgs[:10],pos_boxes[:10],svm)
-    pred_pos = []
     positivos_correctos = 0
     positivos_totales = 0
-    for i in range(len(box_pred)):
-        tot = 0
-        for pred in box_pred[i]:
-            if pred:
-                positivos_correctos+=1
-                tot+=1
-        positivos_totales+=len(pos_boxes[i])
-        pred_pos.append(tot/len(pos_boxes[i]))
+    pred_pos = []
+    for i in range(len(pos_imgs[:2])):
+        print("Obteniendo resultados de la imagen " + str(i) + "/" + str(len(pos_imgs)))
+        prediction,pos_cor,pos_tot = getSinglePrediction(svm, pos_imgs[i], pos_boxes[i], positivos_correctos, positivos_totales)
+        pred_pos.append(prediction)
+        positivos_correctos += pos_cor
+        positivos_totales += pos_tot
+        printStats(pred_pos, [], positivos_correctos, positivos_totales)
+
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
     pred_neg_windows = getPredNeg(neg_imgs[:10],svm)
