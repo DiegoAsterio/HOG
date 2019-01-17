@@ -660,7 +660,7 @@ def getCenter(region):
     return x, y
 
 @autojit
-def getRegion(index, G,indexes):
+def getRegion(index, G, indexes):
     indices = indexes.copy()
     region = [index]
     non_tested = [index]
