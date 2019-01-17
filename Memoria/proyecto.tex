@@ -288,14 +288,45 @@ Cuando estamos analizando las imágenes positivas vamos tomando ventanas de la i
 
 Para poder obtener la región sobre la que queremos comprobar su solapamiento con las cajas reales de los peatones tomamos el rectángulo mínimo que engloba cada región conexa. Veamos de forma gráfica esta idea con un ejemplo real:
 
-\begin{figure}
+\begin{figure}[H]
 	\includegraphics[scale=0.16]{./Imagenes/test01.jpg}
 	\caption{Ejemplo de una persona junto a una bicicleta}
 \end{figure}
 
 En este ejemplo podemos ver cada uno de los tres niveles de la pirámide Gaussiana en los que tenemos marcadas cajas de color rojo y verde. Las cajas de color rojo son las provistas por el fichero de anotaciones de dicha imagen y las cajas verdes se corresponden con las halladas mediante el mapa de calor correspondiente. Además, se puede observar que el mapa de calor correspondiente a cada nivel se sitúa a la derecha de su imagen asociada.
 
+Con esta información dada podemos observar en primer lugar las ventajas que vamos a obtener de usar el método de supresión de no máximos. Como podemos ver en el primer nivel de la pirámide Gaussiana hemos obtenido cuatro regiones en total y tres regiones muy próximas entre sí. Lo que hemos conseguido es que esas regiones se separen entre sí. Si no hubiéramos realizado la supresión tendríamos valores menores que el umbral rodeando dichas regiones, haciendo por tanto que el método obtuviera una única región. En este caso el hecho de obtener tres regiones no nos ha supuesto una ventaja, pero si pensamos en esta circunstancia cuando tengamos un grupo de peatones juntos podemos entender que gracias a esto es más fácil poder conseguir una caja para cada uno de ellos. 
 
+Además aquí podemos ver también la potencia del uso de varios niveles de la pirámide Gaussiana. Al obtener una imagen de tamaño la mitad con respecto a la original tenemos que la ventana de $64\times 128$ que vamos pasando por la misma cubre una región mayor, con lo que es más propicia a que en niveles más bajos de la pirámide englobemos a peatones de tamaño grande en proporción a la imagen completa. Esto hace que el método que estamos empleando sea muy versátil, pues empleamos los niveles más altos de la pirámide para detectar peatones de pequeño tamaño por la misma y los niveles más bajos para los peatones de tamaño mayor.
+
+Observemos el siguiente caso de estudio:
+
+\begin{figure}[H]
+	\includegraphics[scale=0.3]{./Imagenes/test02.jpg}
+	\caption{Imagen de dos personas abrazadas y una andando al lado}
+\end{figure}
+
+En este caso podemos ver el ejemplo de tres peatones en un puente andando, estando dos de ellos muy pegados ya que van abrazados. Si analizamos el comportamiento nos damos cuenta de que los peatones en la imagen inicial ocupan un espacio muy significativo de la misma, por lo que el en primer nivel de la pirámide Gaussiana no hemos podido obtener unas cajas relevantes usando nuestra ventana. Este hecho no es así cuando pasamos al siguiente nivel, donde ya obtenemos dos cajas perfectamente delimitadas incluyendo a los peatones. 
+
+Este hecho es importante puesto que en el ejemplo hemos podido separar dos regiones, la que contiene a los peatones abrazados y la que contiene al peatón que anda al lado. Esto es completamente razonable, ya que los peatones abrazados están tan juntos que nuestro umbral de supresión de no máximos no es capaz de discernir la división entre las regiones. Además no querríamos tener que aumentar tanto el nivel del umbral para conseguir la diferenciación, puesto que si lo hiciéramos nos quedaríamos con demasiados pocos valores en las regiones del mapa de calor, con lo que las ventanas obtenidas serían de un tamaño menor y por tanto no conseguiríamos el solapamiento del 50\% que vamos buscando. 
+
+Veamos un ejemplo de dos personas con un espacio considerable entre sí para analizar una casuística favorable:
+
+\begin{figure}[H]
+	\includegraphics[scale=0.43]{./Imagenes/test03.jpg}
+	\caption{Imagen de dos personas con una separación notable entre ellos}
+\end{figure}
+
+Como podemos observar esta casuística nos deja un espacio entre peatones que posibilita una distinción de las regiones muy evidente.
+
+Veamos ahora un ejemplo aún más difícil con una alta concentración de personas:
+
+\begin{figure}[H]
+	\includegraphics[scale=0.11]{./Imagenes/test04.jpg}
+	\caption{Imagen de unos niños y personas andando}
+\end{figure}
+
+Esta imagen representa un salto en dificultad debido a la concentración de personas en la misma, en concreto tenemos 7 personas incluyendo a niños y personas de fondo. Como podemos observar el primer nivel de la pirámide no es útil debido al tamaño de las personas de la foto, por contra en el segundo nivel obtenemos unas ventanas muy favorables y si contamos las del segundo nivel y las del tercero entonces podemos comprobar que cubrimos casi todos los peatones de la imagen. Cabe destacar que no es simple la detección de todas estas personas. Representa un problema no sólo para el método si no también para los descriptores y la SVM puesto que los gradientes pueden variar enormemente si tenemos personas superpuestas entre sí.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               Propuestas de mejora                               %%
