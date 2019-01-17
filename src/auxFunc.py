@@ -611,10 +611,10 @@ def checkOccurrences(heatMap, boxes, scale):
     indexes = differentFromZero(m)
     regions = []
     while len(indexes) != 0:
-        region = getRegion(indexes[0],heatMap,indexes)
+        region = getRegion(indexes[0], indexes)
         indexes = substractRegion(region,indexes)
         regions.append(region)
-    ourBoxes = createBoxes(regions,scale,heatMap)
+    ourBoxes = createBoxes(regions, heatMap)
     answer = np.zeros(len(boxes)).astype(np.bool)
     for xmin, ymin, xmax, ymax in ourBoxes:
         for i in range(len(boxes)):
@@ -629,7 +629,7 @@ def checkOccurrences(heatMap, boxes, scale):
     return answer, ourBoxes
 
 @autojit
-def createBoxes(regions,scale,G):
+def createBoxes(regions,G):
     boxes = []
     y_boundary,x_boundary = G.shape
     for region in regions:
@@ -669,7 +669,7 @@ def getCenter(region):
     return x, y
 
 @autojit
-def getRegion(index, G,indexes):
+def getRegion(index, indexes):
     indices = indexes.copy()
     region = [index]
     non_tested = [index]
