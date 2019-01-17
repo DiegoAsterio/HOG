@@ -753,7 +753,7 @@ def getPredictions(svm):
     positivos_correctos = 0
     positivos_totales = 0
     pred_pos = []
-    for i in range(len(pos_imgs[:2])):
+    for i in range(len(pos_imgs)):
         print("Obteniendo resultados de la imagen " + str(i) + "/" + str(len(pos_imgs)))
         prediction,pos_cor,pos_tot = getSinglePrediction(svm, pos_imgs[i], pos_boxes[i], positivos_correctos, positivos_totales)
         pred_pos.append(prediction)
@@ -763,7 +763,7 @@ def getPredictions(svm):
 
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
-    pred_neg_windows = getPredNeg(neg_imgs[:10],svm)
+    pred_neg_windows = getPredNeg(neg_imgs,svm)
     pred_neg = []
     for predictions in pred_neg_windows:
         tot = 0
