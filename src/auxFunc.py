@@ -623,8 +623,9 @@ def checkOccurrences(heatMap, boxes, scale):
             ymin_interseccion = ymin if ymin>(y2//scale) else (y2//scale)
             xmax_interseccion = xmax if xmax<(x2//scale) else (x2//scale)
             ymax_interseccion = ymax if ymax<(y2//scale) else (y2//scale)
-            if checkArea(x1//scale, y1//scale, x2//scale, y2//scale, xmin_interseccion, ymin_interseccion, xmax_interseccion, ymax_interseccion):
-                answer[i] = True
+            if xmin_interseccion<xmax_interseccion and ymin_interseccion<ymax_interseccion:
+                if checkArea(x1//scale, y1//scale, x2//scale, y2//scale, xmin_interseccion, ymin_interseccion, xmax_interseccion, ymax_interseccion):
+                    answer[i] = True
     return answer, ourBoxes
 
 @autojit
