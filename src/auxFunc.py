@@ -655,7 +655,7 @@ def obtainBox(x,y,x_boundary,y_boundary):
     ymin = 0 if y-64<0 else y-64
     xmax = x_boundary-1 if x+32>=x_boundary else x+32
     ymax = y_boundary-1 if y+64>=y_boundary else y+64
-    return (xmin,ymin,xmax,ymax)
+    return (ymin, xmin, ymax, xmax)#return (xmin,ymin,xmax,ymax)
 
 @autojit
 def getElemsMax(G,region):
