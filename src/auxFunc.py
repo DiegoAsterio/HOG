@@ -680,12 +680,11 @@ def getCenter(region):
 
 @autojit
 def getRegion(index, indexes):
-    indices = indexes.copy()
     region = [index]
     non_tested = [index]
     while non_tested:
         ind_reg = non_tested.pop()
-        for ind in indices:
+        for ind in indexes:
             if checkAdjacent(ind_reg,ind) and ind not in region:
                 region.append(ind)
                 non_tested.append(ind)
