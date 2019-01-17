@@ -556,7 +556,7 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
             print("Obteniendo el mapa de calor")
             heatMap = buildHeatMap((y,x),prediction,coord)
             print("Obteniendo las ocurrencias")
-            answer, boxes_nuestras,heatMapRes = checkOccurrences(heatMap, boxes, scale)
+            answer, boxes_nuestras, heatMapRes = checkOccurrences(heatMap, boxes, scale)
             ret |= answer
 
             maximum = max(list(heatMapRes.reshape(-1)))
@@ -608,6 +608,11 @@ def cutBeneathRate(rate, heatMap):
     ret[ret<rate]=0
     return ret
 
+def debugRegion(region,heatMap):
+    for i,j in region:
+        if heatMap[i,j] != 0:
+            print("esta fallando esto basto!")
+
 def checkOccurrences(heatMap, boxes, scale):
     maximum_heat = max(list(heatMap.reshape(-1)))
     umbral = int(0.5*maximum_heat)
@@ -616,6 +621,7 @@ def checkOccurrences(heatMap, boxes, scale):
     regions = []
     while len(indexes) != 0:
         region = getRegion(indexes[0], indexes)
+        debugRegion(region, m)
         indexes = substractRegion(region,indexes)
         regions.append(region)
     ourBoxes = createBoxes(regions, m)
