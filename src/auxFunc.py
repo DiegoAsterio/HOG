@@ -556,9 +556,11 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
             print("Obteniendo el mapa de calor")
             heatMap = buildHeatMap((y,x),prediction,coord)
             print("Obteniendo las ocurrencias")
-            answer, boxes_nuestras = checkOccurrences(heatMap, boxes, scale)
+            answer, boxes_nuestras,heatMapRes = checkOccurrences(heatMap, boxes, scale)
             ret |= answer
 
+            maximum = max(list(heatMapRes.reshape(-1)))
+            heatMapRes*=(255/maximum)
             img_rectangulos=np.uint8(level)
             if len(boxes_nuestras)>0:
                 cv.rectangle(img_rectangulos, (boxes_nuestras[0][0],boxes_nuestras[0][3]), (boxes_nuestras[0][2], boxes_nuestras[0][1]), (0,255,0), 3)
@@ -569,6 +571,7 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
                 for xmin,ymin,xmax,ymax in boxes[1:]:
                     cv.rectangle(img_rectangulos, (xmin//scale,ymax//scale), (xmax//scale, ymin//scale), (0,0,255), 3)
                 imgs_con_boxes.append(img_rectangulos)
+            imgs_con_boxes.append(np.uint8(heatMapRes))
 
         # Escalamos para obtener las coordenadas adecuadas en cada nivel de la pirámide Gaussiana
         scale*=2
@@ -601,12 +604,13 @@ def differentFromZero(heatMap):
 
 @autojit
 def cutBeneathRate(rate, heatMap):
-    heatMap[heatMap<rate]=0
-    return heatMap
+    ret = np.copy(heatMap)
+    ret[ret<rate]=0
+    return ret
 
-@autojit
 def checkOccurrences(heatMap, boxes, scale):
-    umbral = 1      # Es como si no hubiese umbral (<1 es cero)
+    maximum_heat = max(list(heatMap.reshape(-1)))
+    umbral = int(0.5*maximum_heat)
     m = cutBeneathRate(umbral,heatMap)
     indexes = differentFromZero(m)
     regions = []
@@ -614,21 +618,21 @@ def checkOccurrences(heatMap, boxes, scale):
         region = getRegion(indexes[0], indexes)
         indexes = substractRegion(region,indexes)
         regions.append(region)
-    ourBoxes = createBoxes(regions, heatMap)
+    ourBoxes = createBoxes(regions, m)
     answer = np.zeros(len(boxes)).astype(np.bool)
+
     for xmin, ymin, xmax, ymax in ourBoxes:
         for i in range(len(boxes)):
             x1, y1, x2, y2 = boxes[i]
             xmin_interseccion = xmin if xmin>(x1//scale) else (x1//scale)
-            ymin_interseccion = ymin if ymin>(y2//scale) else (y2//scale)
+            ymin_interseccion = ymin if ymin>(y1//scale) else (y1//scale)
             xmax_interseccion = xmax if xmax<(x2//scale) else (x2//scale)
             ymax_interseccion = ymax if ymax<(y2//scale) else (y2//scale)
             if xmin_interseccion<xmax_interseccion and ymin_interseccion<ymax_interseccion:
                 if checkArea(x1//scale, y1//scale, x2//scale, y2//scale, xmin_interseccion, ymin_interseccion, xmax_interseccion, ymax_interseccion):
                     answer[i] = True
-    return answer, ourBoxes
+    return answer, ourBoxes, m
 
-@autojit
 def createBoxes(regions,G):
     boxes = []
     y_boundary,x_boundary = G.shape
@@ -722,7 +726,7 @@ def getPredictions(svm):
 
     # Obtenemos las respuestas de las imagenes positivas
     print("Obteniendo las predicciones de las imagenes positivas")
-    box_pred = getPredPos(pos_imgs[:20],pos_boxes[:20],svm)
+    box_pred = getPredPos(pos_imgs[28:29],pos_boxes[28:29],svm)
     pred_pos = []
     for i in range(len(box_pred)):
         tot = 0
@@ -732,7 +736,7 @@ def getPredictions(svm):
         pred_pos.append(tot/len(pos_boxes[i]))
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
-    pred_neg_windows = getPredNeg(neg_imgs[:20],svm)
+    pred_neg_windows = getPredNeg(neg_imgs[28:29],svm)
     pred_neg = []
     for predictions in pred_neg_windows:
         tot = 0
