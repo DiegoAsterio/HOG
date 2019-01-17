@@ -42,56 +42,6 @@ def gradientComputation1DPaper(img,sigma=0):
     # En cada pixel el gradiente es el gradiente del canal con mayor norma (RGB)
     return af.getGradient(outputSignalsdx, outputSignalsdy)
 
-def gradientComputation1DAlt1(img,sigma=0):
-    '''
-    @brief Funcion que computa el gradiente usando la mascara [-1,1]
-    @param img Imagen sobre la que calcular el gradiente
-    @param sigma varianza del nucleo gaussiano con el que se convoluciona la imagen
-    @return Devuelve una matriz que contiene el gradiente computado sobre la imagen
-    '''
-    imgAux = None
-    if sigma==0:
-        imgAux = np.copy(img)
-    else:
-        imgAux = cv.GaussianBlur(img,(0,0),sigma)
-    outputSignalsdx = af.convoluteWith1DMask([-1,1],True,imgAux)
-    outputSignalsdy = af.convoluteWith1DMask([-1,1],False,imgAux)
-    return af.getGradient(outputSignalsdx, outputSignalsdy)
-
-def gradientComputation1DAlt2(img,sigma=0):
-    '''
-    @brief Funcion que computa el gradiente usando la mascara [1,-8,0,8,-1]
-    @param img Imagen sobre la que calcular el gradiente
-    @param sigma varianza del nucleo gaussiano con el que se convoluciona la imagen
-    @return Devuelve una matriz que contiene el gradiente computado sobre la imagen
-    '''
-    imgAux = None
-    if sigma==0:
-        imgAux = np.copy(img)
-    else:
-        imgAux = cv.GaussianBlur(img,(0,0),sigma)
-    outputSignalsdx = af.convoluteWith1DMask([1,-8,0,8,-1],True,imgAux)
-    outputSignalsdy = af.convoluteWith1DMask([1,-8,0,8,-1],False,imgAux)
-    return af.getGradient(outputSignalsdx, outputSignalsdy)
-
-def gradientComputation1DAlt3(img,sigma=0):
-    '''
-    @brief Funcion que computa el gradiente usando una mascara 2D
-    @param img Imagen sobre la que calcular el gradiente
-    @param sigma varianza del nucleo gaussiano con el que se convoluciona la imagen
-    @return Devuelve una matriz que contiene el gradiente computado sobre la imagen
-    '''
-    imgAux = None
-    if sigma==0:
-        imgAux = np.copy(img)
-    else:
-        imgAux = cv.GaussianBlur(img,(0,0),sigma)
-    mask1 = np.array([[0,-1],[1,0]])
-    outputSignalsdx = cv.filter2D(img,-1,mask1)
-    mask2 = np.array([[-1,0],[0,1]])
-    outputSignalsdy = cv.filter2D(img,-1,mask2)
-
-    return af.getGradient(outputSignalsdx, outputSignalsdy)
 
 ################################################################################
 ##                      3: Spatial/Orientation Binning                        ##
