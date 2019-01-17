@@ -564,6 +564,10 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
                 cv.rectangle(img_rectangulos, (boxes_nuestras[0][0],boxes_nuestras[0][3]), (boxes_nuestras[0][2], boxes_nuestras[0][1]), (0,255,0), 3)
                 for xmin,ymin,xmax,ymax in boxes_nuestras[1:]:
                     cv.rectangle(img_rectangulos, (xmin,ymax), (xmax, ymin), (0,255,0), 3)
+                # Añade los rectángulos de las anotaciones
+                cv.rectangle(img_rectangulos, (boxes[0][0]//scale,boxes[0][3]//scale), (boxes[0][2]//scale, boxes[0][1]//scale), (0,0,255), 3)
+                for xmin,ymin,xmax,ymax in boxes[1:]:
+                    cv.rectangle(img_rectangulos, (xmin//scale,ymax//scale), (xmax//scale, ymin//scale), (0,0,255), 3)
                 imgs_con_boxes.append(img_rectangulos)
 
         # Escalamos para obtener las coordenadas adecuadas en cada nivel de la pirámide Gaussiana
@@ -615,7 +619,11 @@ def checkOccurrences(heatMap, boxes, scale):
     for xmin, ymin, xmax, ymax in ourBoxes:
         for i in range(len(boxes)):
             x1, y1, x2, y2 = boxes[i]
-            if checkArea(x1//scale, y1//scale, x2//scale, y2//scale, xmin, ymin, xmax, ymax):
+            xmin_interseccion = xmin if xmin>(x1//scale) else (x1//scale)
+            ymin_interseccion = ymin if ymin>(y2//scale) else (y2//scale)
+            xmax_interseccion = xmax if xmax<(x2//scale) else (x2//scale)
+            ymax_interseccion = ymax if ymax<(y2//scale) else (y2//scale)
+            if checkArea(x1//scale, y1//scale, x2//scale, y2//scale, xmin_interseccion, ymin_interseccion, xmax_interseccion, ymax_interseccion):
                 answer[i] = True
     return answer, ourBoxes
 
@@ -677,47 +685,6 @@ def getRegion(index, G, indexes):
 def checkAdjacent(i1,i2):
     return ((i1[0]==i2[0]+1 or i1[0]==i2[0]-1) and i1[1]==i2[1]) or ((i1[1]==i2[1]+1 or i1[1]==i2[1]-1) and i1[0]==i2[0])
 
-def DFSiterative(elem, G):
-    discovered = []
-    S = []
-    S.append(elem)
-    while S:
-        vert = S.pop()
-        if not vert in discovered:
-            discovered.append(vert)
-            adjacent = getAdjacents(vert,G)
-            S = S+adjacent
-    return discovered
-
-def getAdjacents(vert, G):
-    adjacents = []
-    i1 = (vert[0]+1,vert[1])
-    i2 = (vert[0],vert[1]+1)
-    i3 = (vert[0]-1,vert[1])
-    i4 = (vert[0],vert[1]-1)
-    if checkInGNPos(i1,G):
-        adjacents.append(i1)
-    if checkInGNPos(i2,G):
-        adjacents.append(i2)
-    if checkInGNPos(i3,G):
-        adjacents.append(i3)
-    if checkInGNPos(i4,G):
-        adjacents.append(i4)
-    return adjacents
-
-def checkInGNPos(index, graph):
-    inside = True
-    alto, ancho  = graph.shape
-    y, x = index
-    if y<0 or y>=alto:
-        inside = False
-    if x<0 or x>=ancho:
-        inside = False
-    if inside:
-        return graph[index] != 0
-    else:
-        return False
-
 @autojit
 def substractRegion(subset, theset):
     return list(set(theset).difference(set(subset)))
@@ -754,7 +721,7 @@ def getPredictions(svm):
 
     # Obtenemos las respuestas de las imagenes positivas
     print("Obteniendo las predicciones de las imagenes positivas")
-    box_pred = getPredPos(pos_imgs[:50],pos_boxes[:50],svm)
+    box_pred = getPredPos(pos_imgs[:20],pos_boxes[:20],svm)
     pred_pos = []
     for i in range(len(box_pred)):
         tot = 0
@@ -764,7 +731,7 @@ def getPredictions(svm):
         pred_pos.append(tot/len(pos_boxes[i]))
     # Calculamos las respuestas de las imagenes negativas
     print("Obteniendo las predicciones de las imagenes negativas")
-    pred_neg_windows = getPredNeg(neg_imgs[:50],svm)
+    pred_neg_windows = getPredNeg(neg_imgs[:20],svm)
     pred_neg = []
     for predictions in pred_neg_windows:
         tot = 0
