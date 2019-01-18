@@ -629,26 +629,55 @@ def differentFromZero(heatMap):
 
 @autojit
 def cutBeneathRate(rate, heatMap):
-    ret = np.copy(heatMap)
-    ret[ret<rate]=0
+    '''
+    @brief Función que dado un mapa de color y un valor del umbral
+    transforma en 0 todos los valores por debajo de dicho umbral.
+    @param rate Umbral por debajo del cual todos los valores pasan
+    a ser 0
+    @param heatMap mapa del color sobre el cual se realiza la 
+    transformacion.
+    @return devuelve un mapa de calor (Matriz numpy)
+    '''
+    # Copiamos el mapa de calor
+    ret = np.copy(heatMap) 
+    ret[ret<rate]=0 # los valores por debajo de rate pasan a ser 0
     return ret
 
 def checkOccurrences(heatMap, boxes, scale):
+    '''
+    @brief Funcion que dado un mapa de calor y unas cajas en las
+    que se sabe que hay un peaton comprueba cuantas veces aparecen
+    los peatones en nuestro mapa de calor.
+    @param heatMap mapa de calor con la informacion relativa a la
+    prediccion
+    @param boxes vector de indices con las coordenadas de las cajas 
+    que engloban a un peaton
+    @param scale escala de la piramide Gaussiana en la que se ha 
+    construido el mapa de calor.
+    @return devuelve un vector de Bool del tamano de boxes si se ha
+    encontrado la caja i-esima la posicion i-esima vale True si no
+    se ha encontrado vale False.    
+    '''
     maximum_heat = max(list(heatMap.reshape(-1)))
+    # Definimos un umbral proporcional al maximo valor del mapa de calor
     umbral = int(0.5*maximum_heat)
+    # Los valores inferiores al umbral pasan a ser 0
     m = cutBeneathRate(umbral,heatMap)
+    # Se recuperan los indices del mapa de calor distintos de 0
     indexes = differentFromZero(m)
     regions = []
+    # Separamos en regiones conexas el mapa de calor.
     while len(indexes) != 0:
         region = getRegion(indexes[0], indexes)
         indexes = substractRegion(region,indexes)
         regions.append(region)
-    ourBoxes = createBoxes(regions, m)
+    ourBoxes = createBoxes(regions)
     answer = np.zeros(len(boxes)).astype(np.bool)
 
     for xmin, ymin, xmax, ymax in ourBoxes:
         for i in range(len(boxes)):
             x1, y1, x2, y2 = boxes[i]
+            # calculamos la interseccion entre nuestras cajas y las de las anotaciones
             xmin_interseccion = xmin if xmin>(x1//scale) else (x1//scale)
             ymin_interseccion = ymin if ymin>(y1//scale) else (y1//scale)
             xmax_interseccion = xmax if xmax<(x2//scale) else (x2//scale)
@@ -658,47 +687,46 @@ def checkOccurrences(heatMap, boxes, scale):
                     answer[i] = True
     return answer, ourBoxes, m
 
-def createBoxes(regions,G):
+def createBoxes(regions):
+    '''
+    @brief Se generan las cajas que engloban a las regiones del mapa
+    de calor.
+    @param regions vector que tiene todos los vectores que indices que
+    suponen cada region.
+    @return devuelve un vector con los indices del extremo inferior
+    izqdo. y superior dcho. de la caja.
+    '''
     boxes = []
-    y_boundary,x_boundary = G.shape
+    y_boundary,x_boundary = matriz.shape
     for region in regions:
-        #subRegion = getElemsMax(G,region)
-        x1,y1,x2,y2 = getCenter(region)
-        #boxes.append(obtainBox(x,y,y_boundary, x_boundary))
+        x1,y1,x2,y2 = getBoundingBox(region)
         boxes.append((x1,y1,x2,y2))
     return boxes
 
-@autojit
-def obtainBox(x,y,x_boundary,y_boundary):
-    xmin = 0 if x-32<0 else x-32
-    ymin = 0 if y-64<0 else y-64
-    xmax = x_boundary-1 if x+32>=x_boundary else x+32
-    ymax = y_boundary-1 if y+64>=y_boundary else y+64
-    return (xmin, ymin, xmax, ymax)#return (xmin,ymin,xmax,ymax)
-
-@autojit
-def getElemsMax(G,region):
-    maxim = -1
-    for i,j in region:
-        if maxim < G[i,j]:
-            maxim = G[i,j]
-    ret = []
-    for i,j in region:
-        if G[i,j] == maxim:
-            ret.append((i,j))
-    return ret
-
-def getCenter(region):
+def getBoundingBox(region):
+    '''
+    @brief Se generan una caja qu engloba una region
+    @param regions vector que indices de una determinada region
+    @return devuelve una tupla con los indices de una region
+    '''
     xmin = min(list(map(lambda x:x[0],region)))
     ymin = min(list(map(lambda x:x[1],region)))
     xmax = max(list(map(lambda x:x[0],region)))
     ymax = max(list(map(lambda x:x[1],region)))
-    #x = int((xmin + xmax)/2)
-    #y = int((ymin + ymax)/2)
     return ymin,xmin,ymax,xmax
 
 @autojit
 def getRegion(index, indexes):
+    '''
+    @brief A partir de un indice y de un conjunto de indices se
+    devuelven la region de los indices de la componente conexa a la
+    que pertenece dicho indice
+    @param index indice sobre el que se quiere calcular la region
+    @param indexes todos los indices que se encuentran en regiones
+    del espacio.
+    @return devuelve un vector con los indices de una determinada 
+    componente conexa
+    '''
     region = [index]
     non_tested = [index]
     while non_tested:
@@ -711,6 +739,12 @@ def getRegion(index, indexes):
 
 @autojit
 def checkAdjacent(i1,i2):
+    '''
+    @brief Comprueba que dos indices son adyacentes 
+    @param i1 primer indice
+    @param i2 segundo indice
+    @return devuelve True si lo son False si no
+    '''
     ret = False # en ppo. no son adyacentes
     ret = ((i1[0] + 1 == i2[0]) and (i1[1] == i2[1])) or ret # comprueba si i1 + (1,0) == i2
     ret = ((i1[0] - 1 == i2[0]) and (i1[1] == i2[1])) or ret # comprueba si i1 - (1,0) == i2
@@ -720,6 +754,12 @@ def checkAdjacent(i1,i2):
 
 @autojit
 def substractRegion(subset, theset):
+    '''
+    @brief Diferencia entre conjuntosn
+    @param subset subconjunto a borrar
+    @param theset conjunto sobre el que hacer la diferencia
+    @return devuelve un conjunto
+    '''
     return list(set(theset).difference(set(subset)))
 
 def printStats(pred_pos, pred_neg, positivos_correctos, positivos_totales):
