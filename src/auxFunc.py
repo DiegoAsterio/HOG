@@ -763,6 +763,13 @@ def substractRegion(subset, theset):
     return list(set(theset).difference(set(subset)))
 
 def printStats(pred_pos, pred_neg, positivos_correctos, positivos_totales):
+    '''
+    @brief Función que imprime las estadísticas parciales de la ejecución
+    @param pred_pos Lista con las predicciones correspodientes a las imágenes positivas
+    @param pred_neg Lista con las predicciones correspondientes a las imágenes negativas
+    @param positivos_correctos Número de peatones positivos identificados correctamente
+    @param positivos_totales Número de peatones totales hasta el momento
+    '''
     pos_score = 0
     neg_score = 0
 
@@ -781,6 +788,17 @@ def printStats(pred_pos, pred_neg, positivos_correctos, positivos_totales):
     print("##################################################\n\n")
 
 def getSinglePrediction(svm, img, pos_box, positivos_correctos, positivos_totales):
+    '''
+    @brief Función que obtiene la predicción para una sola imagen
+    @param svm SVM con la que vamos a predecir
+    @param img Imagen sobre la que queremos obtener la predicción
+    @param pos_box Caja con los peatones reales de la imagen pasada
+    @param positivos_correctos Número de peatones positivos identificados correctamente
+    @param positivos_totales Número de peatones totales hasta el momento
+    @return Devuelve tres valores, el primero es el número de peatones detectados
+    correctamente partido el número de peatones totales de la imagen, el segundo es el valor
+    de positivos_correctos actualizado y el tercero el de positivos_totales actualizado
+    '''
     box_pred = getPredPos([img],[pos_box],svm)
     tot = 0
     positivos_correctos_local = positivos_correctos
