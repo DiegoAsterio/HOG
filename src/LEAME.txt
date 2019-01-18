@@ -1,0 +1,2 @@
+Las imagenes de test no se han incluido en la entrega.
+Para poder ejecutar la aplicacion descargue el repositorio del siguiente enlace: https://github.com/DiegoAsterio/HOG
