@@ -115,7 +115,7 @@ distintos puntos de vista lo que ha dado lugar a diversos
 descriptores. Nuestra implementación se basa en el paper de
 Navneet Dalal y Bill Triggs en el que desarrollan un descriptor
 basado en el gradiente de una imagen llamado descriptor HOG.
-El metodo se basa en calcular los gradientes de una imagen y a
+El método se basa en calcular los gradientes de una imagen y a
 continuación construir histogramas locales basado en la
 orientación de dichos gradientes.
 
@@ -236,7 +236,7 @@ como negativas. Los $10$ recortes se han elegido de forma aleatoria
 dentro de las imágenes. A partir de todos esos recortes se han generado
 los descriptores HOG asociados con los que se ha entrenado la SVM.
 
-Hemos utilizado la implementación de openCV de SVM. La SVM es
+Hemos utilizado la implementación de OpenCV de SVM. La SVM es
 lineal y tiene el mismo coeficiente C que en el paper de referencia
 es decir $C = 0.01$.
 
@@ -261,13 +261,13 @@ El dataset INRIA también incluye un fichero de anotaciones en el caso en el que
 
 En primer lugar se toman los tres primeros niveles de la pirámide Gaussiana para la imagen original i.e. una lista con la imagen original y los dos niveles siguientes de la pirámide (se incluye a la imagen original como el primer nivel de la pirámide Gaussiana).
 
-Cada uno de estos niveles se recorre con una ventana deslizante de $128\times 64$ píxeles. Tras la obtención de todos los parches de un nivel de la piramide Gaussiana se calculan los descriptores asociados a estos parches. Estos descriptores son la entrada de la SVM que predice si hay o no un peatón en cada parche. Es entonces cuando se obtienen ventanas en las que se predice que haya un peatón y ventanas en las que se predice lo contrario.
+Cada uno de estos niveles se recorre con una ventana deslizante de $128\times 64$ píxeles. Tras la obtención de todos los parches de un nivel de la pirámide Gaussiana se calculan los descriptores asociados a estos parches. Estos descriptores son la entrada de la SVM que predice si hay o no un peatón en cada parche. Es entonces cuando se obtienen ventanas en las que se predice que haya un peatón y ventanas en las que se predice lo contrario.
 
 Se toma en este momento, una matriz de ceros del mismo tamaño que el nivel de la pirámide Gaussiana que se esta evaluando y en cada posición se suma 1 cada vez que el predictor afirme que dicho píxel está en una región en la que aparece un peatón. Se termina con una matriz que tiene 0 en las posiciones en las que nunca se ha predicho que hay un peatón y números mayores que 0 indicando cuántas veces dicho píxel ha estado en una ventana con un peatón. Esta estructura es conocida como mapa de calor (Heat map). Una vez obtenida esta matriz se truncan los valores menores que un umbral a 0 para conservar únicamente las regiones mas significativas, es decir, tomando como umbral 2 entonces todos los píxeles con valor menor estricto que 2 tendrían un 0 en el mapa de calor.
 
 Con esta estructura ya realizada se pueden estudiar las regiones conexas de la misma, es decir, las regiones en las que existen números mayores que 0 que son adyacentes entre sí. De esta forma se obtienen regiones disjuntas del mapa de calor.
 
-Por último se comprueba que las regiones encontradas solapen al menos en un 50\% con las regiones aportadas por los ficheros de anotaciones y devolvemos para cada imagen $\frac{n\acute{u}mero \ de \ peatones \ acertados}{n\acute{u}mero \ de \ peatones \ totales}$. De esta forma tenemos una medida entre 0 y 1 que nos dice cuánto hemos acertado en cada imagen. Si se suman todos estos números se alclanza una medida global del acierto, de forma que la puntuación máxima que podríamos obtener sería el número de imágenes.
+Por último se comprueba que las regiones encontradas solapen al menos en un 50\% con las regiones aportadas por los ficheros de anotaciones y devolvemos para cada imagen $\frac{n\acute{u}mero \ de \ peatones \ acertados}{n\acute{u}mero \ de \ peatones \ totales}$. De esta forma tenemos una medida entre 0 y 1 que nos dice cuánto hemos acertado en cada imagen. Si se suman todos estos números se alcanza una medida global del acierto, de forma que la puntuación máxima que podríamos obtener sería el número de imágenes.
 
 De igual modo para hacer una predicción y medida equivalente en las imágenes negativas, para cada imagen de test negativa tomamos $10$ ventanas de tamaño $128\times 64$ de forma aleatoria y devolvemos el número de ventanas acertadas partido por el número de ventanas totales, en este caso 10. Las medidas de las imágenes negativas y positivas acertadas son comparables entre sí.
 
