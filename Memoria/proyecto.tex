@@ -176,7 +176,7 @@ de las columnas del histograma se acumula el voto se utiliza el
 ángulo $\theta$ del gradiente. Cada columna del histograma se
 identifica con un ángulo entre 0 y 180 hay tantos ángulos como
 columnas tenga el histograma (en nuestro caso 9) y están a la misma
-distancia unos de otros. A continuacion se eligen los dos angulos
+distancia unos de otros. A continuación se eligen los dos ángulos
 $\theta_i,\theta_{i+1}$ de entre los nueve mencionados anteriormente
 de forma que $ \theta_i \le \theta < \theta_{i+1} $. A la columna
 $i$-esima se le vota con
@@ -197,13 +197,13 @@ norma euclídea :
 \[
   \frac{v}{\|v\|_2}
 \]
-En esta seccion es importante que los bloques se solapen, es
-decir habra bloques que compartan celdas. Para conseguir esto
+En esta sección es importante que los bloques se solapen, es
+decir habrá bloques que compartan celdas. Para conseguir esto
 empezamos con el bloque formado por las $3\times 3$ primeras
 celdas una vez esta construido y normalizado se almacena el
 vector resultado y se siguen construyendo bloques. Cada bloque
-en construccion se rellena con la matriz formada por las
-$3\times 3$ celdas que estan un paso a la derecha. Cuando
+en construcción se rellena con la matriz formada por las
+$3\times 3$ celdas que están un paso a la derecha. Cuando
 se agota la fila cambiamos de columna. De esta forma,
 recorremos toda la ventana.
 
@@ -257,7 +257,7 @@ El el paper de referencia no se discute en ningún momento el método de test ut
 
 
 
-El dataset INRIA tambien incluye un fichero de anotaciones en el caso en el que la imagen de Test es positiva. Como en la fase de entrenamiento las anotaciones indican el rectángulo de la imagen en el que aparece un peatón. De esta forma, una vez estimada la región en la que el predictor encuentra un peatón se puede comprobar si coincide con las regiones provistas por el fichero de anotaciones. 
+El dataset INRIA también incluye un fichero de anotaciones en el caso en el que la imagen de Test es positiva. Como en la fase de entrenamiento las anotaciones indican el rectángulo de la imagen en el que aparece un peatón. De esta forma, una vez estimada la región en la que el predictor encuentra un peatón se puede comprobar si coincide con las regiones provistas por el fichero de anotaciones. 
 
 En primer lugar se toman los tres primeros niveles de la pirámide Gaussiana para la imagen original i.e. una lista con la imagen original y los dos niveles siguientes de la pirámide (se incluye a la imagen original como el primer nivel de la pirámide Gaussiana).
 
@@ -348,14 +348,13 @@ Con esto los resultados que hemos obtenido son:
 
 \subsection{Trabajo futuro: propuestas de mejora}
 
-A pesar de que estamos contentos con el resultado obtenido. Despues del trabajo realizado podemos afirmar que nuestra implementacion tiene espacio para la mejora.
+A pesar de que estamos contentos con el resultado obtenido. Después del trabajo realizado podemos afirmar que nuestra implementación tiene espacio para la mejora.
 
-En primer lugar pensamos que el tiempo en el que se calculan los descriptores deberia ser mas razonable. Esto lo pensamos porque la aplicacion inmediata de una solucion como esta puede ser la identificacion de peatones desde un coche en conduccion. Teniendo en cuenta el tiempo que se tarda en identificar un peaton en una imagen (hay que recorrer los tres piramides de la piramide Gaussiana) no parece una opcion viable para la identificacion a tiempo real.
+En primer lugar pensamos que el tiempo en el que se calculan los descriptores debería ser mas razonable. Esto lo pensamos porque la aplicación inmediata de una solución como esta puede ser la identificación de peatones desde un coche en conducción. Teniendo en cuenta el tiempo que se tarda en identificar un peatón en una imagen (hay que recorrer los tres pirámides de la pirámide Gaussiana) no parece una opción viable para la identificación a tiempo real.
 
-Otro hecho que identificamos como un problema es que este metodo es sensible al tamano de los peatones de la imagen. La forma que hemos tenido de paliar este hecho ha sido recorrer varios niveles de la piramide Gaussiana, a pesar de todo no esta asegurado que la ventana se adapte al tamano del peaton.
+Otro hecho que identificamos como un problema es que este método es sensible al tamaño de los peatones de la imagen. La forma que hemos tenido de paliar este hecho ha sido recorrer varios niveles de la pirámide Gaussiana, a pesar de todo no esta asegurado que la ventana se adapte al tamaño del peatón. Pensamos que otra aproximación al problema seria recorrer la imagen con varios tamaños de ventana que se dimensionasen después de un suavizado al tamaño de la ventana que acepta nuestro descriptor. Esto permitiría dar mas flexibilidad al método a la hora de encontrar personas de distinto tamaño.
 
-En ultimo lugar pensamos que el metodo de busqueda que utilizamos plantea una desventaja clara. Al acumular votos sobre un mapa de calor de una imagen ocurre que cuando los peatones se encuentran en puntos muy cercanos de la imagen las regiones que aparecen en el mapa de calor se solapan. Esto dificulta nuestra capacidad de
-distinguir cada peaton como una entidad diferenciada.
+En ultimo lugar pensamos que el método de búsqueda que utilizamos plantea una desventaja clara. Al acumular votos sobre un mapa de calor de una imagen ocurre que cuando los peatones se encuentran en puntos muy cercanos de la imagen las regiones que aparecen en el mapa de calor se solapan. Esto dificulta nuestra capacidad de distinguir cada peatón como una entidad diferenciada.
 
 \normalsize
 
