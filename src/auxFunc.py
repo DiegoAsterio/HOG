@@ -8,8 +8,10 @@ import descriptorHOG
 from profilehooks import profile
 from numba import jit, autojit
 
+# Ruta al dataset
 PATH_TO_INRIA = "../INRIAPerson"
 
+# Contador empleado para poder escribir las imágenes con las cajas por orden a disco
 GLOBAL_COUNT=0
 
 ################################################################################
@@ -17,6 +19,11 @@ GLOBAL_COUNT=0
 ################################################################################
 
 def concatenaImagenes(vim):
+    '''
+    @brief Función que dada una secuencia de imágenes devuelve una concatenación de ellas por orden
+    @param vim Imagenes que queremos concatenar
+    @return Devuelve una sóla imagen con todas las de vim concatenadas
+    '''
     imagenes = []
     max_h = 0
     max_w = 0
@@ -107,6 +114,12 @@ def obtainNegatives(imgs,svm,neg_samples_dir=PATH_TO_INRIA+"/Train/neg/", num_wi
     return pred
 
 def obtainHardNegativeExamples(svm, hard_training_dir=PATH_TO_INRIA+"/hard_negative_examples/"):
+    '''
+    @brief Función que dada una svm y un conjunto de imágenes negativas predice y obtiene las imágenes
+    negativas en las que se dan falsos positivos, imprimiéndolas en el directorio hard_negative_examples
+    @param svm SVM ya entrenada sobre la que queremos obtener los ejemplos negativos en los que falla
+    @param hard_training_dir Directorio en el que se van a imprimir los recortes en los que se falla
+    '''
     negatives = obtainNegativesRaw()
     names = [name.split(".")[0] for name in os.listdir(PATH_TO_INRIA+"/Train/neg/")]
     formats = [name.split(".")[1] for name in os.listdir(PATH_TO_INRIA+"/Train/neg/")]
@@ -390,6 +403,11 @@ def loadTestImgs():
     return pos_imgs,neg_imgs
 
 def obtainNegativesRaw():
+    '''
+    @brief Función que devuelve un vector de imágenes negativas del directorio
+    de entrenamiento del dataset
+    @return Una lista que contiene las imágenes de entrenamiento negativas
+    '''
     vim = []
     neg_imgs_names = os.listdir(PATH_TO_INRIA+"/Train/neg")
     for imname in neg_imgs_names:
@@ -579,6 +597,17 @@ def getPredPosImg(svm, img, boxes, stepY=16, stepX=8):
 
 @autojit
 def buildHeatMap(size, prediction, coord):
+    '''
+    @brief Función que dado un tamaño, un conjunto de predicciones y la esquina
+    superior izquierda correspondiente a la ventana obtenida, da un mapa de calor.
+    @param size Tamaño de la imagen, será el mismo que el del mapa de calor
+    @param prediction Vector de predicciones para cada ventana
+    @param coord Vector con las coordenadas de la esquina superior izquierda
+    de la ventana
+    @return Devuelve una matriz del mismo tamaño que la imagen que contiene en cada
+    posición un número que corresponde a la cantidad de veces que dicho píxel ha estado
+    en una ventana en la que se ha predicho que hay una persona.
+    '''
     HeatMap = np.zeros(size)
     for i in range(len(prediction)):
         if prediction[i] == 1:
@@ -588,6 +617,12 @@ def buildHeatMap(size, prediction, coord):
 
 @autojit
 def differentFromZero(heatMap):
+    '''
+    @brief Función que dado un mapa de calor devuelve los índices que tienen valores distintos de cero
+    @param heatMap Mapa de calor de la imagen
+    @return Devuelve una lista con tuplas que contienen las coordenadas que tienen valores distintos de
+    cero en el mapa de calor.
+    '''
     x,y = np.nonzero(heatMap)
     indexes = list(zip(x,y))
     return indexes
