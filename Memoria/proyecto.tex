@@ -337,15 +337,21 @@ Para estudiar el funcionamiento del método de test hemos tomado varias métrica
 Además de esta métrica hemos incorporado otra que contabiliza, de forma global, cuántos peatones hemos acertado respecto a cuántos hay en total. De esta forma obtenemos $\frac{peatones \ acertados}{numero \ total \ de \ peatones}$. De igual forma podemos obtener un porcentaje con esta medida.
 
 Para las imágenes negativas obtenemos una medida similar a la primera obtenida con las imágenes positivas. Esto es el número de ventanas acertadas por imagen partido por el número de ventanas por imagen. De esta forma obtenemos igualmente un valor entre 0 y 1 con lo que podemos hacer igual que con las imágenes positivas y obtener un porcentaje. 
-%%%%%%%%%%%%%%%%%%%%%%%%%
-Con todo esto descrito hasta el momento hemos obtenido un porcentaje de clasificación VALOR para las imágenes positivas, un porcentaje de VALOR para las imágenes negativas y en global un porcentaje de VALOR. En la métrica de peatones totales acertados y peatones totales hemos obtenido un porcentaje de VALOR. Para este test hemos realizado la prueba con 288 imágenes positivas y VALOR negativas. 
+
+Con todo esto descrito hasta el momento hemos obtenido un porcentaje de clasificación VALOR para las imágenes del 82.52\%, un porcentaje de 98.52\% para las imágenes negativas y en global un porcentaje de 92.302\%. En la métrica de peatones totales acertados y peatones totales hemos obtenido un porcentaje de 76.259\%. Para este test hemos realizado la prueba con 288 imágenes positivas y 453 negativas. 
 
 Como podemos observar el resultado obtenido para las imágenes negativas es muy bueno, puesto que la SVM está muy bien entrenada para ejemplos negativos al tener muchas más ventanas negativas que positivas en la fase de entrenamiento. La clasificación en imágenes positivas es también muy buena al ser mayor que un 80\%.
 
 En concreto los resultados finales conjuntos arrojados por el programa de test han sido:
 
-PONER FOTO DE LOS RESULTADOS
-%%%%%%%%%%%%%%%%%%%%%%%%%
+Positivos: 237.66071428571428/288 ; 82.52108134920634\%
+
+Negativos: 446.2999999999997/453 ; 98.5209713024282\%
+
+Porcentaje de acierto total con la media por imagen: 92.30239059186422\%
+
+Peatones totales detectados: 76.25923235654462\%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               Propuestas de mejora                               %%
